@@ -142,7 +142,7 @@ const FOOTER = `<footer class="site-footer" role="contentinfo">
 function renderCard(proj) {
   const thumb = proj.thumb || 'https://placehold.co/640x360/F0EDE6/8A827C?text=Preview';
   const label = demoLabel(proj.demo, proj.demoExt);
-  const target = proj.demoExt ? ' target="_blank" rel="noopener noreferrer"' : '';
+  const target = ' target="_blank" rel="noopener noreferrer"';
   return `<div class="project-item-card">
   <div style="overflow:hidden;width:100%;aspect-ratio:16/9;position:relative;">
     <img style="width:100%;height:100%;object-fit:cover;object-position:top;display:block;" src="${esc(thumb)}" alt="${esc(proj.title)}" loading="lazy" onerror="this.src='https://placehold.co/640x360/F0EDE6/8A827C?text=Preview+Unavailable'">
