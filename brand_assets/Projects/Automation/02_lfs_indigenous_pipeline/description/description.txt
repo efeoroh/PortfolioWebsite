@@ -1,0 +1,1 @@
+Automated the extraction and processing of 5M+ rows of Indigenous statistical data used in multiple recurring analytical reports, reducing reporting time by 90%+.

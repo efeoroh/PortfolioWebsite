@@ -1,0 +1,1088 @@
+---
+title: "Does Playing in a Party Make You Better?"
+subtitle: "A Causal Analysis of Social Gameplay vs Solo Queue in Dota 2"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    theme: darkly
+    highlight: espresso
+    df_print: paged
+---
+
+<style>
+body, .main-container { background-color: #212121 !important; }
+.navbar-default { background-color: #1a1a1a !important; border-color: #1a1a1a !important; }
+h1, h2, h3, h4 { color: #b8966e !important; }
+.list-group-item.active {
+  background-color: #b8966e !important;
+  border-color:     #b8966e !important;
+}
+.tocify { background-color: #2d2d2d !important; border-color: #363636 !important; }
+.tocify-item a { color: #d0d0d0 !important; }
+p, li, td { color: #d0d0d0; }
+blockquote {
+  border-left:      3px solid #6b9b5e;
+  background-color: #2d2d2d;
+  color:            #d0d0d0;
+  padding:          10px 18px;
+  border-radius:    0 3px 3px 0;
+  font-style:       normal;
+  margin:           12px 0;
+}
+.insight-box {
+  background-color: #1e1e1e;
+  border:           1px solid #b8966e;
+  border-radius:    4px;
+  padding:          16px 20px;
+  margin:           14px 0;
+  color:            #d0d0d0;
+  line-height:      1.7;
+}
+.label-treat { color: #6b9b5e; font-weight: bold; }
+.label-ctrl  { color: #9b5e5e; font-weight: bold; }
+img  { border-radius: 2px; }
+.table { color: #d0d0d0; }
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo       = TRUE,
+  message    = FALSE,
+  warning    = FALSE,
+  fig.width  = 10,
+  fig.height = 5.5,
+  fig.align  = "center",
+  dpi        = 150
+)
+```
+
+```{r libraries}
+required_pkgs <- c(
+  "tidyverse", "httr", "jsonlite", "lubridate",
+  "scales", "knitr", "kableExtra", "patchwork", "ggrepel", "zoo"
+)
+new_pkgs <- required_pkgs[!required_pkgs %in% installed.packages()[,"Package"]]
+if (length(new_pkgs)) install.packages(new_pkgs, repos = "https://cloud.r-project.org")
+
+library(tidyverse)
+library(httr)
+library(jsonlite)
+library(lubridate)
+library(scales)
+library(knitr)
+library(kableExtra)
+library(patchwork)
+library(ggrepel)
+library(zoo)
+
+# ── Charcoal Dota Theme: Muted Radiant vs Dire ────────────────────────────────
+C_BG    <- "#212121"   # near-black charcoal
+C_PANEL <- "#2d2d2d"   # card/panel
+C_GRID  <- "#363636"   # very faint gridlines
+C_GOLD  <- "#b8966e"   # warm muted gold  (titles, highlights)
+C_EMPH  <- "#c8a96e"   # slightly brighter gold (callouts)
+C_TREAT <- "#6b9b5e"   # muted Radiant green  = Party  (treatment)
+C_CTRL  <- "#9b5e5e"   # muted Dire red       = Solo   (control)
+C_TEXT  <- "#d0d0d0"   # primary text
+C_MUTED <- "#888888"   # secondary / caption text
+C_STRIP <- "#1a1a1a"   # facet header background
+
+# ── Custom ggplot2 theme ──────────────────────────────────────────────────────
+theme_dota2 <- function(base_size = 12) {
+  theme(
+    plot.background   = element_rect(fill = C_BG,    color = NA),
+    panel.background  = element_rect(fill = C_PANEL, color = NA),
+    panel.grid.major  = element_line(color = C_GRID,  linewidth = 0.18),
+    panel.grid.minor  = element_blank(),
+    panel.border      = element_blank(),
+    axis.line         = element_line(color = C_GRID, linewidth = 0.3),
+    axis.ticks        = element_line(color = C_GRID, linewidth = 0.3),
+    plot.title        = element_text(color = C_GOLD,  face = "bold",
+                                     size  = base_size + 2),
+    plot.subtitle     = element_text(color = C_MUTED, size = base_size - 1),
+    plot.caption      = element_text(color = "#555555", size = base_size - 2),
+    axis.title        = element_text(color = C_TEXT,  size = base_size),
+    axis.text         = element_text(color = C_MUTED, size = base_size - 1),
+    legend.background = element_rect(fill = C_BG,    color = NA),
+    legend.key        = element_rect(fill = C_PANEL, color = NA),
+    legend.text       = element_text(color = C_TEXT,  size = base_size - 1),
+    legend.title      = element_text(color = C_GOLD,  size = base_size),
+    strip.background  = element_rect(fill = C_STRIP,  color = NA),
+    strip.text        = element_text(color = C_GOLD,  face = "bold", size = base_size),
+    plot.margin       = margin(16, 16, 10, 10)
+  )
+}
+
+ann_theme <- theme(
+  plot.background = element_rect(fill = C_BG, color = NA),
+  plot.title      = element_text(color = C_GOLD,  face = "bold", size = 14),
+  plot.subtitle   = element_text(color = C_MUTED, size = 11)
+)
+
+# Convenience wrappers for consistent color mapping
+scale_fill_groups <- function(...) {
+  scale_fill_manual(
+    values = c("Party (Treatment)" = C_TREAT, "Solo (Control)" = C_CTRL),
+    ...
+  )
+}
+scale_color_groups <- function(...) {
+  scale_color_manual(
+    values = c("Party (Treatment)" = C_TREAT, "Solo (Control)" = C_CTRL),
+    ...
+  )
+}
+```
+
+---
+
+## The Question
+
+Every Dota 2 player has faced the choice: queue solo and prove yourself against the world, or coordinate with friends and share the experience. This report asks whether that choice has a measurable effect on how you play and how you engage with the game.
+
+The central question is:
+
+> **Does playing in a party meaningfully change player performance, behavior, and engagement compared to solo queuing?**
+
+This is not a trivial question for a game studio. If party play systematically improves performance, it has implications for matchmaking design. If it changes leaver behavior or match duration, it affects the experience for all five players on each team. And if it shifts engagement patterns, it has direct retention implications.
+
+**Scope:** This analysis focuses on professional and high-skill players tracked by OpenDota. Behavioral patterns at this tier are driven more by skill and context than at lower ranks, making any observed differences more attributable to the social condition itself.
+
+---
+
+## Data Collection
+
+```{r data-collection, cache = TRUE}
+fetch_pro_players <- function() {
+  resp <- tryCatch(
+    GET("https://api.opendota.com/api/proPlayers", timeout(30)),
+    error = function(e) NULL
+  )
+  if (is.null(resp) || status_code(resp) != 200) return(NULL)
+  raw    <- content(resp, as = "text", encoding = "UTF-8")
+  parsed <- tryCatch(fromJSON(raw, flatten = TRUE), error = function(e) NULL)
+  if (is.null(parsed) || !is.data.frame(parsed) || nrow(parsed) == 0) return(NULL)
+  as_tibble(parsed)
+}
+
+fetch_player_matches <- function(account_id, limit = 60) {
+  url  <- paste0("https://api.opendota.com/api/players/",
+                 account_id, "/matches?limit=", limit)
+  resp <- tryCatch(GET(url, timeout(30)), error = function(e) NULL)
+  if (is.null(resp) || status_code(resp) != 200) return(NULL)
+  raw    <- content(resp, as = "text", encoding = "UTF-8")
+  parsed <- tryCatch(fromJSON(raw, flatten = TRUE), error = function(e) NULL)
+  if (is.null(parsed) || !is.data.frame(parsed) || nrow(parsed) == 0) return(NULL)
+  parsed$account_id <- account_id
+  Sys.sleep(1.2)
+  as_tibble(parsed)
+}
+
+set.seed(42)
+pro_list <- fetch_pro_players()
+if (is.null(pro_list)) stop("proPlayers API unavailable.")
+
+if (!"account_id"      %in% names(pro_list)) pro_list$account_id      <- NA_real_
+if (!"last_match_time" %in% names(pro_list)) pro_list$last_match_time <- NA_character_
+
+pro_filtered <- pro_list %>%
+  filter(!is.na(account_id), account_id > 0) %>%
+  mutate(last_dt = tryCatch(as_datetime(last_match_time, tz = "UTC"),
+                             error = function(e) as.POSIXct(NA))) %>%
+  filter(!is.na(last_dt), last_dt >= Sys.time() - days(365)) %>%
+  distinct(account_id, .keep_all = TRUE)
+
+n_sample   <- min(35, nrow(pro_filtered))
+pro_sample <- pro_filtered %>% sample_n(n_sample)
+cat("Players available:", nrow(pro_filtered), "| Sampled:", n_sample, "\n\n")
+
+raw_matches <- map(pro_sample$account_id, fetch_player_matches) %>%
+  purrr::compact() %>%
+  bind_rows()
+
+if (nrow(raw_matches) == 0) stop("No match data retrieved.")
+
+for (col in c("kills","deaths","assists","duration","leaver_status","party_size",
+              "average_rank","game_mode","lobby_type","radiant_win",
+              "player_slot","start_time")) {
+  if (!col %in% names(raw_matches)) raw_matches[[col]] <- NA
+}
+
+cat("Players with data:", n_distinct(raw_matches$account_id), "\n")
+cat("Total match records:", nrow(raw_matches), "\n")
+cat("Party size coverage:", round(mean(!is.na(raw_matches$party_size))*100, 1), "%\n")
+```
+
+---
+
+## Data Understanding
+
+Before comparing groups, the dataset's structure and baseline distributions are established. This is essential: if the baseline looks wrong, the treatment comparison cannot be trusted.
+
+### Dataset Snapshot
+
+```{r snapshot}
+tibble(
+  Metric = c("Total Records","Unique Players","Unique Matches",
+             "Date Range","Median Kills","Median Deaths","Median Assists",
+             "Median Duration (min)","Party Size Coverage","Leaver Rate"),
+  Value = c(
+    comma(nrow(raw_matches)),
+    comma(n_distinct(raw_matches$account_id)),
+    comma(n_distinct(raw_matches$match_id)),
+    paste(format(as_datetime(min(raw_matches$start_time,na.rm=TRUE)),"%Y-%m-%d"),
+          "to",
+          format(as_datetime(max(raw_matches$start_time,na.rm=TRUE)),"%Y-%m-%d")),
+    round(median(raw_matches$kills,         na.rm=TRUE),1),
+    round(median(raw_matches$deaths,        na.rm=TRUE),1),
+    round(median(raw_matches$assists,       na.rm=TRUE),1),
+    round(median(raw_matches$duration/60,   na.rm=TRUE),1),
+    paste0(round(mean(!is.na(raw_matches$party_size))*100,1),"%"),
+    paste0(round(mean(raw_matches$leaver_status>0,na.rm=TRUE)*100,2),"%")
+  )
+) %>%
+  kable(caption="Dataset Snapshot") %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"), full_width=FALSE)
+```
+
+### Party Size Distribution
+
+```{r party-size-dist, fig.height=4}
+raw_matches %>%
+  filter(!is.na(party_size)) %>%
+  count(party_size) %>%
+  mutate(
+    group = ifelse(party_size == 1, "Solo (Control)", "Party (Treatment)"),
+    pct   = n / sum(n) * 100
+  ) %>%
+  ggplot(aes(x = factor(party_size), y = n, fill = group)) +
+  geom_col(alpha = 0.9, width = 0.6, show.legend = TRUE) +
+  geom_text(aes(label = paste0(round(pct,1),"%")),
+            vjust = -0.5, color = C_TEXT, size = 3.5) +
+  scale_fill_groups(name = NULL) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.15))) +
+  labs(title   = "Match Count by Party Size",
+       subtitle = "Solo (party_size = 1) becomes the control group. Any party becomes treatment.",
+       x = "Party Size", y = "Match Count") +
+  theme_dota2() + theme(legend.position = "top")
+```
+
+```{r party-size-results, include=FALSE}
+ps_dist  <- raw_matches %>% filter(!is.na(party_size)) %>% count(party_size)
+pct_solo <- round(sum(ps_dist$n[ps_dist$party_size==1]) / sum(ps_dist$n) * 100, 1)
+pct_party<- round(100 - pct_solo, 1)
+n_party_types <- sum(ps_dist$party_size > 1)
+```
+
+> **`r pct_solo`% of matches in this dataset were played solo; `r pct_party`% were played in a party of some size.** The chart shows the full distribution of party sizes. Party sizes range from 2 to 5, with all non-solo matches grouped into the treatment group. This distribution tells us how common each mode of play is for this cohort, and confirms there is enough data in both groups for reliable statistical comparison.
+
+### Baseline Performance Distributions
+
+```{r baseline-dists, fig.height=8}
+mk <- raw_matches %>% filter(!is.na(kills)) %>%
+  ggplot(aes(x=kills)) +
+  geom_histogram(binwidth=1, fill=C_GOLD, color=C_BG, alpha=0.85) +
+  geom_vline(xintercept=median(raw_matches$kills,na.rm=TRUE),
+             color=C_EMPH, linetype="dashed", linewidth=0.9) +
+  labs(title="Kills", x="Kills per Match", y="Count") + theme_dota2()
+
+md_p <- raw_matches %>% filter(!is.na(deaths)) %>%
+  ggplot(aes(x=deaths)) +
+  geom_histogram(binwidth=1, fill=C_CTRL, color=C_BG, alpha=0.85) +
+  geom_vline(xintercept=median(raw_matches$deaths,na.rm=TRUE),
+             color=C_EMPH, linetype="dashed", linewidth=0.9) +
+  labs(title="Deaths", x="Deaths per Match", y="Count") + theme_dota2()
+
+ma <- raw_matches %>% filter(!is.na(assists)) %>%
+  ggplot(aes(x=assists)) +
+  geom_histogram(binwidth=2, fill=C_TREAT, color=C_BG, alpha=0.85) +
+  geom_vline(xintercept=median(raw_matches$assists,na.rm=TRUE),
+             color=C_EMPH, linetype="dashed", linewidth=0.9) +
+  labs(title="Assists", x="Assists per Match", y="Count") + theme_dota2()
+
+mdur <- raw_matches %>% filter(!is.na(duration)) %>%
+  mutate(dm=duration/60) %>%
+  ggplot(aes(x=dm)) +
+  geom_histogram(binwidth=5, fill=C_MUTED, color=C_BG, alpha=0.85) +
+  geom_vline(xintercept=median(raw_matches$duration/60,na.rm=TRUE),
+             color=C_EMPH, linetype="dashed", linewidth=0.9) +
+  labs(title="Duration", x="Duration (min)", y="Count") + theme_dota2()
+
+(mk + md_p) / (ma + mdur) +
+  plot_annotation(
+    title    = "Baseline: Distribution of Core Match Variables",
+    subtitle = "Gold dashed lines = medians. Established before the treatment split.",
+    theme    = ann_theme
+  )
+```
+
+```{r baseline-nums, include=FALSE}
+bl_k <- round(median(raw_matches$kills,         na.rm=TRUE),1)
+bl_d <- round(median(raw_matches$deaths,        na.rm=TRUE),1)
+bl_a <- round(median(raw_matches$assists,       na.rm=TRUE),1)
+bl_r <- round(median(raw_matches$duration/60,   na.rm=TRUE),1)
+```
+
+> **The baseline confirms a high-skill, consistent dataset.** The median match produces `r bl_k` kills, `r bl_d` deaths, and `r bl_a` assists per player, in games lasting a median of `r bl_r` minutes. These distributions are the reference point: any treatment effect found later represents a deviation from this baseline driven by party vs solo context.
+
+---
+
+## The A/B Test: How the Split Works
+
+This section explains the experimental design clearly before any comparisons are made. Understanding how the groups were built, and what assumptions underpin the comparison, is essential for interpreting the results.
+
+### Step-by-Step: From Raw Data to Two Groups
+
+```{r treatment-definition}
+matches <- raw_matches %>%
+  filter(!is.na(party_size)) %>%
+  mutate(
+    match_date   = as_datetime(start_time),
+    duration_min = duration / 60,
+    kda          = (kills + assists) / pmax(deaths, 1),
+    won = case_when(
+      !is.na(player_slot) & !is.na(radiant_win) &
+        player_slot < 128  & radiant_win        ~ TRUE,
+      !is.na(player_slot) & !is.na(radiant_win) &
+        player_slot >= 128 & !radiant_win        ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    left_match  = !is.na(leaver_status) & leaver_status > 0,
+    group       = ifelse(party_size > 1, "Party (Treatment)", "Solo (Control)"),
+    treat_dummy = as.integer(party_size > 1)
+  ) %>%
+  arrange(account_id, match_date) %>%
+  group_by(account_id) %>%
+  mutate(days_since_last = as.numeric(
+    difftime(match_date, lag(match_date), units = "days")
+  )) %>%
+  ungroup()
+
+group_counts <- matches %>% count(group)
+n_party <- group_counts$n[group_counts$group == "Party (Treatment)"]
+n_solo  <- group_counts$n[group_counts$group == "Solo (Control)"]
+
+cat("Group sizes:\n")
+cat("  Party (Treatment):", n_party, "matches\n")
+cat("  Solo (Control):", n_solo, "matches\n")
+cat("  Total with party_size data:", nrow(matches), "\n")
+```
+
+**Step 1: Every match has a `party_size` field.** This integer records how many players from the same group queued together for that match. A value of 1 means the player queued entirely alone. Any value above 1 means they queued with at least one other person.
+
+**Step 2: The split is applied at the match level, not the player level.** This is a critical design choice. The same player can appear in both groups: they might solo queue on Tuesday and party queue with teammates on Saturday. Each individual match gets assigned to exactly one group based on its own `party_size` value.
+
+**Step 3: The two groups are defined as follows:**
+
+| Group | Definition | Role | Color |
+|---|---|---|---|
+| <span class="label-treat">Party (Treatment)</span> | `party_size > 1` | Matches with coordinated queuing | Green |
+| <span class="label-ctrl">Solo (Control)</span> | `party_size == 1` | Matches with individual queuing | Red |
+
+**Step 4: Outcomes are measured separately for each group** and compared across performance (KDA, kills, deaths, assists), behavior (leaver rate, match duration), and engagement (inactivity gaps, match frequency).
+
+### Why This Approximates an A/B Test
+
+In a true randomized A/B test, participants are randomly assigned to treatment and control so that the two groups are statistically identical in all other ways. Party vs solo queuing is not randomized: players choose which mode to queue. This creates the possibility of **self-selection bias**, where the types of matches played, or the types of players involved, differ between the two groups for reasons unrelated to the party effect itself.
+
+However, the design still approximates a useful quasi-experiment for two reasons:
+
+**First**, professional players at this skill tier are experienced enough that their decision to party or solo is driven by context (who is available, what they feel like practicing) rather than by a systematic difference in how good they are feeling or performing. Unlike casual players, professionals routinely switch between modes.
+
+**Second**, and most importantly, the within-player analysis in Section 4 of this report directly addresses the self-selection problem. By comparing each player's solo matches to their own party matches, fixed characteristics (skill level, hero pool, playstyle) cancel out. Any remaining difference reflects the party condition itself.
+
+**The key assumption:** Within any given player's history, the matches where they queued with a party are not systematically different from their solo matches in ways unrelated to coordination itself. If, for example, a player only parties when they are already on a winning streak, party matches would look better for reasons that have nothing to do with the party.
+
+### Balance Check
+
+```{r balance-check}
+balance <- matches %>%
+  group_by(group) %>%
+  summarise(
+    Matches       = n(),
+    Players       = n_distinct(account_id),
+    `Avg KDA`     = round(mean(kda,          na.rm=TRUE),3),
+    `Avg Kills`   = round(mean(kills,         na.rm=TRUE),2),
+    `Avg Deaths`  = round(mean(deaths,        na.rm=TRUE),2),
+    `Avg Duration`= round(mean(duration_min,  na.rm=TRUE),1),
+    `Leaver Rate` = paste0(round(mean(left_match,na.rm=TRUE)*100,2),"%"),
+    .groups = "drop"
+  )
+
+balance %>%
+  kable(caption = "Balance Check: Party vs Solo Groups") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = TRUE) %>%
+  column_spec(1, bold = TRUE,
+              color = c(C_CTRL, C_TREAT)[
+                match(balance$group, c("Solo (Control)","Party (Treatment)"))
+              ])
+```
+
+```{r balance-nums, include=FALSE}
+bal_party <- balance %>% filter(group=="Party (Treatment)")
+bal_solo  <- balance %>% filter(group=="Solo (Control)")
+bal_diff_kda <- round(bal_party$`Avg KDA` - bal_solo$`Avg KDA`, 3)
+bal_diff_dir <- ifelse(bal_diff_kda > 0, "higher", "lower")
+```
+
+> **The balance check already reveals the first signal before any formal testing.** Party matches show an average KDA of `r bal_party[["Avg KDA"]]` vs. `r bal_solo[["Avg KDA"]]` in solo matches, a raw difference of `r abs(bal_diff_kda)` KDA points with party being `r bal_diff_dir`. Whether this difference is real and significant, or driven by confounders, is what the remainder of the analysis determines.
+
+---
+
+## Section 1: Performance -- Does Party Play Make You Better?
+
+The most immediate question is whether playing with a party changes how well a player performs in-game. KDA is the headline metric: it captures kills plus assists divided by deaths, giving a composite view of both offensive contribution and survival.
+
+### KDA Density: Party vs Solo
+
+```{r kda-density, fig.height=5}
+kda_meds <- matches %>%
+  group_by(group) %>%
+  summarise(med=median(kda,na.rm=TRUE), .groups="drop")
+
+matches %>%
+  filter(!is.na(kda), kda <= 20) %>%
+  ggplot(aes(x=kda, fill=group, color=group)) +
+  geom_density(alpha=0.28, linewidth=1) +
+  geom_vline(data=kda_meds, aes(xintercept=med, color=group),
+             linetype="dashed", linewidth=1.1) +
+  scale_fill_groups(name=NULL) +
+  scale_color_groups(name=NULL) +
+  labs(title   = "KDA Distribution: Party vs Solo",
+       subtitle = "Each curve = all matches in that group. Dashed lines = group medians.",
+       x="KDA Ratio", y="Density") +
+  theme_dota2() + theme(legend.position="top")
+```
+
+```{r kda-density-nums, include=FALSE}
+kda_c   <- matches$kda[matches$treat_dummy==0 & !is.na(matches$kda)]
+kda_t   <- matches$kda[matches$treat_dummy==1 & !is.na(matches$kda)]
+t_kda   <- t.test(kda_t, kda_c)
+kda_m_c <- round(median(kda_c),2)
+kda_m_t <- round(median(kda_t),2)
+kda_dir <- ifelse(kda_m_t > kda_m_c, "higher", "lower")
+kda_d   <- round(abs(kda_m_t - kda_m_c),3)
+kda_sig <- t_kda$p.value < 0.05
+kda_p   <- round(t_kda$p.value,4)
+kda_concl <- ifelse(kda_sig,
+  paste0("This difference is statistically significant (p = ", kda_p,
+         "), meaning it is unlikely to be due to random variation."),
+  paste0("This difference does not reach statistical significance (p = ", kda_p,
+         "), so it could be explained by random variation alone."))
+```
+
+> **Party players show `r kda_dir` KDA than solo players (median: `r kda_m_t` vs. `r kda_m_c`), a gap of `r kda_d` KDA points.** `r kda_concl` The two density curves represent the full distribution of all matches in each group. A rightward shift in the green (party) curve relative to the red (solo) curve signals a performance advantage. The dashed median lines make the central tendency difference concrete. The degree of overlap between the two curves indicates how consistent this effect is: substantial overlap means the advantage is modest and many solo matches outperform many party matches.
+
+### KDA Statistical Comparison
+
+```{r kda-test}
+tibble(
+  Group   = c("Solo (Control)", "Party (Treatment)"),
+  N       = c(length(kda_c), length(kda_t)),
+  Mean    = round(c(mean(kda_c), mean(kda_t)),3),
+  Median  = c(kda_m_c, kda_m_t),
+  SD      = round(c(sd(kda_c), sd(kda_t)),3)
+) %>%
+  kable(caption=paste0(
+    "KDA t-Test | t = ", round(t_kda$statistic,3),
+    " | p = ", kda_p, " | ",
+    ifelse(kda_sig, "SIGNIFICANT", "NOT SIGNIFICANT")
+  )) %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"),
+                full_width=FALSE) %>%
+  column_spec(1, bold=TRUE, color=c(C_CTRL, C_TREAT))
+```
+
+```{r kda-boxplot, fig.height=5}
+matches %>%
+  filter(!is.na(kda), kda<=20) %>%
+  ggplot(aes(x=group, y=kda, fill=group)) +
+  geom_boxplot(outlier.shape=21, outlier.size=1.5, outlier.alpha=0.4,
+               alpha=0.85, show.legend=FALSE, width=0.5) +
+  geom_hline(yintercept=median(matches$kda,na.rm=TRUE),
+             color=C_GOLD, linetype="dashed", linewidth=0.8) +
+  annotate("text", x=0.56, y=median(matches$kda,na.rm=TRUE)+0.15,
+           label="Overall median", color=C_GOLD, size=3.2, hjust=0) +
+  scale_fill_groups(name=NULL) +
+  labs(title   = "KDA by Group: Boxplot",
+       subtitle = "Box = middle 50% of matches. Whiskers = 1.5x IQR. Gold line = overall median.",
+       x=NULL, y="KDA Ratio") +
+  theme_dota2()
+```
+
+> **The boxplot asks two questions about KDA: did the center shift, and did the variability change?** The box height shows how spread out KDA values are in each group. A narrower party box would indicate more consistent performance when coordinating; a wider box indicates more variance. The position relative to the gold overall-median line shows which group plays above or below the dataset average. The party group median of `r kda_m_t` `r ifelse(kda_m_t > median(matches$kda, na.rm=TRUE), "sits above", "sits below")` the overall median, while the solo group median of `r kda_m_c` `r ifelse(kda_m_c > median(matches$kda, na.rm=TRUE), "sits above", "sits below")` it.
+
+### Component Breakdown: Kills, Deaths, Assists
+
+```{r component-viz, fig.height=5}
+comp_agg <- matches %>%
+  filter(!is.na(kills),!is.na(deaths),!is.na(assists)) %>%
+  pivot_longer(c(kills,deaths,assists), names_to="metric", values_to="val") %>%
+  group_by(group, metric) %>%
+  summarise(mean_v=mean(val,na.rm=TRUE), se=sd(val,na.rm=TRUE)/sqrt(n()),
+            .groups="drop") %>%
+  mutate(metric=factor(metric, levels=c("kills","deaths","assists"),
+                        labels=c("Kills","Deaths","Assists")))
+
+comp_agg %>%
+  ggplot(aes(x=metric, y=mean_v, fill=group)) +
+  geom_col(position="dodge", alpha=0.9, width=0.6) +
+  geom_errorbar(aes(ymin=mean_v-se*1.96, ymax=mean_v+se*1.96),
+                position=position_dodge(0.6), width=0.18,
+                color=C_TEXT, linewidth=0.7) +
+  scale_fill_groups(name=NULL) +
+  labs(title   = "Mean Kills, Deaths, Assists: Party vs Solo",
+       subtitle = "Error bars = 95% confidence intervals. Decomposing KDA reveals the mechanism.",
+       x=NULL, y="Mean per Match") +
+  theme_dota2() + theme(legend.position="top")
+```
+
+```{r component-tests}
+comp_tests <- map_dfr(
+  list(list("kills","Kills"),list("deaths","Deaths"),list("assists","Assists")),
+  function(item) {
+    v <- item[[1]]; l <- item[[2]]
+    x <- matches[[v]][matches$treat_dummy==1 & !is.na(matches[[v]])]
+    y <- matches[[v]][matches$treat_dummy==0 & !is.na(matches[[v]])]
+    if (length(x)<2||length(y)<2) return(NULL)
+    tt <- t.test(x,y)
+    tibble(Metric=l, Solo=round(mean(y),3), Party=round(mean(x),3),
+           Delta=round(mean(x)-mean(y),3),
+           `p-value`=round(tt$p.value,4), Significant=tt$p.value<0.05)
+  }
+)
+comp_tests %>%
+  kable(caption="Component Metric Tests: Party vs Solo") %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"),
+                full_width=FALSE) %>%
+  column_spec(6, color=ifelse(comp_tests$Significant, C_TREAT, C_CTRL))
+```
+
+```{r component-nums, include=FALSE}
+k_row <- comp_tests %>% filter(Metric=="Kills")
+d_row <- comp_tests %>% filter(Metric=="Deaths")
+a_row <- comp_tests %>% filter(Metric=="Assists")
+k_dir <- if(nrow(k_row)>0) ifelse(k_row$Delta>0,"more kills","fewer kills") else "similar kills"
+d_dir <- if(nrow(d_row)>0) ifelse(d_row$Delta>0,"more deaths","fewer deaths") else "similar deaths"
+a_dir <- if(nrow(a_row)>0) ifelse(a_row$Delta>0,"more assists","fewer assists") else "similar assists"
+k_sig <- if(nrow(k_row)>0) k_row$Significant else FALSE
+d_sig <- if(nrow(d_row)>0) d_row$Significant else FALSE
+a_sig <- if(nrow(a_row)>0) a_row$Significant else FALSE
+n_sig_comp <- sum(c(k_sig, d_sig, a_sig))
+k_delta <- if(nrow(k_row)>0) abs(round(k_row$Delta,3)) else 0
+a_delta <- if(nrow(a_row)>0) abs(round(a_row$Delta,3)) else 0
+```
+
+> **Party players recorded `r k_dir` (`r ifelse(k_sig,"significant","not significant")`), `r d_dir` (`r ifelse(d_sig,"significant","not significant")`), and `r a_dir` (`r ifelse(a_sig,"significant","not significant")`) compared to solo players.** `r n_sig_comp` of 3 component metrics reached statistical significance. This breakdown reveals the mechanism behind the headline KDA number. Higher assists in party play are expected: coordinated players often set up kills for each other, generating more assist credit. Higher kills could reflect better focusing and target calling. Lower deaths would indicate that party coordination improves survival, perhaps through better positioning or warning calls. The combination of which metrics moved tells us whether the party effect is primarily offensive, defensive, or both.
+
+---
+
+## Section 2: Behavior -- Does Party Play Change How You Act in a Match?
+
+Beyond individual performance, party vs solo play may change the texture of behavior during a match: how long games last, and whether players abandon mid-game.
+
+### Match Duration: Party vs Solo
+
+```{r duration-viz, fig.height=4.5}
+dur_meds <- matches %>%
+  group_by(group) %>%
+  summarise(med=median(duration_min,na.rm=TRUE), .groups="drop")
+
+matches %>%
+  filter(!is.na(duration_min), duration_min>5, duration_min<90) %>%
+  ggplot(aes(x=duration_min, fill=group, color=group)) +
+  geom_density(alpha=0.28, linewidth=1) +
+  geom_vline(data=dur_meds, aes(xintercept=med, color=group),
+             linetype="dashed", linewidth=1.1) +
+  scale_fill_groups(name=NULL) +
+  scale_color_groups(name=NULL) +
+  labs(title   = "Match Duration: Party vs Solo",
+       subtitle = "Coordinated parties may end games faster or draw them out through better teamfighting.",
+       x="Duration (minutes)", y="Density") +
+  theme_dota2() + theme(legend.position="top")
+```
+
+```{r duration-nums, include=FALSE}
+dur_c <- matches$duration_min[matches$treat_dummy==0 & !is.na(matches$duration_min)]
+dur_t <- matches$duration_min[matches$treat_dummy==1 & !is.na(matches$duration_min)]
+t_dur <- t.test(dur_t, dur_c)
+dur_m_c <- round(median(dur_c),1)
+dur_m_t <- round(median(dur_t),1)
+dur_dir <- ifelse(dur_m_t > dur_m_c, "longer", "shorter")
+dur_sig <- t_dur$p.value < 0.05
+dur_p   <- round(t_dur$p.value,4)
+dur_mech <- ifelse(dur_m_t < dur_m_c,
+  "Coordinated teams may end games more efficiently once they gain an advantage, bypassing the extended late-game that often emerges in solo queue.",
+  "Parties may be more likely to contest objectives and extend fights, leading to longer but potentially higher-quality games.")
+```
+
+> **Party matches lasted a median of `r dur_m_t` minutes vs. `r dur_m_c` minutes solo, making party games `r dur_dir` (p = `r dur_p`, `r ifelse(dur_sig,"significant","not significant")`).** `r dur_mech` Duration matters beyond this single finding: longer games create more opportunities for kills and assists, which mechanically inflates KDA. This is one reason duration is controlled for in the regression models later. A systematic duration difference between groups means some of the raw KDA gap may be a duration artifact rather than a pure coordination effect.
+
+### Leaver Behavior: Party vs Solo
+
+```{r leaver-viz, fig.height=4.5}
+leave_agg <- matches %>%
+  group_by(group) %>%
+  summarise(rate=mean(left_match,na.rm=TRUE), n=n(),
+            se=sqrt(rate*(1-rate)/n), .groups="drop")
+
+leave_agg %>%
+  ggplot(aes(x=group, y=rate, fill=group)) +
+  geom_col(width=0.42, alpha=0.9, show.legend=FALSE) +
+  geom_errorbar(aes(ymin=pmax(rate-se*1.96,0), ymax=rate+se*1.96),
+                width=0.14, color=C_TEXT, linewidth=0.8) +
+  geom_text(aes(label=paste0(round(rate*100,2),"%")),
+            vjust=-0.7, color=C_EMPH, fontface="bold", size=4.5) +
+  scale_fill_groups(name=NULL) +
+  scale_y_continuous(labels=percent_format(accuracy=0.01),
+                     expand=expansion(mult=c(0,0.2))) +
+  labs(title   = "Early Exit Rate: Party vs Solo",
+       subtitle = "Proportion of matches where leaver_status > 0. Error bars = 95% CI.",
+       x=NULL, y="Leave Rate") +
+  theme_dota2()
+
+prop_res <- tryCatch(
+  prop.test(x=round(leave_agg$rate*leave_agg$n), n=leave_agg$n),
+  error=function(e) NULL
+)
+if (!is.null(prop_res))
+  cat("Proportion test p:", round(prop_res$p.value,4), "\n",
+      ifelse(prop_res$p.value<0.05,"Significant.","Not significant."))
+```
+
+```{r leaver-nums, include=FALSE}
+lr_c <- round(leave_agg$rate[leave_agg$group=="Solo (Control)"]   * 100, 2)
+lr_t <- round(leave_agg$rate[leave_agg$group=="Party (Treatment)"]* 100, 2)
+lr_dir <- ifelse(lr_t < lr_c, "lower", "higher")
+lr_sig <- if (!is.null(prop_res)) prop_res$p.value < 0.05 else FALSE
+lr_interp <- ifelse(lr_t < lr_c,
+  "Party players abandon less frequently, which is intuitive: leaving a match lets down your friends, adding a social accountability dimension that solo players lack.",
+  "Party players abandon more frequently, which may reflect shared frustration dynamics where one player's tilt affects the whole group and makes collective exit more likely.")
+```
+
+> **The early exit rate was `r lr_t`% in party matches vs. `r lr_c`% in solo matches, making abandonment `r lr_dir` when playing with others (`r ifelse(lr_sig,"statistically significant","not statistically significant")`).** `r lr_interp` Leaver behavior is one of the clearest behavioral signals in this dataset because it represents a definitive decision to abandon a match mid-game. Any difference here has direct implications for the overall match experience of all other players involved.
+
+---
+
+## Section 3: Engagement -- Does Party Play Affect How Often You Return?
+
+Engagement is measured through the temporal pattern of play. Players who enjoy their matches tend to return sooner; players who are frustrated or bored extend their breaks.
+
+### Inactivity Gaps: Party vs Solo Match Types
+
+```{r gap-viz, fig.height=5}
+gap_data <- matches %>%
+  filter(!is.na(days_since_last), days_since_last>=0, days_since_last<=30)
+
+gap_meds <- gap_data %>%
+  group_by(group) %>%
+  summarise(med=median(days_since_last,na.rm=TRUE), .groups="drop")
+
+gap_data %>%
+  ggplot(aes(x=days_since_last, fill=group, color=group)) +
+  geom_density(alpha=0.28, linewidth=1) +
+  geom_vline(data=gap_meds, aes(xintercept=med, color=group),
+             linetype="dashed", linewidth=1.1) +
+  scale_fill_groups(name=NULL) +
+  scale_color_groups(name=NULL) +
+  labs(title   = "Inactivity Gap After Each Match Type",
+       subtitle = "Days before next match, capped at 30. Does a party or solo session bring you back faster?",
+       x="Days Since Previous Match", y="Density") +
+  theme_dota2() + theme(legend.position="top")
+```
+
+```{r gap-test}
+gap_c <- gap_data$days_since_last[gap_data$treat_dummy==0]
+gap_t <- gap_data$days_since_last[gap_data$treat_dummy==1]
+
+if (length(gap_c)>1 && length(gap_t)>1) {
+  t_gap <- t.test(gap_t, gap_c)
+  tibble(
+    Group             = c("Solo (Control)","Party (Treatment)"),
+    N                 = c(length(gap_c),length(gap_t)),
+    `Mean Gap (days)` = round(c(mean(gap_c),mean(gap_t)),2),
+    `Median Gap (days)`=round(c(median(gap_c),median(gap_t)),2)
+  ) %>%
+    kable(caption=paste0(
+      "Inactivity Gap | p = ", round(t_gap$p.value,4), " | ",
+      ifelse(t_gap$p.value<0.05,"SIGNIFICANT","NOT SIGNIFICANT")
+    )) %>%
+    kable_styling(bootstrap_options=c("striped","hover","bordered"),
+                  full_width=FALSE) %>%
+    column_spec(1, bold=TRUE, color=c(C_CTRL, C_TREAT))
+}
+```
+
+```{r gap-nums, include=FALSE}
+if (length(gap_c)>1&&length(gap_t)>1) {
+  t_gap_s  <- t.test(gap_t, gap_c)
+  gm_c     <- round(median(gap_c),2)
+  gm_t     <- round(median(gap_t),2)
+  g_dir    <- ifelse(gm_t < gm_c, "shorter", "longer")
+  g_sig    <- t_gap_s$p.value < 0.05
+  g_p      <- round(t_gap_s$p.value, 4)
+  g_interp <- ifelse(gm_t < gm_c,
+    "This suggests that a party session creates a stronger pull to return: social experiences have more momentum.",
+    "This suggests that solo sessions motivate faster returns, possibly because players feel more personal agency over their performance and are eager to improve.")
+} else {
+  gm_c <- NA; gm_t <- NA; g_dir <- "similar"
+  g_sig <- FALSE; g_p <- NA; g_interp <- "Insufficient data."
+}
+```
+
+> **After a party match, the median gap before the next match was `r gm_t` days, compared to `r gm_c` days after a solo match, making post-party gaps `r g_dir` (p = `r g_p`, `r ifelse(g_sig,"significant","not significant")`).** `r g_interp` This measure captures how the match experience affects return motivation. If party sessions create shorter gaps, they are generating a stronger engagement pull than solo sessions. Note that this is an intra-player measure: we are looking at a given player's behavior immediately after each type of match, which gives cleaner signal than comparing different players.
+
+---
+
+## Section 4: The Within-Player Test -- The Cleanest Comparison
+
+Every analysis so far has compared party matches against solo matches in aggregate. That is useful, but it conflates two things: the effect of party play itself, and any systematic differences in which players, or which types of matches, fall into each group.
+
+The within-player analysis eliminates this problem. For every player who has both party and solo matches in the dataset, their own solo average is compared to their own party average. Fixed player characteristics (skill level, hero pool, playstyle, general tendency to perform) cancel out of this difference. What remains can only be explained by the party condition or random variation.
+
+This is the closest this dataset comes to a controlled experiment.
+
+```{r within-player}
+within_player <- matches %>%
+  group_by(account_id) %>%
+  filter(any(treat_dummy==1) & any(treat_dummy==0)) %>%
+  summarise(
+    solo_kda    = mean(kda[treat_dummy==0],    na.rm=TRUE),
+    party_kda   = mean(kda[treat_dummy==1],    na.rm=TRUE),
+    kda_diff    = mean(kda[treat_dummy==1],    na.rm=TRUE) -
+                  mean(kda[treat_dummy==0],    na.rm=TRUE),
+    solo_kills  = mean(kills[treat_dummy==0],  na.rm=TRUE),
+    party_kills = mean(kills[treat_dummy==1],  na.rm=TRUE),
+    solo_deaths = mean(deaths[treat_dummy==0], na.rm=TRUE),
+    party_deaths= mean(deaths[treat_dummy==1], na.rm=TRUE),
+    n_solo      = sum(treat_dummy==0),
+    n_party     = sum(treat_dummy==1),
+    .groups = "drop"
+  ) %>%
+  filter(n_solo>=3, n_party>=3, !is.na(solo_kda), !is.na(party_kda))
+
+cat("Players with 3+ matches in BOTH solo and party:", nrow(within_player))
+```
+
+### Slope Chart: Each Player vs Themselves
+
+```{r slope-chart, fig.height=6}
+if (nrow(within_player) >= 3) {
+  n_imp  <- sum(within_player$kda_diff >= 0)
+  n_dec  <- sum(within_player$kda_diff <  0)
+  pct_imp<- round(n_imp / nrow(within_player) * 100)
+
+  within_player %>%
+    mutate(direction = ifelse(kda_diff >= 0, "Higher in Party", "Lower in Party")) %>%
+    pivot_longer(c(solo_kda, party_kda), names_to="mode", values_to="kda") %>%
+    mutate(mode = factor(mode,
+                          levels = c("solo_kda","party_kda"),
+                          labels = c("Solo\n(Control)","Party\n(Treatment)"))) %>%
+    ggplot(aes(x=mode, y=kda, group=account_id, color=direction)) +
+    geom_line(linewidth=0.9, alpha=0.6) +
+    geom_point(size=3.5, alpha=0.85) +
+    scale_color_manual(
+      values = c("Higher in Party"=C_TREAT, "Lower in Party"=C_CTRL),
+      name   = "KDA Change"
+    ) +
+    labs(title   = "Within-Player KDA: Solo vs Party",
+         subtitle = paste0(
+           "Each line = one player comparing themselves. ",
+           n_imp, " players higher in party | ",
+           n_dec, " players lower in party."
+         ),
+         x=NULL, y="Average KDA") +
+    theme_dota2() + theme(legend.position="top")
+} else {
+  cat("Insufficient players with data in both conditions.")
+}
+```
+
+```{r within-nums, include=FALSE}
+if (nrow(within_player) >= 3) {
+  pt      <- t.test(within_player$party_kda, within_player$solo_kda, paired=TRUE)
+  n_imp2  <- sum(within_player$kda_diff>=0)
+  n_dec2  <- sum(within_player$kda_diff<0)
+  pct_i   <- round(n_imp2/nrow(within_player)*100)
+  mean_d  <- round(mean(within_player$kda_diff),3)
+  pt_p    <- round(pt$p.value,4)
+  pt_sig  <- pt$p.value < 0.05
+  pt_dir  <- ifelse(mean_d>0,"higher","lower")
+  pt_concl <- ifelse(pt_sig,
+    paste0("This is statistically significant (p = ", pt_p,
+           "). The party effect on individual performance is real."),
+    paste0("This does not reach statistical significance (p = ", pt_p,
+           "). The within-player variation is too large to attribute the change to party play with confidence."))
+} else {
+  n_imp2<-0; n_dec2<-0; pct_i<-0; mean_d<-0
+  pt_p<-NA; pt_sig<-FALSE; pt_dir<-"unchanged"; pt_concl<-"Insufficient data."
+}
+```
+
+> **`r pct_i`% of players (`r n_imp2` of `r nrow(within_player)`) performed better in party matches than in their own solo matches.** Green lines slope upward (party KDA higher), red lines slope downward (party KDA lower). Because this is a self-comparison, differences in skill level, hero pool, or general tendencies cannot explain the pattern. The slope chart answers the core causal question directly: for these specific players, in their own history, did queuing with others change how they performed?
+
+### Paired t-Test: Player vs Themselves
+
+```{r paired-test}
+if (nrow(within_player) >= 3) {
+  pt2 <- t.test(within_player$party_kda, within_player$solo_kda, paired=TRUE)
+  tibble(
+    ` `    = c("Solo (own average)","Party (own average)","Mean change (Party minus Solo)"),
+    Value  = c(round(mean(within_player$solo_kda),3),
+               round(mean(within_player$party_kda),3),
+               round(mean(within_player$kda_diff),3))
+  ) %>%
+    kable(caption=paste0(
+      "Paired t-Test | t = ", round(pt2$statistic,3),
+      " | p = ", round(pt2$p.value,4), " | ",
+      ifelse(pt2$p.value<0.05,"SIGNIFICANT","NOT SIGNIFICANT")
+    )) %>%
+    kable_styling(bootstrap_options=c("striped","hover","bordered"),
+                  full_width=FALSE)
+}
+```
+
+> **On average, each player's KDA was `r mean_d` points `r pt_dir` in party matches compared to their own solo matches.** `r pt_concl` This paired test is the most important result in the report. If this is significant, it means party play genuinely changes how a player performs, controlling for who they are. If it is not significant, the between-group difference found earlier is more likely explained by compositional differences (e.g., better players tending to party more often) than by the party effect itself.
+
+### Distribution of Individual KDA Changes
+
+```{r within-dist, fig.height=4.5}
+if (nrow(within_player) >= 3) {
+  within_player %>%
+    ggplot(aes(x=kda_diff)) +
+    geom_histogram(aes(fill=kda_diff>=0), binwidth=0.3,
+                   color=C_BG, alpha=0.9) +
+    geom_vline(xintercept=0, color=C_GOLD, linetype="dashed", linewidth=1) +
+    geom_vline(xintercept=mean(within_player$kda_diff),
+               color=C_EMPH, linetype="dotted", linewidth=0.9) +
+    scale_fill_manual(values=c("TRUE"=C_TREAT,"FALSE"=C_CTRL),
+                      labels=c("TRUE"="KDA higher in party","FALSE"="KDA lower in party"),
+                      name=NULL) +
+    annotate("text", x=mean(within_player$kda_diff)+0.05, y=Inf,
+             vjust=2, hjust=0, size=3.4, color=C_EMPH,
+             label=paste0("Mean: ", round(mean(within_player$kda_diff),3))) +
+    labs(title   = "Within-Player KDA Change: Party minus Solo",
+         subtitle = "Each bar = one player's difference between their own party and solo averages.",
+         x="KDA Change (Party minus Solo)", y="Players") +
+    theme_dota2() + theme(legend.position="top")
+}
+```
+
+> **The distribution of within-player KDA changes shows whether the party advantage (or disadvantage) is consistent across players or concentrated in a few outliers.** Players to the right of the gold zero-line performed better in party matches than in their own solo matches; those to the left performed worse. A distribution skewed heavily right, with most players showing positive changes, constitutes strong causal evidence that party play broadly improves performance for this cohort. A symmetric distribution centered near zero suggests the effect varies by player and averages out rather than being a universal benefit. The warm dotted line marks the mean change of `r mean_d` KDA points.
+
+---
+
+## Section 5: Regression -- Controlling for Confounders
+
+The t-tests and density comparisons above show raw differences between groups. Regression models allow us to ask whether those differences hold after accounting for other factors that influence KDA independently of party play.
+
+Three models are compared progressively to test whether the party effect is robust or driven by confounders.
+
+```{r regression}
+reg_data <- matches %>%
+  filter(!is.na(kda), !is.na(duration_min))
+
+m1 <- lm(kda ~ treat_dummy, data=reg_data)
+m2 <- lm(kda ~ treat_dummy + duration_min, data=reg_data)
+m3 <- lm(kda ~ treat_dummy + duration_min + kills + deaths, data=reg_data)
+
+fmt_reg <- function(mod, lbl) {
+  s <- summary(mod)
+  as.data.frame(coef(s)) %>%
+    rownames_to_column("Term") %>%
+    transmute(Model=lbl, Term,
+              Estimate=round(Estimate,4), SE=round(`Std. Error`,4),
+              t=round(`t value`,3), `p-value`=round(`Pr(>|t|)`,4),
+              Significant=`Pr(>|t|)`<0.05,
+              `R-sq`=round(s$r.squared,4))
+}
+
+treat_coefs <- bind_rows(
+  fmt_reg(m1,"M1: Raw party effect"),
+  fmt_reg(m2,"M2: + Duration control"),
+  fmt_reg(m3,"M3: + Kill/Death controls")
+) %>% filter(Term=="treat_dummy")
+
+treat_coefs %>%
+  kable(caption="Party Effect on KDA: Coefficient Across Three Models") %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"),
+                full_width=TRUE) %>%
+  column_spec(7, color=ifelse(treat_coefs$Significant, C_TREAT, C_CTRL))
+```
+
+```{r regression-nums, include=FALSE}
+m1_c  <- round(coef(m1)["treat_dummy"],4)
+m2_c  <- round(coef(m2)["treat_dummy"],4)
+m3_c  <- round(coef(m3)["treat_dummy"],4)
+m1_s  <- summary(m1)$coefficients["treat_dummy","Pr(>|t|)"] < 0.05
+m2_s  <- summary(m2)$coefficients["treat_dummy","Pr(>|t|)"] < 0.05
+m3_s  <- summary(m3)$coefficients["treat_dummy","Pr(>|t|)"] < 0.05
+stable<- abs(m1_c - m3_c) < abs(m1_c) * 0.5
+reg_concl <- ifelse(stable,
+  paste0("The coefficient is stable: M1 = ", m1_c, ", M2 = ", m2_c,
+         ", M3 = ", m3_c, ". The party effect is not explained away by duration or combat volume."),
+  paste0("The coefficient changes materially: M1 = ", m1_c, ", M2 = ", m2_c,
+         ", M3 = ", m3_c,
+         ". Some of the raw party KDA advantage is explained by differences in match structure."))
+```
+
+> **`r reg_concl`** Model 1 captures the unadjusted difference: party matches produce `r m1_c` more (or fewer, if negative) KDA points than solo matches. Model 2 adds match duration as a control, because longer games create more kill/assist opportunities regardless of party composition. Model 3 adds raw kill and death counts as additional controls. A coefficient that stays similar across all three models means the party effect is a genuine behavioral difference. A coefficient that collapses to near zero when controls are added means the raw group difference was primarily driven by structural differences in how party vs solo matches are played, not by the coordination benefit itself.
+
+---
+
+## Statistical Summary
+
+```{r stat-summary}
+run_t <- function(var, lbl) {
+  x <- matches[[var]][matches$treat_dummy==1 & !is.na(matches[[var]])]
+  y <- matches[[var]][matches$treat_dummy==0 & !is.na(matches[[var]])]
+  if (length(x)<2||length(y)<2) return(NULL)
+  tt <- t.test(x,y)
+  tibble(Outcome=lbl, Solo=round(mean(y),3), Party=round(mean(x),3),
+         Delta=round(mean(x)-mean(y),3),
+         `p-value`=round(tt$p.value,4), Sig=tt$p.value<0.05,
+         Direction=ifelse(tt$p.value>=0.05,"No significant change",
+                   ifelse(mean(x)>mean(y),"Higher in party","Lower in party")))
+}
+
+gap_row <- if (length(gap_c)>1&&length(gap_t)>1) {
+  tt <- t.test(gap_t,gap_c)
+  tibble(Outcome="Inactivity Gap (days)",Solo=round(mean(gap_c),3),
+         Party=round(mean(gap_t),3),Delta=round(mean(gap_t)-mean(gap_c),3),
+         `p-value`=round(tt$p.value,4),Sig=tt$p.value<0.05,
+         Direction=ifelse(tt$p.value>=0.05,"No significant change",
+                   ifelse(mean(gap_t)<mean(gap_c),"Shorter after party","Longer after party")))
+} else NULL
+
+paired_row <- if (nrow(within_player)>=3) {
+  pt3 <- t.test(within_player$party_kda, within_player$solo_kda, paired=TRUE)
+  tibble(Outcome="KDA (Within-Player Paired)",
+         Solo=round(mean(within_player$solo_kda),3),
+         Party=round(mean(within_player$party_kda),3),
+         Delta=round(mean(within_player$kda_diff),3),
+         `p-value`=round(pt3$p.value,4),Sig=pt3$p.value<0.05,
+         Direction=ifelse(pt3$p.value>=0.05,"No within-player change",
+                   ifelse(mean(within_player$kda_diff)>0,
+                          "Higher in party (within-player)","Lower in party (within-player)")))
+} else NULL
+
+all_tests <- bind_rows(
+  run_t("kda","KDA (Group-Level)"),
+  run_t("kills","Kills"),
+  run_t("deaths","Deaths"),
+  run_t("assists","Assists"),
+  run_t("duration_min","Duration (min)"),
+  gap_row, paired_row
+)
+
+all_tests %>%
+  kable(col.names=c("Outcome","Solo Mean","Party Mean","Delta",
+                     "p-value","Significant","Direction"),
+        caption="Complete Statistical Summary: Party vs Solo") %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"),
+                full_width=TRUE) %>%
+  column_spec(6, color=ifelse(all_tests$Sig, C_TREAT, C_CTRL))
+```
+
+---
+
+## Key Insights and Highlights
+
+```{r insights-compute, include=FALSE}
+n_sig     <- sum(all_tests$Sig, na.rm=TRUE)
+n_tests   <- nrow(all_tests)
+sig_list  <- paste(all_tests$Outcome[all_tests$Sig], collapse=", ")
+if (length(sig_list)==0 || sig_list=="") sig_list <- "none of the tested outcomes"
+
+perf_sig  <- kda_sig
+eng_sig   <- !is.na(g_sig) && g_sig
+within_sig_flag <- nrow(within_player)>=3 && pt_sig
+
+headline <- case_when(
+  within_sig_flag & perf_sig ~
+    paste0("Party play has a statistically significant and causal effect on player performance. ",
+           "Both the group-level comparison and the within-player test confirm the finding."),
+  within_sig_flag & !perf_sig ~
+    paste0("The within-player test finds a significant effect (p = ", pt_p,
+           "), even though the group-level KDA comparison was not significant. ",
+           "This suggests the party benefit is real but masked at the group level by compositional differences."),
+  !within_sig_flag & perf_sig ~
+    paste0("Party matches show higher KDA at the group level (significant at p = ", kda_p,
+           "), but the within-player test does not confirm this causally (p = ", pt_p,
+           "). The group difference may reflect selection rather than a party effect."),
+  TRUE ~
+    paste0("Neither the group-level comparison nor the within-player test finds a statistically significant ",
+           "party effect on KDA. Party play does not appear to meaningfully change performance for this cohort.")
+)
+```
+
+<div class="insight-box">
+**Overall Verdict:** `r headline`
+</div>
+
+### Performance: Does Party Play Help You Win Fights?
+
+> **Group-level:** Party KDA = `r round(mean(kda_t),3)` vs. Solo KDA = `r round(mean(kda_c),3)` (difference: `r round(mean(kda_t)-mean(kda_c),3)`, p = `r kda_p`, `r ifelse(kda_sig,"significant","not significant")`). Component analysis: `r k_dir` (`r ifelse(k_sig,"significant","not significant")`), `r d_dir` (`r ifelse(d_sig,"significant","not significant")`), `r a_dir` (`r ifelse(a_sig,"significant","not significant")`).
+
+> **Within-player:** Among the `r nrow(within_player)` players with both solo and party matches, `r pct_i`% performed better in party play. Mean within-player KDA change: `r mean_d` points (`r ifelse(pt_sig,"significant -- the party effect is likely real","not significant -- individual variation is too high to confirm causation")`).
+
+### Behavior: Does Party Play Change How You Act?
+
+> **Leaver rate** was `r lr_t`% in party matches vs. `r lr_c`% solo, making it `r lr_dir` when coordinating (`r ifelse(lr_sig,"significant","not significant")`). **Match duration** was `r dur_dir` in party matches (`r dur_m_t` min vs. `r dur_m_c` min, p = `r dur_p`, `r ifelse(dur_sig,"significant","not significant")`). `r lr_interp`
+
+### Engagement: Does Party Play Bring You Back Sooner?
+
+> **Inactivity gap** after party matches was `r gm_t` days vs. `r gm_c` days after solo matches, a `r g_dir` return window (`r ifelse(g_sig,"statistically significant","not statistically significant")`). `r g_interp`
+
+### Causal Confidence
+
+> The causal credibility of this analysis rests on the within-player comparison, which controls for all fixed player characteristics. `r ifelse(within_sig_flag, paste0("That test returned p = ", pt_p, ", supporting a genuine causal link between party play and performance."), paste0("That test returned p = ", pt_p, ", meaning we cannot confidently attribute the group-level differences to party play itself rather than player selection."))` Regression models show the treatment coefficient `r ifelse(stable,"remained stable", "shifted substantially")` after controlling for match duration and combat volume, `r ifelse(stable,"reinforcing the causal interpretation","suggesting structural match differences contribute to the raw group gap")`.
+
+### Summary Scorecard
+
+```{r scorecard}
+all_tests %>%
+  mutate(
+    Result = case_when(
+      Sig & Delta > 0 ~ "Party advantage",
+      Sig & Delta < 0 ~ "Solo advantage",
+      TRUE            ~ "No significant difference"
+    )
+  ) %>%
+  select(Outcome, Delta, `p-value`, Sig, Direction, Result) %>%
+  kable(
+    col.names = c("Outcome","Delta","p-value","Significant","Direction","Result"),
+    caption   = "Full Findings Scorecard: Party vs Solo"
+  ) %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"),
+                full_width=TRUE) %>%
+  column_spec(4, color=ifelse(all_tests$Sig, C_TREAT, C_CTRL)) %>%
+  column_spec(6, bold=TRUE,
+              color=case_when(
+                all_tests$Sig & all_tests$Delta > 0 ~ C_TREAT,
+                all_tests$Sig & all_tests$Delta < 0 ~ C_CTRL,
+                TRUE ~ C_MUTED
+              ))
+```
+
+### The Bottom Line
+
+`r headline` The outcomes that showed significant differences were: **`r ifelse(sig_list=="none of the tested outcomes", "none", sig_list)`**. The most important result is the within-player paired test (p = `r pt_p`), which `r ifelse(within_sig_flag,"confirms that coordination itself drives a performance change beyond what player skill alone would predict","suggests the group-level differences are better explained by which players choose to party than by what party play itself does to performance")`. For a game studio, the engagement signal is equally important: `r ifelse(!is.na(g_sig)&&g_sig, paste0("the significant reduction in post-match inactivity gaps (p = ", g_p,") suggests that social play meaningfully accelerates return behavior, a direct retention lever"), paste0("no significant engagement difference was detected (p = ", g_p,"), meaning party play does not appear to be a reliable retention mechanism in this data"))`.
+
+---
+
+## Robustness and Limitations
+
+**Self-selection is the central challenge.** Unlike a patch (which is exogenous), party queuing is a choice. Players may systematically choose to party under different circumstances: when they are feeling confident, when they have time, or when certain teammates are online. The within-player analysis partially addresses this by controlling for fixed player characteristics, but does not eliminate all time-varying confounds.
+
+**Match-level treatment creates within-player exposure.** The same player contributes matches to both groups, which is analytically favorable (it enables the within-player test) but means group sizes are not fully independent. The aggregate t-tests treat all matches as independent observations, which slightly overstates precision.
+
+**Party size heterogeneity.** The treatment group combines duos (party_size = 2) with full teams (party_size = 5). A duo has fundamentally different coordination dynamics than a five-stack, yet both are labeled "treatment." Splitting by party size would give finer resolution at the cost of smaller group sizes.
+
+**Professional player specifics.** This cohort plays at the highest skill tier, where individual mechanics are strong enough to carry games without coordination. The party effect here may be smaller than it would be for less skilled players, for whom coordination offers proportionally more benefit.

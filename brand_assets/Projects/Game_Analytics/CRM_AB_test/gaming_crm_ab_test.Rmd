@@ -1,0 +1,1214 @@
+---
+title: "Gaming CRM Campaign Effectiveness"
+subtitle: "A/B Test Analysis: Campaign Exposure vs. Player Engagement and Conversion"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    theme: flatly
+    highlight: tango
+    df_print: paged
+---
+
+<style>
+h1, h2, h3, h4 { color: #2C3E50 !important; }
+.navbar-default  { background-color: #2C3E50 !important; border-color: #2C3E50 !important; }
+.list-group-item.active {
+  background-color: #E67E22 !important;
+  border-color:     #E67E22 !important;
+}
+blockquote {
+  border-left:      4px solid #E67E22;
+  background-color: #FFF9F5;
+  color:            #2C3E50;
+  padding:          10px 18px;
+  border-radius:    0 4px 4px 0;
+  font-style:       normal;
+  margin:           12px 0;
+}
+.insight-box {
+  background-color: #EBF5FB;
+  border:           1px solid #3498DB;
+  border-radius:    6px;
+  padding:          16px 20px;
+  margin:           14px 0;
+  color:            #2C3E50;
+  line-height:      1.75;
+}
+.rec-box {
+  background-color: #EAFAF1;
+  border:           1px solid #27AE60;
+  border-radius:    6px;
+  padding:          14px 18px;
+  margin:           12px 0;
+  color:            #2C3E50;
+}
+.tag-treat { color: #E67E22; font-weight: bold; }
+.tag-ctrl  { color: #3498DB; font-weight: bold; }
+img { border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+.table { color: #2C3E50; }
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo       = TRUE,
+  message    = FALSE,
+  warning    = FALSE,
+  fig.width  = 10,
+  fig.height = 5,
+  fig.align  = "center",
+  dpi        = 150
+)
+```
+
+```{r libraries}
+required_pkgs <- c(
+  "tidyverse", "scales", "knitr", "kableExtra",
+  "patchwork", "ggrepel"
+)
+new_pkgs <- required_pkgs[!required_pkgs %in% installed.packages()[,"Package"]]
+if (length(new_pkgs)) install.packages(new_pkgs, repos = "https://cloud.r-project.org")
+
+library(tidyverse)
+library(scales)
+library(knitr)
+library(kableExtra)
+library(patchwork)
+library(ggrepel)
+
+# ── Product Analytics Color System ────────────────────────────────────────────
+C_BG    <- "#FFFFFF"
+C_PANEL <- "#F8F9FA"
+C_GRID  <- "#E9ECEF"
+C_TEXT  <- "#2C3E50"
+C_MUTED <- "#7F8C8D"
+C_TREAT <- "#E67E22"   # orange  = campaign exposed (treatment)
+C_CTRL  <- "#3498DB"   # blue    = not exposed (control)
+C_EMPH  <- "#9B59B6"   # purple  = emphasis / funnel
+C_GREEN <- "#27AE60"   # success
+C_RED   <- "#E74C3C"   # warning / negative
+C_GOLD  <- "#F39C12"   # warm highlight
+
+# ── Clean product analytics ggplot2 theme ─────────────────────────────────────
+theme_crm <- function(base_size = 12) {
+  theme(
+    plot.background   = element_rect(fill = C_BG,    color = NA),
+    panel.background  = element_rect(fill = C_PANEL, color = NA),
+    panel.grid.major  = element_line(color = C_GRID,  linewidth = 0.35),
+    panel.grid.minor  = element_blank(),
+    panel.border      = element_blank(),
+    axis.line         = element_line(color = "#CED4DA", linewidth = 0.4),
+    axis.ticks        = element_line(color = C_GRID, linewidth = 0.3),
+    plot.title        = element_text(color = C_TEXT,  face = "bold",
+                                     size  = base_size + 2),
+    plot.subtitle     = element_text(color = C_MUTED, size = base_size - 1),
+    plot.caption      = element_text(color = C_MUTED, size = base_size - 2,
+                                     hjust = 0),
+    axis.title        = element_text(color = C_TEXT,  size = base_size),
+    axis.text         = element_text(color = C_MUTED, size = base_size - 1),
+    legend.background = element_rect(fill = C_BG,    color = NA),
+    legend.key        = element_rect(fill = C_BG,    color = NA),
+    legend.text       = element_text(color = C_TEXT,  size = base_size - 1),
+    legend.title      = element_text(color = C_TEXT,  size = base_size,
+                                     face  = "bold"),
+    strip.background  = element_rect(fill = "#EDF2F7", color = "#CED4DA"),
+    strip.text        = element_text(color = C_TEXT,  face = "bold",
+                                     size  = base_size),
+    plot.margin       = margin(14, 14, 10, 10)
+  )
+}
+
+ann_theme <- theme(
+  plot.background = element_rect(fill = C_BG, color = NA),
+  plot.title      = element_text(color = C_TEXT, face = "bold", size = 14),
+  plot.subtitle   = element_text(color = C_MUTED, size = 11)
+)
+
+scale_fill_groups <- function(...) {
+  scale_fill_manual(values = c("Exposed (Treatment)" = C_TREAT,
+                                "Not Exposed (Control)" = C_CTRL), ...)
+}
+scale_color_groups <- function(...) {
+  scale_color_manual(values = c("Exposed (Treatment)" = C_TREAT,
+                                 "Not Exposed (Control)" = C_CTRL), ...)
+}
+```
+
+---
+
+## Overview
+
+This report evaluates the effectiveness of a multi-channel CRM campaign across a gaming player base. The campaign was delivered via three channels (email, push notification, and in-game message) to a randomly selected subset of players, with the remainder serving as the control group.
+
+**The central question:** Did campaign exposure meaningfully increase player engagement, conversion, and retention -- and which player segments and channels drove the strongest results?
+
+The analysis moves through five stages:
+
+1. **Data exploration and cleaning** -- understand the dataset and handle quality issues
+2. **A/B test framework** -- define groups and validate the experimental design
+3. **Outcome analysis** -- compare treatment and control across engagement, conversion, and retention
+4. **Funnel analysis** -- trace drop-off from campaign sent through to purchase
+5. **Segmentation** -- identify which players and channels responded best
+
+---
+
+## Data Generation
+
+The dataset simulates a 90-day CRM campaign window across 5,000 players. Realistic behavioral patterns are embedded directly into the data generation, including segment-specific engagement tendencies, channel effectiveness variation, and deliberate noise to reflect production data quality.
+
+```{r data-generation}
+set.seed(2024)
+N <- 5000
+
+# ── Player attributes ─────────────────────────────────────────────────────────
+player_segment <- sample(
+  c("Casual","Competitive","Returning"), N, replace = TRUE,
+  prob = c(0.50, 0.30, 0.20)
+)
+platform <- sample(c("PC","Console"), N, replace = TRUE, prob = c(0.60, 0.40))
+region   <- sample(c("North America","Europe","APAC","LATAM", NA), N,
+                   replace = TRUE, prob = c(0.34, 0.28, 0.20, 0.12, 0.06))
+
+# ── Campaign assignment (randomized) ──────────────────────────────────────────
+campaign_exposed <- rbinom(N, 1, prob = 0.50)
+campaign_type_raw <- ifelse(
+  campaign_exposed == 1,
+  sample(c("Email","Push","In-Game"), N, replace = TRUE, prob = c(0.40, 0.35, 0.25)),
+  NA
+)
+
+# ── Session length (minutes): competitive > returning > casual ────────────────
+sl_base <- case_when(
+  player_segment == "Competitive" ~ 68,
+  player_segment == "Returning"   ~ 48,
+  TRUE                            ~ 32
+)
+# Platform modifier: PC sessions slightly longer
+sl_platform_mod <- ifelse(platform == "PC", 6, 0)
+session_length_raw <- round(rnorm(N, mean = sl_base + sl_platform_mod, sd = 14))
+# Introduce outliers (~0.5%)
+sl_outliers <- sample(1:N, round(N * 0.005))
+session_length_raw[sl_outliers] <- session_length_raw[sl_outliers] * sample(4:7, length(sl_outliers), replace = TRUE)
+# Introduce missing values (~2%)
+sl_missing <- sample(1:N, round(N * 0.02))
+session_length_raw[sl_missing]  <- NA
+session_length_raw <- pmax(session_length_raw, 1, na.rm = FALSE)
+
+# ── Games played ──────────────────────────────────────────────────────────────
+gp_base <- case_when(
+  player_segment == "Competitive" ~ 9,
+  player_segment == "Returning"   ~ 6,
+  TRUE                            ~ 3
+)
+games_played <- pmax(round(rpois(N, lambda = gp_base)), 1)
+
+# ── Campaign click rate: in-game > push > email, and varies by segment ────────
+click_prob <- case_when(
+  is.na(campaign_type_raw) ~ 0,
+  campaign_type_raw == "In-Game" & player_segment == "Competitive" ~ 0.72,
+  campaign_type_raw == "In-Game" & player_segment == "Returning"   ~ 0.66,
+  campaign_type_raw == "In-Game"                                    ~ 0.50,
+  campaign_type_raw == "Push"    & player_segment == "Competitive" ~ 0.47,
+  campaign_type_raw == "Push"    & player_segment == "Returning"   ~ 0.41,
+  campaign_type_raw == "Push"                                       ~ 0.28,
+  campaign_type_raw == "Email"   & player_segment == "Returning"   ~ 0.34,
+  campaign_type_raw == "Email"   & player_segment == "Competitive" ~ 0.24,
+  TRUE ~ 0.18
+)
+clicked_campaign <- rbinom(N, 1, click_prob)
+clicked_campaign[campaign_exposed == 0] <- 0
+
+# ── Return rate ───────────────────────────────────────────────────────────────
+return_prob <- case_when(
+  clicked_campaign == 1 & player_segment == "Returning"   ~ 0.84,
+  clicked_campaign == 1 & player_segment == "Competitive" ~ 0.74,
+  clicked_campaign == 1                                    ~ 0.60,
+  campaign_exposed == 1                                    ~ 0.35,
+  TRUE                                                      ~ 0.22
+)
+returned_after_campaign <- rbinom(N, 1, return_prob)
+
+# ── Purchase (higher for returned + returning segment) ────────────────────────
+purchase_prob <- case_when(
+  returned_after_campaign == 1 & player_segment == "Returning"   ~ 0.58,
+  returned_after_campaign == 1 & player_segment == "Competitive" ~ 0.42,
+  returned_after_campaign == 1                                    ~ 0.26,
+  campaign_exposed == 1                                            ~ 0.14,
+  TRUE                                                              ~ 0.07
+)
+purchases <- rbinom(N, 1, purchase_prob)
+
+# ── In-game spend (only for purchasers; region-adjusted) ─────────────────────
+spend_base <- case_when(
+  player_segment == "Returning"   ~ 38,
+  player_segment == "Competitive" ~ 28,
+  TRUE                            ~ 16
+)
+region_mult <- case_when(
+  region == "North America" ~ 1.30,
+  region == "Europe"        ~ 1.12,
+  region == "APAC"          ~ 0.82,
+  region == "LATAM"         ~ 0.68,
+  TRUE                       ~ 1.00
+)
+in_game_spend_raw <- ifelse(
+  purchases == 1,
+  round(rgamma(N, shape = 2, rate = 1 / spend_base) * region_mult, 2),
+  0
+)
+# Outliers in spend (~2% of buyers)
+spend_out <- sample(which(purchases == 1), max(1, round(sum(purchases) * 0.02)))
+in_game_spend_raw[spend_out] <- in_game_spend_raw[spend_out] * sample(6:10, length(spend_out), replace = TRUE)
+
+# ── Churn flag ────────────────────────────────────────────────────────────────
+churn_prob <- case_when(
+  purchases == 1                                          ~ 0.06,
+  player_segment == "Casual"      & purchases == 0       ~ 0.44,
+  player_segment == "Competitive" & purchases == 0       ~ 0.18,
+  player_segment == "Returning"   & purchases == 0       ~ 0.30,
+  TRUE                                                    ~ 0.25
+)
+churn_flag <- rbinom(N, 1, churn_prob)
+
+# ── Session date ──────────────────────────────────────────────────────────────
+session_date <- Sys.Date() - sample(0:89, N, replace = TRUE)
+
+# ── Assemble raw dataset ──────────────────────────────────────────────────────
+raw_data <- tibble(
+  player_id               = 1:N,
+  session_date            = session_date,
+  session_length          = session_length_raw,
+  games_played            = games_played,
+  purchases               = purchases,
+  in_game_spend           = in_game_spend_raw,
+  campaign_exposed        = campaign_exposed,
+  campaign_type           = campaign_type_raw,
+  clicked_campaign        = clicked_campaign,
+  returned_after_campaign = returned_after_campaign,
+  player_segment          = player_segment,
+  platform                = platform,
+  region                  = region,
+  churn_flag              = churn_flag
+)
+
+cat("Raw dataset:", nrow(raw_data), "rows x", ncol(raw_data), "columns\n")
+cat("Campaign exposure: Treatment =", sum(raw_data$campaign_exposed),
+    "| Control =", sum(1 - raw_data$campaign_exposed), "\n")
+```
+
+**What was built into this dataset:**
+
+- `player_segment` drives baseline engagement: Competitive players have the longest sessions (base: 68 min), Casual players the shortest (base: 32 min)
+- `campaign_type` drives click rates: In-Game messages convert at 50--72%, Push at 28--47%, Email at 18--34%
+- `returned_after_campaign` is strongly tied to clicking: players who clicked return at 60--84%
+- `purchases` and `in_game_spend` are highest for Returning players who returned after clicking
+- `region` modulates spend: North American players spend 30% more than LATAM players
+- Outliers are intentionally seeded in `session_length` (~0.5%) and `in_game_spend` (~2% of buyers)
+- Missing values in `session_length` (~2%) and `region` (~6%)
+
+---
+
+## Data Exploration and Cleaning
+
+### Raw Data Overview
+
+```{r raw-overview}
+tibble(
+  Variable      = names(raw_data),
+  Type          = sapply(raw_data, class),
+  `Missing (N)` = sapply(raw_data, function(x) sum(is.na(x))),
+  `Missing (%)`  = round(sapply(raw_data, function(x) mean(is.na(x)) * 100), 1),
+  `Unique Values`= sapply(raw_data, function(x) n_distinct(x, na.rm = TRUE))
+) %>%
+  kable(caption = "Raw Dataset: Variable Summary") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = TRUE) %>%
+  column_spec(4, color = ifelse(
+    sapply(raw_data, function(x) mean(is.na(x)) * 100) > 0,
+    C_RED, C_TEXT
+  ))
+```
+
+### Outlier Detection
+
+```{r outlier-plots, fig.height=4}
+p_sl_raw <- raw_data %>%
+  filter(!is.na(session_length)) %>%
+  ggplot(aes(x = session_length)) +
+  geom_histogram(binwidth = 15, fill = C_CTRL, color = "white", alpha = 0.85) +
+  geom_vline(xintercept = quantile(raw_data$session_length, 0.99, na.rm = TRUE),
+             color = C_RED, linetype = "dashed", linewidth = 0.9) +
+  annotate("text", x = quantile(raw_data$session_length, 0.99, na.rm=TRUE) + 10,
+           y = Inf, vjust = 2, hjust = 0, size = 3.2, color = C_RED,
+           label = "99th pctile\n(cap here)") +
+  labs(title = "Session Length (Raw)", x = "Minutes", y = "Count") +
+  theme_crm()
+
+p_sp_raw <- raw_data %>%
+  filter(in_game_spend > 0) %>%
+  ggplot(aes(x = in_game_spend)) +
+  geom_histogram(binwidth = 20, fill = C_TREAT, color = "white", alpha = 0.85) +
+  geom_vline(xintercept = quantile(raw_data$in_game_spend[raw_data$in_game_spend>0],
+                                    0.99, na.rm = TRUE),
+             color = C_RED, linetype = "dashed", linewidth = 0.9) +
+  labs(title = "In-Game Spend (Raw, Buyers Only)", x = "USD", y = "Count") +
+  theme_crm()
+
+p_sl_raw + p_sp_raw +
+  plot_annotation(
+    title    = "Pre-Clean: Outliers Are Visible in Both Distributions",
+    subtitle = "Dashed red lines mark 99th percentiles used as capping thresholds.",
+    theme    = ann_theme
+  )
+```
+
+> **Outliers are present in both session length and in-game spend, and both require treatment before analysis.** A small number of players show session lengths far exceeding the plausible daily maximum, and a handful of buyers show spending patterns 6--10x the typical level. If left uncapped, these values would distort group means and bias regression estimates. The red dashed lines mark the 99th percentile, which is used as the capping threshold.
+
+### Data Cleaning
+
+```{r cleaning}
+# ── Outlier capping ───────────────────────────────────────────────────────────
+sl_cap    <- quantile(raw_data$session_length,  0.99, na.rm = TRUE)
+spend_cap <- quantile(raw_data$in_game_spend[raw_data$in_game_spend > 0],
+                      0.99, na.rm = TRUE)
+
+# ── Build cleaned dataset ─────────────────────────────────────────────────────
+df <- raw_data %>%
+  mutate(
+    # Cap outliers
+    session_length = pmin(session_length, sl_cap),
+    in_game_spend  = pmin(in_game_spend,  spend_cap),
+    # Impute missing session_length with segment median
+    session_length = ifelse(
+      is.na(session_length),
+      median(session_length, na.rm = TRUE),
+      session_length
+    ),
+    # Impute missing region
+    region = replace_na(region, "Unknown"),
+    # Create group label
+    group = ifelse(campaign_exposed == 1,
+                   "Exposed (Treatment)", "Not Exposed (Control)"),
+    # Flag buyers
+    is_buyer = purchases == 1
+  )
+
+# Cleaning summary
+tibble(
+  Step = c(
+    "Session length: capped outliers",
+    "Session length: imputed missing",
+    "In-game spend: capped outliers",
+    "Region: imputed missing as 'Unknown'"
+  ),
+  `Records Affected` = c(
+    sum(raw_data$session_length > sl_cap,  na.rm = TRUE),
+    sum(is.na(raw_data$session_length)),
+    sum(raw_data$in_game_spend > spend_cap, na.rm = TRUE),
+    sum(is.na(raw_data$region))
+  )
+) %>%
+  kable(caption = "Cleaning Steps Applied") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE)
+
+cat("\nClean dataset:", nrow(df), "rows | Zero dropped.\n")
+cat("Session cap:", round(sl_cap, 1), "min | Spend cap: $", round(spend_cap, 2), "\n")
+```
+
+**Cleaning decisions:**
+
+- **Outlier capping:** Values above the 99th percentile are winsorized rather than deleted. This preserves the full observation count while preventing extreme values from dominating group means.
+- **Session length imputation:** Missing values (~`r sum(is.na(raw_data$session_length))` records) are replaced with the dataset median rather than dropped. Given the 2% rate, listwise deletion would introduce bias if missingness correlates with engagement level.
+- **Region imputation:** Missing region is coded as "Unknown" and retained for segmentation analysis. These records are real players and dropping them would reduce the control group disproportionately.
+
+### Post-Clean Distributions
+
+```{r post-clean-plots, fig.height=4}
+p_sl_clean <- df %>%
+  ggplot(aes(x = session_length, fill = group)) +
+  geom_histogram(binwidth = 5, position = "identity", alpha = 0.55, color = NA) +
+  scale_fill_groups(name = NULL) +
+  labs(title = "Session Length (Clean)", x = "Minutes", y = "Count") +
+  theme_crm() + theme(legend.position = "top")
+
+p_gp_clean <- df %>%
+  ggplot(aes(x = games_played, fill = group)) +
+  geom_histogram(binwidth = 1, position = "identity", alpha = 0.55, color = NA) +
+  scale_fill_groups(name = NULL) +
+  labs(title = "Games Played (Clean)", x = "Games", y = "Count") +
+  theme_crm() + theme(legend.position = "top")
+
+p_sl_clean + p_gp_clean +
+  plot_annotation(
+    title    = "Post-Clean Distributions: Treatment vs Control Overlap",
+    subtitle = "Distributions should overlap substantially if randomization was successful.",
+    theme    = ann_theme
+  )
+```
+
+> **After cleaning, the treatment and control distributions overlap closely, confirming that the campaign was assigned randomly and not systematically targeted at already-engaged players.** This is the most important pre-analysis check: if the exposed group had much longer sessions before the campaign, any post-campaign difference could reflect selection rather than campaign impact. The near-identical shapes here validate the experimental design.
+
+---
+
+## The A/B Test: How the Groups Are Formed
+
+### Step-by-Step: From Data to Two Groups
+
+```{r group-assignment}
+group_counts <- df %>% count(group)
+n_treat <- group_counts$n[group_counts$group == "Exposed (Treatment)"]
+n_ctrl  <- group_counts$n[group_counts$group == "Not Exposed (Control)"]
+```
+
+**Step 1: The campaign was sent to a randomly selected ~50% of the player base.** This random selection is the cornerstone of the experimental design. Each player independently had a 50% probability of receiving the campaign, regardless of their engagement history, segment, or platform.
+
+**Step 2: Group assignment is encoded in the `campaign_exposed` variable:**
+
+| Group | Definition | N | Color |
+|---|---|---|---|
+| <span class="tag-treat">Exposed (Treatment)</span> | `campaign_exposed == 1` | `r n_treat` | Orange |
+| <span class="tag-ctrl">Not Exposed (Control)</span> | `campaign_exposed == 0` | `r n_ctrl` | Blue |
+
+**Step 3: All outcome metrics are measured after exposure.** Session length, games played, purchases, spend, and return rate are measured for the period following the campaign window. The control group's metrics over the same period serve as the baseline.
+
+**Step 4: The comparison is made at the group level.** Because assignment was random, any difference between groups in outcomes can be attributed to the campaign rather than to pre-existing player differences.
+
+**Why this is a valid A/B test:** Random assignment ensures that the treatment and control groups are statistically identical in expectation on all variables, both measured and unmeasured. This eliminates confounding: the groups should be similar in segment mix, platform, region, and baseline engagement levels. Any post-exposure outcome difference is therefore attributable to the campaign itself, not to who was selected.
+
+**Key assumption:** The campaign did not bleed over to control group players (no network spillover). Players in the control group did not receive the campaign through peer effects, shared accounts, or other indirect channels.
+
+### Balance Check
+
+```{r balance-check}
+balance <- df %>%
+  group_by(group) %>%
+  summarise(
+    N                 = n(),
+    `% Competitive`   = round(mean(player_segment=="Competitive")*100,1),
+    `% Casual`        = round(mean(player_segment=="Casual")*100,1),
+    `% Returning`     = round(mean(player_segment=="Returning")*100,1),
+    `% PC`            = round(mean(platform=="PC")*100,1),
+    `Avg Session (min)` = round(mean(session_length,na.rm=TRUE),1),
+    `Avg Games`       = round(mean(games_played),1),
+    .groups = "drop"
+  )
+
+balance %>%
+  kable(caption = "Balance Check: Are the Two Groups Comparable?") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = TRUE) %>%
+  column_spec(1, bold = TRUE,
+              color = c(C_CTRL, C_TREAT)[match(
+                balance$group, c("Not Exposed (Control)","Exposed (Treatment)")
+              )])
+```
+
+```{r balance-nums, include=FALSE}
+bt <- balance %>% filter(group == "Exposed (Treatment)")
+bc <- balance %>% filter(group == "Not Exposed (Control)")
+sl_diff_baseline <- round(abs(bt$`Avg Session (min)` - bc$`Avg Session (min)`), 1)
+```
+
+> **The two groups are well-balanced on all pre-treatment characteristics.** Session length at baseline differs by only `r sl_diff_baseline` minutes between groups, segment mix is nearly identical, and platform split is uniform. This confirms that the randomization worked correctly and that any differences we observe in outcomes can be attributed to the campaign.
+
+---
+
+## Section 1: Engagement -- Did the Campaign Get Players Playing More?
+
+Engagement is measured through two variables: `session_length` (how long players play per session) and `games_played` (how many games they complete). Both are measured in the post-exposure window.
+
+### Session Length
+
+```{r session-length, fig.height=5}
+sl_meds <- df %>%
+  group_by(group) %>%
+  summarise(med = median(session_length, na.rm=TRUE), .groups="drop")
+
+df %>%
+  ggplot(aes(x = session_length, fill = group, color = group)) +
+  geom_density(alpha = 0.30, linewidth = 1) +
+  geom_vline(data = sl_meds, aes(xintercept = med, color = group),
+             linetype = "dashed", linewidth = 1.1) +
+  scale_fill_groups(name = NULL) +
+  scale_color_groups(name = NULL) +
+  labs(title   = "Session Length Distribution: Exposed vs Not Exposed",
+       subtitle = "Dashed lines = group medians. Rightward shift in orange = campaign drove longer sessions.",
+       x = "Session Length (minutes)", y = "Density") +
+  theme_crm() + theme(legend.position = "top")
+```
+
+```{r session-test}
+sl_t <- df$session_length[df$campaign_exposed==1]
+sl_c <- df$session_length[df$campaign_exposed==0]
+t_sl <- t.test(sl_t, sl_c)
+
+tibble(
+  Group        = c("Not Exposed (Control)","Exposed (Treatment)"),
+  N            = c(length(sl_c), length(sl_t)),
+  Mean         = round(c(mean(sl_c), mean(sl_t)), 1),
+  Median       = round(c(median(sl_c), median(sl_t)), 1),
+  SD           = round(c(sd(sl_c), sd(sl_t)), 1)
+) %>%
+  kable(caption = paste0(
+    "Session Length | t = ", round(t_sl$statistic,3),
+    " | p = ", round(t_sl$p.value,4), " | ",
+    ifelse(t_sl$p.value < 0.05, "SIGNIFICANT", "NOT SIGNIFICANT")
+  )) %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE) %>%
+  column_spec(1, bold = TRUE, color = c(C_CTRL, C_TREAT))
+```
+
+```{r session-nums, include=FALSE}
+sl_m_c <- round(mean(sl_c), 1)
+sl_m_t <- round(mean(sl_t), 1)
+sl_dir <- ifelse(sl_m_t > sl_m_c, "longer", "shorter")
+sl_d   <- round(abs(sl_m_t - sl_m_c), 1)
+sl_pct <- round(abs(sl_m_t - sl_m_c) / sl_m_c * 100, 1)
+sl_sig <- t_sl$p.value < 0.05
+sl_p   <- round(t_sl$p.value, 4)
+```
+
+> **Exposed players averaged `r sl_m_t` minutes per session vs. `r sl_m_c` minutes for the control group, a difference of `r sl_d` minutes (`r sl_pct`% `r sl_dir`, p = `r sl_p`, `r ifelse(sl_sig,"significant","not significant")`).** The density curves show whether this shift is a consistent move across the entire distribution or driven by a few outliers. A rightward shift in the orange (treatment) curve indicates the campaign motivated players to spend more time in-game. This is a direct engagement signal: longer sessions mean more gameplay value extracted per player visit.
+
+### Games Played
+
+```{r games-played, fig.height=5}
+gp_agg <- df %>%
+  group_by(group) %>%
+  summarise(mean_gp = mean(games_played), se = sd(games_played)/sqrt(n()),
+            .groups = "drop")
+
+gp_agg %>%
+  ggplot(aes(x = group, y = mean_gp, fill = group)) +
+  geom_col(width = 0.5, alpha = 0.9, show.legend = FALSE) +
+  geom_errorbar(aes(ymin = mean_gp - se*1.96, ymax = mean_gp + se*1.96),
+                width = 0.15, color = C_TEXT, linewidth = 0.8) +
+  geom_text(aes(label = round(mean_gp, 2)), vjust = -0.7,
+            color = C_TEXT, fontface = "bold", size = 4.5) +
+  scale_fill_groups(name = NULL) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.18))) +
+  labs(title   = "Average Games Played: Exposed vs Not Exposed",
+       subtitle = "Error bars = 95% CI.",
+       x = NULL, y = "Average Games Played") +
+  theme_crm()
+```
+
+```{r games-nums, include=FALSE}
+gp_t <- df$games_played[df$campaign_exposed==1]
+gp_c <- df$games_played[df$campaign_exposed==0]
+t_gp <- t.test(gp_t, gp_c)
+gp_m_c <- round(mean(gp_c), 2)
+gp_m_t <- round(mean(gp_t), 2)
+gp_dir <- ifelse(gp_m_t > gp_m_c, "more", "fewer")
+gp_sig <- t_gp$p.value < 0.05
+gp_p   <- round(t_gp$p.value, 4)
+```
+
+> **Exposed players completed `r gp_m_t` games per session on average vs. `r gp_m_c` for the control group, playing `r gp_dir` games (p = `r gp_p`, `r ifelse(gp_sig,"significant","not significant")`).** Games played is a depth-of-engagement metric: it measures not just whether a player opened the game but how many full gameplay loops they committed to. A campaign that increases games played is creating genuine behavioral change, not just triggering a brief login.
+
+---
+
+## Section 2: Conversion -- Did the Campaign Drive Purchases?
+
+Conversion is the primary commercial objective of the campaign. Two metrics are analyzed: whether a player made any purchase (binary) and the amount spent among buyers.
+
+### Purchase Rate
+
+```{r purchase-rate, fig.height=5}
+purch_agg <- df %>%
+  group_by(group) %>%
+  summarise(rate = mean(purchases), n = n(),
+            se = sqrt(rate*(1-rate)/n), .groups="drop")
+
+purch_agg %>%
+  ggplot(aes(x = group, y = rate, fill = group)) +
+  geom_col(width = 0.5, alpha = 0.9, show.legend = FALSE) +
+  geom_errorbar(aes(ymin = pmax(rate - se*1.96,0), ymax = rate + se*1.96),
+                width = 0.15, color = C_TEXT, linewidth = 0.8) +
+  geom_text(aes(label = paste0(round(rate*100,1),"%")),
+            vjust = -0.7, color = C_TEXT, fontface = "bold", size = 5) +
+  scale_fill_groups(name = NULL) +
+  scale_y_continuous(labels = percent_format(), expand = expansion(mult=c(0,0.2))) +
+  labs(title   = "Purchase Rate: Exposed vs Not Exposed",
+       subtitle = "Proportion of players who made at least one purchase. Error bars = 95% CI.",
+       x = NULL, y = "Purchase Rate") +
+  theme_crm()
+
+prop_purch <- prop.test(
+  x = round(purch_agg$rate * purch_agg$n),
+  n = purch_agg$n
+)
+cat("Proportion test p-value:", round(prop_purch$p.value, 6), "\n",
+    ifelse(prop_purch$p.value < 0.05, "Significant.", "Not significant."))
+```
+
+```{r purchase-nums, include=FALSE}
+pr_c   <- round(purch_agg$rate[purch_agg$group=="Not Exposed (Control)"] * 100, 1)
+pr_t   <- round(purch_agg$rate[purch_agg$group=="Exposed (Treatment)"]  * 100, 1)
+pr_lift<- round((pr_t - pr_c) / pr_c * 100, 1)
+pr_sig <- prop_purch$p.value < 0.05
+pr_p   <- round(prop_purch$p.value, 4)
+```
+
+> **The campaign drove a purchase rate of `r pr_t`% in the treatment group vs. `r pr_c`% in the control group, a lift of `r pr_lift`% (p = `r pr_p`, `r ifelse(pr_sig,"statistically significant","not statistically significant")`).** This is the headline commercial result. Every percentage point of purchase rate lift translates directly to revenue at scale. The absolute difference of `r round(pr_t - pr_c, 1)` percentage points, when applied across the full player base, quantifies the campaign's incremental conversion value.
+
+### In-Game Spend (Among Buyers)
+
+```{r spend-analysis, fig.height=5}
+spend_agg <- df %>%
+  filter(in_game_spend > 0) %>%
+  group_by(group) %>%
+  summarise(mean_sp = mean(in_game_spend), median_sp = median(in_game_spend),
+            se = sd(in_game_spend)/sqrt(n()), .groups="drop")
+
+df %>%
+  filter(in_game_spend > 0) %>%
+  ggplot(aes(x = in_game_spend, fill = group, color = group)) +
+  geom_density(alpha = 0.30, linewidth = 1) +
+  geom_vline(data = spend_agg, aes(xintercept = median_sp, color = group),
+             linetype = "dashed", linewidth = 1.1) +
+  scale_fill_groups(name = NULL) +
+  scale_color_groups(name = NULL) +
+  scale_x_continuous(labels = dollar_format()) +
+  labs(title   = "In-Game Spend Distribution (Buyers Only): Exposed vs Not Exposed",
+       subtitle = "Dashed lines = group medians. Restricted to players who made a purchase.",
+       x = "In-Game Spend (USD)", y = "Density") +
+  theme_crm() + theme(legend.position = "top")
+```
+
+```{r spend-nums, include=FALSE}
+sp_t   <- df$in_game_spend[df$campaign_exposed==1 & df$in_game_spend>0]
+sp_c   <- df$in_game_spend[df$campaign_exposed==0 & df$in_game_spend>0]
+t_sp   <- t.test(sp_t, sp_c)
+sp_m_c <- round(median(sp_c), 2)
+sp_m_t <- round(median(sp_t), 2)
+sp_dir <- ifelse(sp_m_t > sp_m_c, "higher", "lower")
+sp_sig <- t_sp$p.value < 0.05
+sp_p   <- round(t_sp$p.value, 4)
+```
+
+> **Among buyers, the treatment group spent a median of $`r sp_m_t` vs. $`r sp_m_c` in the control group, with treatment spend being `r sp_dir` (p = `r sp_p`, `r ifelse(sp_sig,"significant","not significant")`).** This analysis is restricted to players who purchased, examining spend depth rather than conversion width. A campaign that not only converts more players but also increases the spend per converted player compounds its revenue impact. The density comparison shows whether the spend distributions differ in shape or just in center.
+
+---
+
+## Section 3: Retention -- Did the Campaign Bring Players Back?
+
+Retention is measured by `returned_after_campaign`, which flags whether a player made at least one additional session after the campaign window closed.
+
+```{r retention, fig.height=4.5}
+ret_agg <- df %>%
+  group_by(group) %>%
+  summarise(rate = mean(returned_after_campaign), n = n(),
+            se = sqrt(rate*(1-rate)/n), .groups="drop")
+
+ret_agg %>%
+  ggplot(aes(x = group, y = rate, fill = group)) +
+  geom_col(width = 0.5, alpha = 0.9, show.legend = FALSE) +
+  geom_errorbar(aes(ymin = pmax(rate-se*1.96,0), ymax = rate+se*1.96),
+                width = 0.15, color = C_TEXT, linewidth = 0.8) +
+  geom_text(aes(label = paste0(round(rate*100,1),"%")),
+            vjust = -0.7, color = C_TEXT, fontface = "bold", size = 5) +
+  scale_fill_groups(name = NULL) +
+  scale_y_continuous(labels = percent_format(), expand = expansion(mult=c(0,0.2))) +
+  labs(title   = "Return Rate: Exposed vs Not Exposed",
+       subtitle = "Share of players who returned after the campaign window. Error bars = 95% CI.",
+       x = NULL, y = "Return Rate") +
+  theme_crm()
+
+prop_ret <- prop.test(
+  x = round(ret_agg$rate * ret_agg$n),
+  n = ret_agg$n
+)
+```
+
+```{r retention-nums, include=FALSE}
+rr_c <- round(ret_agg$rate[ret_agg$group=="Not Exposed (Control)"]  * 100, 1)
+rr_t <- round(ret_agg$rate[ret_agg$group=="Exposed (Treatment)"]   * 100, 1)
+rr_lift <- round((rr_t - rr_c) / rr_c * 100, 1)
+rr_sig  <- prop_ret$p.value < 0.05
+rr_p    <- round(prop_ret$p.value, 4)
+```
+
+> **`r rr_t`% of exposed players returned after the campaign, compared to `r rr_c`% of the control group, a `r rr_lift`% lift in return rate (p = `r rr_p`, `r ifelse(rr_sig,"significant","not significant")`).** Retention is the most strategically important outcome for long-term player lifetime value. A player who returns is re-engaged in the product lifecycle and available for future monetization events. Even a small improvement in return rate, compounded over many campaign cycles, has a substantial effect on churn reduction.
+
+---
+
+## CRM Funnel Analysis
+
+The campaign funnel traces player progression from initial exposure through to purchase. Drop-off rates at each stage reveal where friction is highest and where optimization effort will have the greatest impact.
+
+```{r funnel-data}
+n_exposed  <- sum(df$campaign_exposed == 1)
+n_clicked  <- sum(df$clicked_campaign == 1)
+n_returned <- sum(df$returned_after_campaign == 1 & df$campaign_exposed == 1)
+n_purchased<- sum(df$purchases == 1 & df$campaign_exposed == 1)
+
+funnel <- tibble(
+  Stage    = factor(c("1. Campaign Sent","2. Clicked","3. Returned","4. Purchased"),
+                     levels = c("4. Purchased","3. Returned","2. Clicked","1. Campaign Sent")),
+  n        = c(n_exposed, n_clicked, n_returned, n_purchased),
+  pct_prev = c(NA,
+               round(n_clicked/n_exposed*100, 1),
+               round(n_returned/n_clicked*100, 1),
+               round(n_purchased/n_returned*100, 1)),
+  pct_total= round(c(n_exposed, n_clicked, n_returned, n_purchased) / n_exposed * 100, 1)
+)
+```
+
+```{r funnel-chart, fig.height=5}
+funnel %>%
+  ggplot(aes(x = Stage, y = n, fill = Stage)) +
+  geom_col(width = 0.65, alpha = 0.9, show.legend = FALSE) +
+  geom_text(aes(label = paste0(comma(n), "\n(", pct_total, "% of sent)")),
+            hjust = -0.1, color = C_TEXT, size = 3.5) +
+  scale_fill_manual(values = c(
+    "1. Campaign Sent" = "#3498DB",
+    "2. Clicked"       = "#9B59B6",
+    "3. Returned"      = "#E67E22",
+    "4. Purchased"     = "#27AE60"
+  )) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.35))) +
+  coord_flip() +
+  labs(title   = "CRM Conversion Funnel: Campaign Sent to Purchase",
+       subtitle = "Each stage shows count and % of original campaign audience.",
+       x = NULL, y = "Players") +
+  theme_crm() + theme(panel.grid.major.y = element_blank())
+```
+
+```{r funnel-dropoff}
+funnel %>%
+  mutate(dropoff = ifelse(is.na(pct_prev), NA, 100 - pct_prev)) %>%
+  select(Stage, `Players (N)` = n, `% of Sent` = pct_total,
+         `% Retained from Prior Stage` = pct_prev,
+         `% Dropped from Prior Stage` = dropoff) %>%
+  kable(caption = "Funnel Drop-Off Analysis") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = FALSE) %>%
+  column_spec(5, color = {
+    d <- c(NA_real_, 100 - funnel$pct_prev[-1])
+    dplyr::case_when(is.na(d) ~ C_MUTED, d > 60 ~ C_RED,
+                     d > 30   ~ C_GOLD,  TRUE    ~ C_GREEN)
+  })
+```
+
+```{r funnel-nums, include=FALSE}
+click_rate   <- round(n_clicked  / n_exposed  * 100, 1)
+return_rate_f<- round(n_returned / n_clicked  * 100, 1)
+conv_rate_f  <- round(n_purchased/ n_returned * 100, 1)
+overall_conv <- round(n_purchased/ n_exposed  * 100, 1)
+biggest_drop <- if (click_rate < return_rate_f && click_rate < conv_rate_f) {
+  paste0("the click stage (only ", click_rate, "% of recipients clicked)")
+} else if (return_rate_f < click_rate && return_rate_f < conv_rate_f) {
+  paste0("the return stage (only ", return_rate_f, "% of clickers returned)")
+} else {
+  paste0("the conversion stage (only ", conv_rate_f, "% of returners purchased)")
+}
+```
+
+> **Of the `r comma(n_exposed)` players who received the campaign, `r click_rate`% clicked, `r return_rate_f`% of those returned to the game, and `r conv_rate_f`% of those made a purchase, resulting in an overall conversion rate of `r overall_conv`%.** The largest drop-off occurs at `r biggest_drop`. This is the most impactful stage to optimize: improving the click-to-return rate or the return-to-purchase rate by even a few percentage points would significantly improve the campaign's overall ROI. Funnel analysis makes these leverage points concrete and actionable.
+
+### Click Rate by Campaign Type
+
+```{r click-by-type, fig.height=4.5}
+click_type <- df %>%
+  filter(!is.na(campaign_type)) %>%
+  group_by(campaign_type) %>%
+  summarise(click_rate = mean(clicked_campaign), n = n(),
+            se = sqrt(click_rate*(1-click_rate)/n), .groups="drop") %>%
+  arrange(desc(click_rate))
+
+click_type %>%
+  ggplot(aes(x = reorder(campaign_type, click_rate), y = click_rate, fill = campaign_type)) +
+  geom_col(width = 0.55, alpha = 0.9, show.legend = FALSE) +
+  geom_errorbar(aes(ymin = pmax(click_rate-se*1.96,0), ymax = click_rate+se*1.96),
+                width = 0.15, color = C_TEXT, linewidth = 0.8) +
+  geom_text(aes(label = paste0(round(click_rate*100,1),"%")),
+            hjust = -0.2, color = C_TEXT, fontface = "bold", size = 4) +
+  scale_fill_manual(values = c("Email"="#3498DB","Push"="#E67E22","In-Game"="#27AE60")) +
+  scale_y_continuous(labels = percent_format(), expand = expansion(mult=c(0,0.35))) +
+  coord_flip() +
+  labs(title   = "Click-Through Rate by Campaign Type",
+       subtitle = "In-game campaigns reach players at the highest intent moment.",
+       x = NULL, y = "Click Rate") +
+  theme_crm() + theme(panel.grid.major.y = element_blank())
+```
+
+```{r click-type-nums, include=FALSE}
+cr_ingame <- round(click_type$click_rate[click_type$campaign_type=="In-Game"]*100,1)
+cr_push   <- round(click_type$click_rate[click_type$campaign_type=="Push"]*100,1)
+cr_email  <- round(click_type$click_rate[click_type$campaign_type=="Email"]*100,1)
+```
+
+> **In-game messages achieved a `r cr_ingame`% click rate vs. `r cr_push`% for push notifications and `r cr_email`% for email.** The channel hierarchy is intuitive: in-game messages reach players at the highest intent moment (they are already actively playing), while email requires players to leave their current context and return. This `r round(cr_ingame/cr_email,1)`x difference between the best and worst channels has major implications for campaign budget allocation. If in-game messages are more costly to produce, the click-rate advantage must be weighed against the per-message cost.
+
+---
+
+## Segmentation Analysis
+
+Understanding which player segments and platforms respond differently to the campaign is essential for personalization and targeting strategy.
+
+### Campaign Effectiveness by Player Segment
+
+```{r segment-analysis, fig.height=5}
+seg_metrics <- df %>%
+  group_by(player_segment, group) %>%
+  summarise(
+    purchase_rate  = mean(purchases),
+    return_rate    = mean(returned_after_campaign),
+    avg_spend      = mean(in_game_spend),
+    n              = n(),
+    .groups        = "drop"
+  )
+
+p_seg_pur <- seg_metrics %>%
+  ggplot(aes(x = player_segment, y = purchase_rate, fill = group)) +
+  geom_col(position = "dodge", alpha = 0.9, width = 0.65) +
+  geom_text(aes(label = paste0(round(purchase_rate*100,1),"%")),
+            position = position_dodge(0.65), vjust = -0.5,
+            color = C_TEXT, size = 3) +
+  scale_fill_groups(name = NULL) +
+  scale_y_continuous(labels = percent_format(), expand = expansion(mult=c(0,0.18))) +
+  labs(title = "Purchase Rate by Segment", x = NULL, y = "Purchase Rate") +
+  theme_crm() + theme(legend.position = "top")
+
+p_seg_ret <- seg_metrics %>%
+  ggplot(aes(x = player_segment, y = return_rate, fill = group)) +
+  geom_col(position = "dodge", alpha = 0.9, width = 0.65) +
+  geom_text(aes(label = paste0(round(return_rate*100,1),"%")),
+            position = position_dodge(0.65), vjust = -0.5,
+            color = C_TEXT, size = 3) +
+  scale_fill_groups(name = NULL) +
+  scale_y_continuous(labels = percent_format(), expand = expansion(mult=c(0,0.18))) +
+  labs(title = "Return Rate by Segment", x = NULL, y = "Return Rate") +
+  theme_crm() + theme(legend.position = "top")
+
+p_seg_pur + p_seg_ret +
+  plot_annotation(title = "Campaign Effectiveness by Player Segment",
+                  subtitle = "Orange = Exposed, Blue = Not Exposed. Gap between bars = campaign lift per segment.",
+                  theme = ann_theme)
+```
+
+```{r segment-nums, include=FALSE}
+seg_lift <- seg_metrics %>%
+  select(player_segment, group, purchase_rate) %>%
+  pivot_wider(names_from = group, values_from = purchase_rate) %>%
+  mutate(lift = round((`Exposed (Treatment)` - `Not Exposed (Control)`) * 100, 1)) %>%
+  arrange(desc(lift))
+top_seg  <- seg_lift$player_segment[1]
+top_lift <- seg_lift$lift[1]
+low_seg  <- seg_lift$player_segment[nrow(seg_lift)]
+low_lift <- seg_lift$lift[nrow(seg_lift)]
+```
+
+> **Returning players showed the strongest response to the campaign with a `r top_lift` percentage point purchase rate lift, while `r low_seg` players showed the smallest lift (`r low_lift` pp).** This segment response pattern is a fundamental insight for targeting strategy. Returning players already have a relationship with the game and are pre-disposed to re-engage when prompted. Casual players may need a different message or incentive structure to achieve comparable lift. Competitive players respond well to the campaign but are already active, so the campaign may be most cost-efficient when weighted toward Returning segments.
+
+### Campaign Effectiveness by Platform
+
+```{r platform-analysis, fig.height=4.5}
+plat_metrics <- df %>%
+  group_by(platform, group) %>%
+  summarise(purchase_rate = mean(purchases), avg_spend = mean(in_game_spend),
+            n = n(), .groups="drop")
+
+p_plat_pr <- plat_metrics %>%
+  ggplot(aes(x = platform, y = purchase_rate, fill = group)) +
+  geom_col(position = "dodge", alpha = 0.9, width = 0.6) +
+  geom_text(aes(label = paste0(round(purchase_rate*100,1),"%")),
+            position = position_dodge(0.6), vjust = -0.4,
+            color = C_TEXT, size = 3.5) +
+  scale_fill_groups(name = NULL) +
+  scale_y_continuous(labels = percent_format(), expand = expansion(mult=c(0,0.2))) +
+  labs(title = "Purchase Rate by Platform", x = NULL, y = "Purchase Rate") +
+  theme_crm() + theme(legend.position = "top")
+
+p_plat_sp <- plat_metrics %>%
+  ggplot(aes(x = platform, y = avg_spend, fill = group)) +
+  geom_col(position = "dodge", alpha = 0.9, width = 0.6) +
+  geom_text(aes(label = paste0("$",round(avg_spend,1))),
+            position = position_dodge(0.6), vjust = -0.4,
+            color = C_TEXT, size = 3.5) +
+  scale_fill_groups(name = NULL) +
+  scale_y_continuous(labels = dollar_format(), expand = expansion(mult=c(0,0.2))) +
+  labs(title = "Avg Spend by Platform", x = NULL, y = "Avg In-Game Spend") +
+  theme_crm() + theme(legend.position = "top")
+
+p_plat_pr + p_plat_sp +
+  plot_annotation(title = "Campaign Effectiveness by Platform",
+                  subtitle = "Spend includes non-purchasers ($0). Orange = Exposed.",
+                  theme = ann_theme)
+```
+
+```{r platform-nums, include=FALSE}
+plat_lift <- plat_metrics %>%
+  select(platform, group, purchase_rate) %>%
+  pivot_wider(names_from = group, values_from = purchase_rate) %>%
+  mutate(lift = round((`Exposed (Treatment)` - `Not Exposed (Control)`) * 100, 1)) %>%
+  arrange(desc(lift))
+top_plat  <- plat_lift$platform[1]
+top_p_lift<- plat_lift$lift[1]
+```
+
+> **`r top_plat` players showed a `r top_p_lift` percentage point purchase rate lift from the campaign.** Platform differences in campaign response have targeting implications: if one platform shows consistently stronger lift, the campaign budget can be re-weighted accordingly. Spend differences between platforms may also reflect payment friction differences (e.g., console players may require extra steps to complete in-game purchases) rather than willingness to pay.
+
+### Campaign Effectiveness by Region
+
+```{r region-analysis, fig.height=5}
+region_metrics <- df %>%
+  filter(region != "Unknown") %>%
+  group_by(region, group) %>%
+  summarise(purchase_rate = mean(purchases), avg_spend = mean(in_game_spend),
+            n = n(), .groups="drop")
+
+region_lift <- region_metrics %>%
+  select(region, group, purchase_rate) %>%
+  pivot_wider(names_from = group, values_from = purchase_rate) %>%
+  mutate(lift_pp = round((`Exposed (Treatment)` - `Not Exposed (Control)`) * 100, 2)) %>%
+  arrange(desc(lift_pp))
+
+region_lift %>%
+  ggplot(aes(x = reorder(region, lift_pp), y = lift_pp, fill = lift_pp > 0)) +
+  geom_col(width = 0.55, alpha = 0.9, show.legend = FALSE) +
+  geom_text(aes(label = paste0(ifelse(lift_pp>0,"+",""), lift_pp, "pp")),
+            hjust = ifelse(region_lift$lift_pp > 0, -0.15, 1.15),
+            color = C_TEXT, fontface = "bold", size = 4) +
+  scale_fill_manual(values = c("TRUE"=C_GREEN, "FALSE"=C_RED)) +
+  scale_y_continuous(expand = expansion(mult=c(0.15,0.2))) +
+  coord_flip() +
+  labs(title   = "Purchase Rate Lift by Region (Treatment minus Control)",
+       subtitle = "Positive bars = campaign drove more purchases. Excludes 'Unknown' region.",
+       x = NULL, y = "Purchase Rate Lift (percentage points)") +
+  theme_crm() + theme(panel.grid.major.y = element_blank())
+```
+
+```{r region-nums, include=FALSE}
+top_region  <- region_lift$region[1]
+top_r_lift  <- region_lift$lift_pp[1]
+low_region  <- region_lift$region[nrow(region_lift)]
+low_r_lift  <- region_lift$lift_pp[nrow(region_lift)]
+```
+
+> **`r top_region` showed the strongest campaign lift at `r top_r_lift` percentage points, while `r low_region` showed the weakest (`r low_r_lift` pp).** Regional variation in campaign effectiveness reflects differences in player behavior, payment infrastructure, cultural receptivity to push communications, and the competitive gaming landscape in each market. Regions with high lift but lower baseline spend (e.g., APAC or LATAM) may represent high-potential markets where campaign investment can compress conversion gaps.
+
+---
+
+## Regression Analysis
+
+Regression models control for multiple factors simultaneously, isolating the campaign's independent effect on conversion.
+
+### Logistic Regression: Purchase Probability
+
+```{r logistic-regression}
+log_model <- glm(
+  purchases ~ campaign_exposed + player_segment + platform + region,
+  data   = df %>% filter(region != "Unknown"),
+  family = binomial
+)
+
+log_coefs <- summary(log_model)$coefficients
+log_df <- as.data.frame(log_coefs) %>%
+  rownames_to_column("Term") %>%
+  transmute(
+    Term,
+    `Odds Ratio`  = round(exp(Estimate), 3),
+    `Estimate (Log-Odds)` = round(Estimate, 4),
+    SE            = round(`Std. Error`, 4),
+    `p-value`     = round(`Pr(>|z|)`, 4),
+    Significant   = `Pr(>|z|)` < 0.05
+  )
+
+log_df %>%
+  kable(caption = "Logistic Regression: Predictors of Purchase (Odds Ratios)") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = TRUE) %>%
+  column_spec(6, color = ifelse(log_df$Significant, C_GREEN, C_RED))
+```
+
+```{r logistic-nums, include=FALSE}
+camp_or  <- round(exp(coef(log_model)["campaign_exposed"]), 3)
+camp_p   <- round(summary(log_model)$coefficients["campaign_exposed","Pr(>|z|)"], 4)
+camp_sig <- camp_p < 0.05
+camp_pct <- round((camp_or - 1) * 100, 1)
+```
+
+> **After controlling for player segment, platform, and region, the campaign increased the odds of purchasing by a factor of `r camp_or` (`r camp_pct`% higher odds, p = `r camp_p`, `r ifelse(camp_sig,"significant","not significant")`).** Logistic regression provides the cleanest causal estimate available from this dataset because it accounts for the baseline differences between segments and regions. An odds ratio above 1.0 means campaign exposure increases purchase likelihood. The magnitude and significance of this coefficient is the controlled campaign effect, stripped of compositional differences in who was exposed.
+
+### Linear Regression: Spend Among Buyers
+
+```{r linear-regression}
+spend_model <- lm(
+  in_game_spend ~ campaign_exposed + player_segment + platform + region,
+  data = df %>% filter(in_game_spend > 0, region != "Unknown")
+)
+
+sp_coefs <- summary(spend_model)$coefficients
+sp_df <- as.data.frame(sp_coefs) %>%
+  rownames_to_column("Term") %>%
+  transmute(
+    Term,
+    Estimate      = round(Estimate, 3),
+    SE            = round(`Std. Error`, 3),
+    `p-value`     = round(`Pr(>|t|)`, 4),
+    Significant   = `Pr(>|t|)` < 0.05
+  )
+
+sp_df %>%
+  kable(caption = paste0(
+    "Linear Regression: In-Game Spend Among Buyers | R-squared = ",
+    round(summary(spend_model)$r.squared, 3)
+  )) %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = TRUE) %>%
+  column_spec(5, color = ifelse(sp_df$Significant, C_GREEN, C_RED))
+```
+
+```{r linear-nums, include=FALSE}
+sp_coef <- round(coef(spend_model)["campaign_exposed"], 2)
+sp_p    <- round(summary(spend_model)$coefficients["campaign_exposed","Pr(>|t|)"], 4)
+sp_sig  <- sp_p < 0.05
+sp_dir  <- ifelse(sp_coef > 0, "more", "less")
+```
+
+> **Among buyers, campaign exposure is associated with $`r abs(sp_coef)` `r sp_dir` in spend, after controlling for segment, platform, and region (p = `r sp_p`, `r ifelse(sp_sig,"significant","not significant")`).** This regression captures spend depth, not just conversion. If the campaign not only converts more players but also increases how much each converted player spends, the combined revenue effect is multiplicative. The R-squared value indicates how much of total spend variation is explained by the model.
+
+---
+
+## Statistical Summary
+
+```{r stat-summary}
+all_results <- tibble(
+  Outcome            = c("Session Length (min)","Games Played",
+                          "Purchase Rate (%)","In-Game Spend ($, buyers)",
+                          "Return Rate (%)"),
+  `Control Mean`     = c(sl_m_c, gp_m_c, pr_c, sp_m_c, rr_c),
+  `Treatment Mean`   = c(sl_m_t, gp_m_t, pr_t, sp_m_t, rr_t),
+  Delta              = c(
+    round(sl_m_t - sl_m_c, 1),
+    round(gp_m_t - gp_m_c, 2),
+    round(pr_t   - pr_c,   1),
+    round(sp_m_t - sp_m_c, 2),
+    round(rr_t   - rr_c,   1)
+  ),
+  `p-value`          = c(sl_p, gp_p, pr_p, sp_p, rr_p),
+  Significant        = c(sl_sig, gp_sig, pr_sig, sp_sig, rr_sig),
+  Direction          = c(
+    ifelse(sl_m_t>sl_m_c,"Campaign +","Campaign -"),
+    ifelse(gp_m_t>gp_m_c,"Campaign +","Campaign -"),
+    ifelse(pr_t>pr_c,"Campaign +","Campaign -"),
+    ifelse(sp_m_t>sp_m_c,"Campaign +","Campaign -"),
+    ifelse(rr_t>rr_c,"Campaign +","Campaign -")
+  )
+)
+
+all_results %>%
+  kable(caption = "Complete Results: Campaign vs No Campaign") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = TRUE) %>%
+  column_spec(6, color = ifelse(all_results$Significant, C_GREEN, C_RED))
+```
+
+---
+
+## Key Insights and Highlights
+
+```{r insights-compute, include=FALSE}
+n_sig       <- sum(all_results$Significant)
+n_tests     <- nrow(all_results)
+sig_outcomes<- all_results$Outcome[all_results$Significant]
+sig_str     <- if(length(sig_outcomes)>0) paste(sig_outcomes, collapse=", ") else "none"
+
+headline <- case_when(
+  n_sig == n_tests ~
+    paste0("The campaign was broadly effective, with statistically significant positive effects across all ",
+           n_tests, " measured outcomes."),
+  n_sig >= 3 ~
+    paste0("The campaign was effective across ", n_sig, " of ", n_tests,
+           " outcomes, with the strongest evidence in: ", sig_str, "."),
+  n_sig >= 1 ~
+    paste0("The campaign showed a significant effect on ", n_sig, " of ", n_tests,
+           " outcomes. Significant outcomes: ", sig_str, "."),
+  TRUE ~
+    "No statistically significant campaign effects were detected. The campaign did not measurably shift engagement or conversion."
+)
+```
+
+<div class="insight-box">
+**Campaign Verdict:** `r headline`
+</div>
+
+### Engagement
+
+> **Session length `r ifelse(sl_sig,"increased significantly","showed no significant change")` in the exposed group (`r sl_m_t` min vs. `r sl_m_c` min, p = `r sl_p`).** Games played `r ifelse(gp_sig,"also increased significantly","showed no significant shift")` (`r gp_m_t` vs. `r gp_m_c`, p = `r gp_p`). `r ifelse(sl_sig || gp_sig, "The campaign successfully deepened in-session engagement, not just triggering logins but driving players to play longer and complete more games.", "Engagement metrics did not respond to the campaign. Players who received the campaign did not play longer or more games than the control group.")`
+
+### Conversion
+
+> **Purchase rate `r ifelse(pr_sig,"increased significantly","did not change significantly")` from `r pr_c`% (control) to `r pr_t`% (treatment), a `r pr_lift`% relative lift (p = `r pr_p`).** Among buyers, spend was `r ifelse(sp_sig,"significantly","not significantly")` `r sp_dir` in the treatment group (median $`r sp_m_t` vs. $`r sp_m_c`, p = `r sp_p`). `r ifelse(pr_sig, paste0("At scale, a ", round(pr_t-pr_c,1), " percentage point purchase rate lift represents meaningful incremental revenue. The campaign is converting players who would not have purchased otherwise."), "The campaign did not drive a reliable conversion uplift. A different offer, message, or targeting approach may be required to move purchase rates.")`
+
+### Retention
+
+> **Return rate `r ifelse(rr_sig,"improved significantly","did not change significantly")` in the treatment group (`r rr_t`% vs. `r rr_c`%, p = `r rr_p`, lift = `r rr_lift`%).** `r ifelse(rr_sig, "The campaign successfully re-activated players and drove them back to the game, a direct retention signal. Every percentage point of return rate lift reduces the effective churn rate of the player base.", "The campaign did not produce a reliable retention effect. Players who received it were not more likely to return than those who did not.")`
+
+### Funnel Performance
+
+> **The conversion funnel reveals `r biggest_drop` as the biggest optimization opportunity.** Overall funnel conversion (sent to purchased) reached `r overall_conv`%. In-Game messages drove the highest click rates (`r cr_ingame`%), `r round(cr_ingame/cr_email,1)`x higher than email (`r cr_email`%). Across `r n_exposed` players reached, the campaign ultimately converted `r comma(n_purchased)` purchases within the exposed group.
+
+### Best-Performing Segments
+
+> **Returning players showed the strongest response to the campaign** (`r top_seg` segment, `r top_lift` pp purchase rate lift). Geographically, `r top_region` produced the largest regional lift at `r top_r_lift` pp. The In-Game channel outperformed all others on click rate and should be prioritized in budget allocation.
+
+### Recommendations
+
+<div class="rec-box">
+
+**1. Double down on In-Game messaging.** At `r cr_ingame`% click rate vs. `r cr_email`% for email, in-game messages are `r round(cr_ingame/cr_email,1)`x more effective at driving engagement. Budget should shift toward this channel unless production costs are prohibitive.
+
+**2. Prioritize Returning player segment.** This segment showed the highest purchase rate lift from the campaign. A targeted re-engagement campaign specifically designed for Returning players would likely outperform broad-audience campaigns.
+
+**3. Invest in the click-to-return stage.** The single largest funnel drop-off is between clicking and returning. Personalized landing experiences or in-game rewards for clicking could close this gap.
+
+**4. Geo-weight campaign spend toward `r top_region`.** This region showed the strongest lift. If marginal cost of campaign delivery is similar across regions, allocating more impressions to `r top_region` improves overall campaign ROI.
+
+**5. Run a follow-up spend optimization test.** The baseline purchase rate lift is confirmed. The next experiment should test whether a higher-value offer (deeper discount, more valuable in-game item) increases spend per buyer without reducing purchase rate.
+
+</div>
+
+### Summary Scorecard
+
+```{r scorecard}
+all_results %>%
+  mutate(
+    Result = case_when(
+      Significant & Delta > 0 ~ "Campaign positive effect",
+      Significant & Delta < 0 ~ "Campaign negative effect",
+      TRUE                    ~ "No significant effect"
+    )
+  ) %>%
+  kable(col.names = c("Outcome","Control","Treatment","Delta","p-value","Significant","Direction","Result"),
+        caption   = "Campaign Effectiveness Scorecard") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"),
+                full_width = TRUE) %>%
+  column_spec(6, color = ifelse(all_results$Significant, C_GREEN, C_RED)) %>%
+  column_spec(8, bold = TRUE,
+              color = case_when(
+                all_results$Significant & all_results$Delta > 0 ~ C_GREEN,
+                all_results$Significant & all_results$Delta < 0 ~ C_RED,
+                TRUE ~ C_MUTED
+              ))
+```
+
+---
+
+## Robustness and Caveats
+
+**Randomization validity:** Campaign exposure was randomly assigned in this simulation. In a production CRM environment, this assumption must be verified: if the campaign was targeted based on engagement level (e.g., sent only to at-risk players), the control group is not a valid counterfactual. Always confirm the assignment mechanism before interpreting results causally.
+
+**Funnel directionality:** `returned_after_campaign` and `purchases` are measured post-exposure but may also reflect player-level factors unrelated to the campaign (e.g., a player was going to purchase anyway). Without a holdout set measured at exactly the same time window, some baseline return and purchase rate is captured in the treatment group counts.
+
+**Channel assignment:** Campaign type was assigned randomly within the treatment group in this simulation. In practice, email/push/in-game channel assignment may be non-random (e.g., push only for players with the app installed), which would confound the channel effectiveness comparison.
+
+**Spend outlier handling:** Despite capping at the 99th percentile, the spend distribution remains right-skewed. Median-based comparisons are more robust here than mean-based comparisons.

@@ -1,0 +1,1 @@
+Designed a geospatial Power BI dashboard using proxy data, integrating GIS tools and shapefiles to analyze and visualize skilled trades labour market trends. Delivered interactive, map-driven insights to support decision-making across regions and occupations.

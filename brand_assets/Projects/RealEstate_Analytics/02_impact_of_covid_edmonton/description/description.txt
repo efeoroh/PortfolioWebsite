@@ -1,0 +1,1 @@
+1st Place Winner. Competition involving Masters+ students tasked with analyzing City of Edmonton datasets. I led Section 5 — the core descriptive analysis — conducting large-scale exploratory analysis that identified key structural changes in housing demand and price dynamics, informing the predictive models built by the team.

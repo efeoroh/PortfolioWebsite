@@ -1,0 +1,1197 @@
+---
+title: "Dota 2 Patch Impact Analysis"
+subtitle: "A Causal Evaluation of Game Version Changes on Player Performance and Behavior"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    toc: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
+    theme: darkly
+    highlight: espresso
+    df_print: paged
+---
+
+<style>
+h1, h2, h3, h4 { color: #c9a84c !important; }
+.list-group-item.active {
+  background-color: #c9a84c !important;
+  border-color:     #c9a84c !important;
+}
+blockquote {
+  border-left:      4px solid #c9a84c;
+  background-color: #16213e;
+  color:            #c0c0d0;
+  padding:          10px 16px;
+  border-radius:    0 4px 4px 0;
+  font-style:       normal;
+}
+.insight-box {
+  background-color: #0f3460;
+  border:           1px solid #c9a84c;
+  border-radius:    6px;
+  padding:          16px 20px;
+  margin:           12px 0;
+  color:            #c0c0d0;
+}
+img { border-radius: 3px; }
+.table { color: #c0c0d0; }
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo       = TRUE,
+  message    = FALSE,
+  warning    = FALSE,
+  fig.width  = 10,
+  fig.height = 5.5,
+  fig.align  = "center",
+  dpi        = 150
+)
+```
+
+```{r libraries}
+required_pkgs <- c(
+  "tidyverse", "httr", "jsonlite", "lubridate",
+  "scales", "viridis", "knitr", "kableExtra",
+  "patchwork", "ggrepel", "zoo"
+)
+new_pkgs <- required_pkgs[!required_pkgs %in% installed.packages()[,"Package"]]
+if (length(new_pkgs)) install.packages(new_pkgs, repos = "https://cloud.r-project.org")
+
+library(tidyverse)
+library(httr)
+library(jsonlite)
+library(lubridate)
+library(scales)
+library(viridis)
+library(knitr)
+library(kableExtra)
+library(patchwork)
+library(ggrepel)
+library(zoo)
+
+DOTA_BG    <- "#1a1a2e"
+DOTA_PANEL <- "#16213e"
+DOTA_GRID  <- "#2a2a4a"
+DOTA_GOLD  <- "#c9a84c"
+DOTA_RED   <- "#d94343"
+DOTA_GREEN <- "#4dbd4d"
+DOTA_BLUE  <- "#4d8bd9"
+DOTA_PURP  <- "#9b59d9"
+DOTA_ORNG  <- "#e07b39"
+DOTA_TEXT  <- "#c0c0d0"
+DOTA_MUTED <- "#808090"
+
+COL_TREAT  <- DOTA_GREEN
+COL_CTRL   <- DOTA_BLUE
+
+theme_dota <- function(base_size = 12) {
+  theme(
+    plot.background   = element_rect(fill = DOTA_BG,    color = NA),
+    panel.background  = element_rect(fill = DOTA_PANEL, color = NA),
+    panel.grid.major  = element_line(color = DOTA_GRID,  linewidth = 0.3),
+    panel.grid.minor  = element_blank(),
+    plot.title        = element_text(color = DOTA_GOLD,  face = "bold", size = base_size + 2),
+    plot.subtitle     = element_text(color = DOTA_MUTED, size = base_size - 1),
+    plot.caption      = element_text(color = "#606070",  size = base_size - 2),
+    axis.title        = element_text(color = DOTA_TEXT,  size = base_size),
+    axis.text         = element_text(color = DOTA_MUTED, size = base_size - 1),
+    axis.line         = element_line(color = "#3a3a5a"),
+    axis.ticks        = element_line(color = "#3a3a5a"),
+    legend.background = element_rect(fill = DOTA_BG,    color = NA),
+    legend.key        = element_rect(fill = DOTA_PANEL, color = NA),
+    legend.text       = element_text(color = DOTA_TEXT,  size = base_size - 1),
+    legend.title      = element_text(color = DOTA_GOLD,  size = base_size),
+    strip.background  = element_rect(fill = "#0f3460",   color = NA),
+    strip.text        = element_text(color = DOTA_GOLD,  face = "bold", size = base_size),
+    plot.margin       = margin(15, 15, 10, 10)
+  )
+}
+
+patch_ann <- theme(
+  plot.background = element_rect(fill = DOTA_BG, color = NA),
+  plot.title      = element_text(color = DOTA_GOLD,  face = "bold", size = 14),
+  plot.subtitle   = element_text(color = DOTA_MUTED, size = 11)
+)
+```
+
+---
+
+## Overview
+
+Every Dota 2 patch rewrites the rules of the game. Hero attributes shift, item recipes change, and objective timings are rebalanced. These updates arrive simultaneously for all players and cannot be deferred, making each patch release a natural experiment: an exogenous shock to the game environment that is independent of individual player choices or skill levels.
+
+This report answers one central question:
+
+> **Did the patch change how professional players perform, engage, and behave in their matches?**
+
+The investigation runs through four layers of analysis. First, the data is explored to establish what normal looks like. Second, matches are split into pre-patch (control) and post-patch (treatment) groups and compared visually and statistically. Third, each player is compared to their own pre-patch baseline, removing any noise from comparing different players against each other. Fourth, regression models isolate the patch effect after controlling for match-level factors.
+
+---
+
+## Data Collection
+
+```{r data-collection, cache = TRUE}
+fetch_pro_players <- function() {
+  resp <- tryCatch(GET("https://api.opendota.com/api/proPlayers", timeout(30)),
+                   error = function(e) NULL)
+  if (is.null(resp) || status_code(resp) != 200) return(NULL)
+  raw    <- content(resp, as = "text", encoding = "UTF-8")
+  parsed <- tryCatch(fromJSON(raw, flatten = TRUE), error = function(e) NULL)
+  if (is.null(parsed) || !is.data.frame(parsed) || nrow(parsed) == 0) return(NULL)
+  as_tibble(parsed)
+}
+
+fetch_player_matches <- function(account_id, limit = 60) {
+  url  <- paste0("https://api.opendota.com/api/players/", account_id,
+                 "/matches?limit=", limit)
+  resp <- tryCatch(GET(url, timeout(30)), error = function(e) NULL)
+  if (is.null(resp) || status_code(resp) != 200) return(NULL)
+  raw    <- content(resp, as = "text", encoding = "UTF-8")
+  parsed <- tryCatch(fromJSON(raw, flatten = TRUE), error = function(e) NULL)
+  if (is.null(parsed) || !is.data.frame(parsed) || nrow(parsed) == 0) return(NULL)
+  parsed$account_id <- account_id
+  Sys.sleep(1.2)
+  as_tibble(parsed)
+}
+
+set.seed(77)
+pro_list <- fetch_pro_players()
+if (is.null(pro_list)) stop("proPlayers API unavailable.")
+
+if (!"account_id"      %in% names(pro_list)) pro_list$account_id      <- NA_real_
+if (!"last_match_time" %in% names(pro_list)) pro_list$last_match_time <- NA_character_
+
+pro_filtered <- pro_list %>%
+  filter(!is.na(account_id), account_id > 0) %>%
+  mutate(last_dt = tryCatch(as_datetime(last_match_time, tz = "UTC"),
+                             error = function(e) as.POSIXct(NA))) %>%
+  filter(!is.na(last_dt), last_dt >= Sys.time() - days(365)) %>%
+  distinct(account_id, .keep_all = TRUE)
+
+n_sample   <- min(35, nrow(pro_filtered))
+pro_sample <- pro_filtered %>% sample_n(n_sample)
+cat("Players available:", nrow(pro_filtered), "| Sampled:", n_sample, "\n\n")
+
+raw_matches <- map(pro_sample$account_id, fetch_player_matches) %>%
+  purrr::compact() %>%
+  bind_rows()
+
+if (nrow(raw_matches) == 0) stop("No match data retrieved.")
+
+for (col in c("kills","deaths","assists","duration","leaver_status","party_size",
+              "average_rank","game_mode","lobby_type","radiant_win",
+              "player_slot","start_time","version")) {
+  if (!col %in% names(raw_matches)) raw_matches[[col]] <- NA
+}
+
+cat("Players with data:", n_distinct(raw_matches$account_id), "\n")
+cat("Total match records:", nrow(raw_matches), "\n")
+cat("Unique match IDs:", n_distinct(raw_matches$match_id), "\n")
+cat("Version field coverage:", round(mean(!is.na(raw_matches$version)) * 100, 1), "%\n")
+```
+
+---
+
+## Data Understanding
+
+Before defining any groups, the data is explored to understand what normal looks like at this skill level. This is a critical step: if the baseline is unusual in any way, it changes how we interpret treatment effects.
+
+### Dataset Snapshot
+
+```{r snapshot}
+tibble(
+  Metric = c("Total Records","Unique Players","Unique Matches",
+             "Date Range (Start)","Date Range (End)",
+             "Median Kills","Median Deaths","Median Assists",
+             "Median Duration (min)","Leaver Rate"),
+  Value = c(
+    comma(nrow(raw_matches)),
+    comma(n_distinct(raw_matches$account_id)),
+    comma(n_distinct(raw_matches$match_id)),
+    format(as_datetime(min(raw_matches$start_time, na.rm=TRUE)),"%Y-%m-%d"),
+    format(as_datetime(max(raw_matches$start_time, na.rm=TRUE)),"%Y-%m-%d"),
+    round(median(raw_matches$kills,         na.rm=TRUE), 1),
+    round(median(raw_matches$deaths,        na.rm=TRUE), 1),
+    round(median(raw_matches$assists,       na.rm=TRUE), 1),
+    round(median(raw_matches$duration / 60, na.rm=TRUE), 1),
+    paste0(round(mean(raw_matches$leaver_status > 0, na.rm=TRUE)*100, 2), "%")
+  )
+) %>%
+  kable(caption = "Dataset Snapshot") %>%
+  kable_styling(bootstrap_options = c("striped","hover","bordered"), full_width = FALSE)
+```
+
+### Baseline Performance Distributions
+
+```{r baseline-distributions, fig.height = 8}
+med_k <- median(raw_matches$kills,         na.rm=TRUE)
+med_d <- median(raw_matches$deaths,        na.rm=TRUE)
+med_a <- median(raw_matches$assists,       na.rm=TRUE)
+med_r <- median(raw_matches$duration / 60, na.rm=TRUE)
+
+mk <- raw_matches %>% filter(!is.na(kills)) %>%
+  ggplot(aes(x=kills)) +
+  geom_histogram(binwidth=1, fill=DOTA_RED, color=DOTA_BG, alpha=0.9) +
+  geom_vline(xintercept=med_k, color=DOTA_GOLD, linetype="dashed", linewidth=0.9) +
+  labs(title="Kills", x="Kills per Match", y="Count") + theme_dota()
+
+md_p <- raw_matches %>% filter(!is.na(deaths)) %>%
+  ggplot(aes(x=deaths)) +
+  geom_histogram(binwidth=1, fill=DOTA_BLUE, color=DOTA_BG, alpha=0.9) +
+  geom_vline(xintercept=med_d, color=DOTA_GOLD, linetype="dashed", linewidth=0.9) +
+  labs(title="Deaths", x="Deaths per Match", y="Count") + theme_dota()
+
+ma <- raw_matches %>% filter(!is.na(assists)) %>%
+  ggplot(aes(x=assists)) +
+  geom_histogram(binwidth=2, fill=DOTA_GREEN, color=DOTA_BG, alpha=0.9) +
+  geom_vline(xintercept=med_a, color=DOTA_GOLD, linetype="dashed", linewidth=0.9) +
+  labs(title="Assists", x="Assists per Match", y="Count") + theme_dota()
+
+mdur <- raw_matches %>% filter(!is.na(duration)) %>%
+  mutate(dm=duration/60) %>%
+  ggplot(aes(x=dm)) +
+  geom_histogram(binwidth=5, fill=DOTA_GOLD, color=DOTA_BG, alpha=0.9) +
+  geom_vline(xintercept=med_r, color="white", linetype="dashed", linewidth=0.9) +
+  labs(title="Duration", x="Duration (min)", y="Count") + theme_dota()
+
+(mk + md_p) / (ma + mdur) +
+  plot_annotation(title="Baseline: Core Performance Variables",
+                  subtitle="Established before any group split. Gold/white lines = medians.",
+                  theme=patch_ann)
+```
+
+```{r baseline-results, include=FALSE}
+bl_kills   <- round(median(raw_matches$kills,         na.rm=TRUE), 1)
+bl_deaths  <- round(median(raw_matches$deaths,        na.rm=TRUE), 1)
+bl_assists <- round(median(raw_matches$assists,       na.rm=TRUE), 1)
+bl_dur     <- round(median(raw_matches$duration / 60, na.rm=TRUE), 1)
+```
+
+> **The baseline confirms this is a high-skill, consistent dataset.** The typical match produces `r bl_kills` kills, `r bl_deaths` deaths, and `r bl_assists` assists, with games running a median of `r bl_dur` minutes. Kill and assist distributions are right-skewed because role specialization creates natural variation: carries score more kills while supports accumulate assists. Deaths are tightly clustered below 6, which is a direct marker of professional-level decision-making. These numbers establish the "normal" that the patch comparison will be measured against.
+
+### Game Version Distribution
+
+```{r version-dist, fig.height = 4}
+ver_counts <- raw_matches %>%
+  filter(!is.na(version)) %>%
+  count(version, name="matches") %>%
+  arrange(desc(version))
+
+if (nrow(ver_counts) > 0) {
+  ver_counts %>%
+    mutate(version=factor(version, levels=sort(unique(version)))) %>%
+    ggplot(aes(x=version, y=matches, fill=matches)) +
+    geom_col(alpha=0.9, width=0.65, show.legend=FALSE) +
+    geom_text(aes(label=comma(matches)), vjust=-0.4, color=DOTA_TEXT, size=3.5) +
+    scale_fill_gradient(low="#4d3a8c", high=DOTA_GOLD) +
+    scale_y_continuous(expand=expansion(mult=c(0, 0.18))) +
+    labs(title="Match Count by Game Version (Patch)",
+         subtitle="The newest version becomes the Treatment group; older versions become Control",
+         x="Version ID", y="Match Count") + theme_dota()
+} else {
+  cat("Version data unavailable. Temporal cutoff will be applied.")
+}
+```
+
+```{r version-results, include=FALSE}
+n_versions   <- nrow(ver_counts)
+top_version  <- if (n_versions > 0) max(ver_counts$version) else NA
+top_n        <- if (n_versions > 0) ver_counts$matches[ver_counts$version == top_version] else 0
+version_note <- if (n_versions >= 2) {
+  paste0(n_versions, " distinct patch versions identified. Version ", top_version,
+         " is the newest and becomes the treatment group with ", top_n, " matches.")
+} else {
+  "Only one version found; a temporal cutoff will be used instead."
+}
+```
+
+> **`r version_note`** The height of each bar indicates how many matches were played on that patch version. Newer versions naturally have fewer matches since players have had less time to accumulate history on them. This chart is where the treatment boundary is set: the rightmost bar is the post-patch group, everything to the left is pre-patch.
+
+---
+
+## The A/B Test: How the Split Works
+
+This section explains exactly how the data was divided into treatment and control groups, why this division is valid, and what assumptions it rests on. Understanding the experimental design is essential for interpreting every chart and number that follows.
+
+### Step-by-Step: How Matches Are Assigned to Groups
+
+```{r treatment-definition}
+ver_info <- raw_matches %>%
+  filter(!is.na(version)) %>%
+  count(version) %>%
+  arrange(desc(version))
+
+use_version <- nrow(ver_info) >= 2 &&
+               all(sort(ver_info$n, decreasing=TRUE)[1:2] >= 30)
+
+if (use_version) {
+  latest_v <- max(ver_info$version)
+  prior_vs <- ver_info$version[ver_info$version < latest_v]
+  raw_matches <- raw_matches %>%
+    mutate(group = case_when(
+      !is.na(version) & version == latest_v   ~ "Treatment (Post-Patch)",
+      !is.na(version) & version %in% prior_vs ~ "Control (Pre-Patch)",
+      TRUE                                      ~ NA_character_
+    ))
+  treat_label  <- paste0("Version-based: v", latest_v, " = Post-Patch | v",
+                          paste(sort(prior_vs), collapse="/"), " = Pre-Patch")
+  treat_method <- "game version"
+  treat_v      <- latest_v
+  ctrl_vs      <- paste(sort(prior_vs), collapse=", ")
+  cat("Treatment method: Game Version\n")
+  cat("Treatment (Post-Patch): version =", latest_v, "\n")
+  cat("Control (Pre-Patch): version in", ctrl_vs, "\n")
+} else {
+  cutoff_ts  <- median(raw_matches$start_time, na.rm=TRUE)
+  cutoff_str <- format(as_datetime(cutoff_ts), "%Y-%m-%d")
+  raw_matches <- raw_matches %>%
+    mutate(group = case_when(
+      !is.na(start_time) & start_time >= cutoff_ts ~ "Treatment (Post-Patch)",
+      !is.na(start_time) & start_time <  cutoff_ts ~ "Control (Pre-Patch)",
+      TRUE                                           ~ NA_character_
+    ))
+  treat_label  <- paste0("Temporal cutoff: matches from ", cutoff_str, " onward = Post-Patch")
+  treat_method <- "temporal median"
+  treat_v      <- cutoff_str
+  ctrl_vs      <- paste0("before ", cutoff_str)
+  cat("Fallback: Temporal cutoff at", cutoff_str, "\n")
+}
+
+cat("\nSplit used:", treat_label, "\n")
+```
+
+**The split applied to this dataset:** `r treat_label`
+
+**The four steps of the experimental design:**
+
+**Step 1 -- Collect the raw data.** Match histories are pulled for `r n_sample` professional players (up to 60 matches each). Every match record includes a `version` field that identifies which Dota 2 patch was active when the game was played.
+
+**Step 2 -- Identify the patch boundary.** The unique version values in the dataset are ranked. If at least two versions appear with 30 or more matches each (enough for reliable statistics), the most recent version becomes the **Treatment group** and all earlier versions become the **Control group**. When version data is too sparse, the temporal median of `start_time` is used as the cutoff instead.
+
+**Step 3 -- Assign every match to one group.** Each match is labeled either "Treatment (Post-Patch)" or "Control (Pre-Patch)" based on its version tag. Matches with no version data are excluded from the comparison.
+
+**Step 4 -- Compare outcomes between groups.** KDA, kills, deaths, assists, match duration, inactivity gaps, leaver rate, and party play rate are all measured separately for each group and compared statistically.
+
+**Why this is valid as a quasi-experiment:**
+
+In a true randomized A/B test, participants are randomly assigned to groups. Here, the assignment mechanism is a mandatory Valve software update. Every player in the dataset received the patch at the same time, with no ability to opt out or stay on the previous version. This removes the core threat to causal inference, self-selection, because players did not choose which patch they played on. The patch is therefore an **exogenous shock**: its timing is determined by Valve's release schedule, not by anything about how or when a player chooses to play.
+
+**The key assumption** is that no other significant change happened at the same time as the patch that would explain any difference between the groups. If, for example, a major tournament ended right at the patch boundary and caused many players to stop queuing, that would confound the effect. The robustness section at the end of this report discusses this and other limitations.
+
+### Balance Check: Are the Two Groups Comparable?
+
+```{r group-balance}
+balance <- raw_matches %>%
+  filter(!is.na(group)) %>%
+  group_by(group) %>%
+  summarise(
+    Matches        = n(),
+    Players        = n_distinct(account_id),
+    `Avg KDA`      = round(mean((kills+assists)/pmax(deaths,1), na.rm=TRUE), 3),
+    `Avg Kills`    = round(mean(kills,         na.rm=TRUE), 2),
+    `Avg Deaths`   = round(mean(deaths,        na.rm=TRUE), 2),
+    `Avg Duration` = round(mean(duration/60,   na.rm=TRUE), 1),
+    `Leaver Rate`  = paste0(round(mean(leaver_status > 0, na.rm=TRUE)*100, 2), "%"),
+    .groups = "drop"
+  )
+
+balance %>%
+  kable(caption="Balance Check: Pre-Patch vs Post-Patch Groups") %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"), full_width=TRUE) %>%
+  column_spec(1, bold=TRUE,
+              color=c(COL_CTRL, COL_TREAT)[match(balance$group,
+                     c("Control (Pre-Patch)","Treatment (Post-Patch)"))])
+```
+
+```{r balance-results, include=FALSE}
+ctrl_row  <- balance %>% filter(group == "Control (Pre-Patch)")
+treat_row <- balance %>% filter(group == "Treatment (Post-Patch)")
+n_ctrl    <- if (nrow(ctrl_row)  > 0) ctrl_row$Matches  else 0
+n_treat   <- if (nrow(treat_row) > 0) treat_row$Matches else 0
+size_ratio <- if (n_ctrl > 0) round(max(n_ctrl,n_treat)/min(n_ctrl,n_treat), 1) else NA
+balance_ok <- !is.na(size_ratio) && size_ratio < 3
+```
+
+> **The balance check is a credibility test for the experiment before any outcomes are analyzed.** With `r n_ctrl` matches in the control group and `r n_treat` in the treatment group, the two groups `r ifelse(balance_ok, "are reasonably comparable in size", "show a size imbalance")`. When the groups are similar in average kills, deaths, and duration at this stage, it suggests the patch boundary is not simply separating matches played under fundamentally different conditions (e.g., tournament vs. ranked), which would confound the results. Any large imbalance in baseline metrics here requires cautious interpretation of the effects that follow.
+
+```{r group-size-chart, fig.height = 3.5}
+balance %>%
+  ggplot(aes(x=group, y=Matches, fill=group)) +
+  geom_col(width=0.45, alpha=0.9, show.legend=FALSE) +
+  geom_text(aes(label=comma(Matches)), vjust=-0.5,
+            color=DOTA_GOLD, fontface="bold", size=4.5) +
+  scale_fill_manual(values=c("Control (Pre-Patch)"   =COL_CTRL,
+                              "Treatment (Post-Patch)"=COL_TREAT)) +
+  scale_y_continuous(expand=expansion(mult=c(0,0.18))) +
+  labs(title="Match Count by Group",
+       subtitle="Blue = Pre-Patch (Control) | Green = Post-Patch (Treatment)",
+       x=NULL, y="Match Count") + theme_dota()
+```
+
+> **The pre-patch group (blue) contains `r n_ctrl` matches and the post-patch group (green) contains `r n_treat` matches.** Both groups need to be large enough for statistical tests to have power. Groups that are very unequal in size reduce confidence in the comparison, because the smaller group's estimates carry more uncertainty. The group sizes here `r ifelse(balance_ok, "support reliable comparison", "suggest results should be interpreted with some caution given the imbalance")`.
+
+---
+
+## Feature Engineering
+
+```{r features}
+matches <- raw_matches %>%
+  filter(!is.na(group)) %>%
+  mutate(
+    match_date   = as_datetime(start_time),
+    duration_min = duration / 60,
+    kda          = (kills + assists) / pmax(deaths, 1),
+    won = case_when(
+      !is.na(player_slot) & !is.na(radiant_win) & player_slot < 128  & radiant_win  ~ TRUE,
+      !is.na(player_slot) & !is.na(radiant_win) & player_slot >= 128 & !radiant_win ~ TRUE,
+      TRUE ~ FALSE
+    ),
+    party_play  = !is.na(party_size) & party_size > 1,
+    left_match  = !is.na(leaver_status) & leaver_status > 0,
+    treat_dummy = as.integer(group == "Treatment (Post-Patch)")
+  ) %>%
+  arrange(account_id, match_date) %>%
+  group_by(account_id) %>%
+  mutate(days_since_last = as.numeric(difftime(match_date, lag(match_date), units="days"))) %>%
+  ungroup()
+
+cat("Final dataset:", nrow(matches), "matches |",
+    n_distinct(matches$account_id), "players\n",
+    "Treatment:", sum(matches$treat_dummy),
+    "| Control:", sum(1 - matches$treat_dummy))
+```
+
+---
+
+## Section 1: Was There a Performance Effect?
+
+The first question is the most direct: did the patch change how well players performed? KDA (kills plus assists divided by deaths) is the headline metric. It captures both offensive contribution and survival in a single number, making it the most comprehensive individual performance indicator available.
+
+### KDA Distribution: Pre-Patch vs Post-Patch
+
+```{r kda-density, fig.height=5}
+kda_meds <- matches %>%
+  group_by(group) %>%
+  summarise(med=median(kda, na.rm=TRUE), .groups="drop")
+
+matches %>%
+  filter(!is.na(kda), kda <= 20) %>%
+  ggplot(aes(x=kda, fill=group, color=group)) +
+  geom_density(alpha=0.32, linewidth=0.9) +
+  geom_vline(data=kda_meds, aes(xintercept=med, color=group),
+             linetype="dashed", linewidth=1) +
+  scale_fill_manual(values=c("Control (Pre-Patch)"   =COL_CTRL,
+                              "Treatment (Post-Patch)"=COL_TREAT)) +
+  scale_color_manual(values=c("Control (Pre-Patch)"  =COL_CTRL,
+                               "Treatment (Post-Patch)"=COL_TREAT)) +
+  labs(title="KDA Distribution: Pre-Patch vs Post-Patch",
+       subtitle="Each curve = all matches in that group. Dashed lines = group medians.",
+       x="KDA Ratio", y="Density", fill=NULL, color=NULL) +
+  theme_dota() + theme(legend.position="top")
+```
+
+```{r kda-density-results, include=FALSE}
+kda_c     <- matches$kda[matches$treat_dummy==0 & !is.na(matches$kda)]
+kda_t     <- matches$kda[matches$treat_dummy==1 & !is.na(matches$kda)]
+t_kda     <- t.test(kda_t, kda_c)
+kda_med_c <- round(median(kda_c), 2)
+kda_med_t <- round(median(kda_t), 2)
+kda_dir   <- ifelse(kda_med_t > kda_med_c, "higher", "lower")
+kda_delta <- round(abs(kda_med_t - kda_med_c), 3)
+kda_sig   <- t_kda$p.value < 0.05
+kda_p_txt <- round(t_kda$p.value, 4)
+kda_interp <- ifelse(kda_sig,
+  paste0("This difference is statistically significant (p = ", kda_p_txt,
+         "), meaning it is unlikely to be due to chance."),
+  paste0("This difference does not reach statistical significance (p = ", kda_p_txt,
+         "), so it could plausibly be random variation."))
+```
+
+> **Post-patch KDA (median: `r kda_med_t`) was `r kda_dir` than pre-patch KDA (median: `r kda_med_c`), a shift of `r kda_delta` KDA points.** `r kda_interp` Each smoothed curve shows the distribution of KDA values across all matches in one group. A shift between the two peaks, or a gap between the dashed median lines, indicates how much individual performance changed under the new patch. The broader the overlap between curves, the smaller the practical effect.
+
+### KDA Statistical Test and Boxplot
+
+```{r kda-test}
+tibble(
+  Group    = c("Control (Pre-Patch)", "Treatment (Post-Patch)"),
+  N        = c(length(kda_c), length(kda_t)),
+  Mean     = round(c(mean(kda_c), mean(kda_t)), 3),
+  Median   = round(c(median(kda_c), median(kda_t)), 3),
+  SD       = round(c(sd(kda_c), sd(kda_t)), 3)
+) %>%
+  kable(caption=paste0(
+    "KDA: t = ", round(t_kda$statistic, 3), " | p = ", kda_p_txt, " | ",
+    ifelse(kda_sig, "SIGNIFICANT", "NOT SIGNIFICANT")
+  )) %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"), full_width=FALSE) %>%
+  column_spec(1, bold=TRUE, color=c(COL_CTRL, COL_TREAT))
+```
+
+```{r kda-boxplot, fig.height=5}
+matches %>%
+  filter(!is.na(kda), kda <= 20) %>%
+  ggplot(aes(x=group, y=kda, fill=group)) +
+  geom_boxplot(outlier.shape=21, outlier.size=1.5, outlier.alpha=0.4,
+               alpha=0.85, show.legend=FALSE) +
+  geom_hline(yintercept=median(matches$kda, na.rm=TRUE),
+             color=DOTA_GOLD, linetype="dashed", linewidth=0.8) +
+  annotate("text", x=0.58, y=median(matches$kda, na.rm=TRUE)+0.15,
+           label="Overall median", color=DOTA_GOLD, size=3.2, hjust=0) +
+  scale_fill_manual(values=c("Control (Pre-Patch)"   =COL_CTRL,
+                              "Treatment (Post-Patch)"=COL_TREAT)) +
+  labs(title="KDA by Group: Boxplot",
+       subtitle="Box = middle 50% of matches. Whiskers = 1.5x IQR. Dots = outliers.",
+       x=NULL, y="KDA Ratio") + theme_dota()
+```
+
+> **The boxplot breaks the KDA comparison into two questions: did the center shift, and did the spread change?** The box height shows variability: a taller post-patch box means more inconsistency match-to-match, which can indicate players are still adapting to new mechanics. The position of the box relative to the gold overall-median line shows which group performed above or below the dataset average. Here, the pre-patch group median is `r kda_med_c` and the post-patch group median is `r kda_med_t`. The test result (p = `r kda_p_txt`) tells us whether this difference is real or noise.
+
+### Component Breakdown: Kills, Deaths, Assists
+
+```{r component-comparison, fig.height=5}
+comp_agg <- matches %>%
+  filter(!is.na(kills),!is.na(deaths),!is.na(assists)) %>%
+  pivot_longer(c(kills,deaths,assists), names_to="metric", values_to="value") %>%
+  group_by(group, metric) %>%
+  summarise(mean_val=mean(value,na.rm=TRUE), se=sd(value,na.rm=TRUE)/sqrt(n()),
+            .groups="drop") %>%
+  mutate(metric=factor(metric, levels=c("kills","deaths","assists"),
+                        labels=c("Kills","Deaths","Assists")))
+
+comp_agg %>%
+  ggplot(aes(x=metric, y=mean_val, fill=group)) +
+  geom_col(position="dodge", alpha=0.9, width=0.65) +
+  geom_errorbar(aes(ymin=mean_val-se*1.96, ymax=mean_val+se*1.96),
+                position=position_dodge(0.65), width=0.2,
+                color=DOTA_TEXT, linewidth=0.7) +
+  scale_fill_manual(values=c("Control (Pre-Patch)"   =COL_CTRL,
+                              "Treatment (Post-Patch)"=COL_TREAT)) +
+  labs(title="Mean Kills, Deaths, Assists: Pre-Patch vs Post-Patch",
+       subtitle="Error bars = 95% confidence intervals",
+       x=NULL, y="Mean per Match", fill=NULL) +
+  theme_dota() + theme(legend.position="top")
+```
+
+```{r component-tests}
+comp_tests <- map_dfr(
+  list(list("kills","Kills"), list("deaths","Deaths"), list("assists","Assists")),
+  function(item) {
+    v <- item[[1]]; l <- item[[2]]
+    x <- matches[[v]][matches$treat_dummy==1 & !is.na(matches[[v]])]
+    y <- matches[[v]][matches$treat_dummy==0 & !is.na(matches[[v]])]
+    if (length(x)<2||length(y)<2) return(NULL)
+    tt <- t.test(x,y)
+    tibble(Metric=l, Control=round(mean(y),3), Treatment=round(mean(x),3),
+           Delta=round(mean(x)-mean(y),3), `p-value`=round(tt$p.value,4),
+           Significant=tt$p.value<0.05)
+  }
+)
+
+comp_tests %>%
+  kable(caption="Component Metric t-Tests") %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"), full_width=FALSE) %>%
+  column_spec(6, color=ifelse(comp_tests$Significant, DOTA_GREEN, DOTA_RED))
+```
+
+```{r component-results, include=FALSE}
+k_row <- comp_tests %>% filter(Metric=="Kills")
+d_row <- comp_tests %>% filter(Metric=="Deaths")
+a_row <- comp_tests %>% filter(Metric=="Assists")
+k_dir <- if(nrow(k_row)>0) ifelse(k_row$Delta>0,"more kills","fewer kills") else "similar kills"
+d_dir <- if(nrow(d_row)>0) ifelse(d_row$Delta>0,"more deaths","fewer deaths") else "similar deaths"
+a_dir <- if(nrow(a_row)>0) ifelse(a_row$Delta>0,"more assists","fewer assists") else "similar assists"
+k_sig <- if(nrow(k_row)>0) k_row$Significant else FALSE
+d_sig <- if(nrow(d_row)>0) d_row$Significant else FALSE
+a_sig <- if(nrow(a_row)>0) a_row$Significant else FALSE
+sig_components <- sum(c(k_sig, d_sig, a_sig))
+```
+
+> **Splitting KDA into its three components reveals the mechanism behind any overall shift.** Post-patch players averaged `r k_dir` (`r ifelse(k_sig,"significant","not significant")`), `r d_dir` (`r ifelse(d_sig,"significant","not significant")`), and `r a_dir` (`r ifelse(a_sig,"significant","not significant")`). `r sig_components` out of 3 component metrics showed a statistically significant change. A patch that makes heroes more fragile raises both kills and assists without necessarily affecting deaths. A patch that buffs survivability lowers deaths without changing offensive output. Knowing which component moved tells us what the patch actually changed in gameplay terms, not just the summary score.
+
+### KDA Timeline: Weekly Average by Group
+
+```{r kda-timeline, fig.height=5}
+matches %>%
+  filter(!is.na(kda),!is.na(match_date)) %>%
+  mutate(week=floor_date(match_date,"week")) %>%
+  group_by(week,group) %>%
+  summarise(avg_kda=mean(kda,na.rm=TRUE), n=n(), .groups="drop") %>%
+  filter(n>=5) %>%
+  ggplot(aes(x=week, y=avg_kda, color=group, group=group)) +
+  geom_line(linewidth=0.9, alpha=0.85) +
+  geom_point(size=2.5, alpha=0.8) +
+  geom_smooth(method="loess", se=FALSE, linewidth=0.5, linetype="dotted") +
+  scale_color_manual(values=c("Control (Pre-Patch)"  =COL_CTRL,
+                               "Treatment (Post-Patch)"=COL_TREAT)) +
+  scale_x_datetime(date_labels="%b '%y", date_breaks="1 month") +
+  labs(title="Weekly Average KDA by Group",
+       subtitle="Dotted LOESS lines show trend. A persistent gap = sustained patch effect.",
+       x=NULL, y="Average KDA", color=NULL) +
+  theme_dota() + theme(legend.position="top",
+                        axis.text.x=element_text(angle=30,hjust=1))
+```
+
+> **The timeline view tests whether any KDA difference is a durable shift or a temporary artifact of early-patch adaptation.** A genuine patch effect should appear as a consistent separation between the two lines sustained across multiple weeks. If the gap exists only for one or two weeks and then closes, it is more likely an adaptation effect (players figuring out the new meta) than a true performance change driven by the patch itself. The dotted trend lines smooth the weekly noise. A stable, persistent spread between the green (post-patch) and blue (pre-patch) lines is the strongest visual evidence of a lasting treatment effect.
+
+---
+
+## Section 2: Did the Patch Affect Engagement?
+
+Patches that players enjoy motivate faster return. A well-received update compresses inactivity gaps; a frustrating or unbalanced patch extends them as players take longer breaks between sessions.
+
+### Inactivity Gap: Pre-Patch vs Post-Patch
+
+```{r gap-density, fig.height=5}
+gap_data <- matches %>%
+  filter(!is.na(days_since_last), days_since_last>=0, days_since_last<=30)
+
+gap_meds <- gap_data %>%
+  group_by(group) %>%
+  summarise(med=median(days_since_last,na.rm=TRUE), .groups="drop")
+
+gap_data %>%
+  ggplot(aes(x=days_since_last, fill=group, color=group)) +
+  geom_density(alpha=0.32, linewidth=0.9) +
+  geom_vline(data=gap_meds, aes(xintercept=med, color=group),
+             linetype="dashed", linewidth=1) +
+  scale_fill_manual(values=c("Control (Pre-Patch)"   =COL_CTRL,
+                              "Treatment (Post-Patch)"=COL_TREAT)) +
+  scale_color_manual(values=c("Control (Pre-Patch)"  =COL_CTRL,
+                               "Treatment (Post-Patch)"=COL_TREAT)) +
+  labs(title="Inactivity Gap: Pre-Patch vs Post-Patch",
+       subtitle="Days between consecutive matches per player, capped at 30.",
+       x="Days Since Previous Match", y="Density", fill=NULL, color=NULL) +
+  theme_dota() + theme(legend.position="top")
+```
+
+```{r gap-test}
+gap_c <- gap_data$days_since_last[gap_data$treat_dummy==0]
+gap_t <- gap_data$days_since_last[gap_data$treat_dummy==1]
+
+if (length(gap_c)>1 && length(gap_t)>1) {
+  t_gap <- t.test(gap_t, gap_c)
+  tibble(
+    Group             = c("Control (Pre-Patch)","Treatment (Post-Patch)"),
+    N                 = c(length(gap_c),length(gap_t)),
+    `Mean Gap (days)` = round(c(mean(gap_c),mean(gap_t)),2),
+    `Median Gap (days)`=round(c(median(gap_c),median(gap_t)),2)
+  ) %>%
+    kable(caption=paste0(
+      "Inactivity Gap | p = ", round(t_gap$p.value,4), " | ",
+      ifelse(t_gap$p.value<0.05,"SIGNIFICANT","NOT SIGNIFICANT")
+    )) %>%
+    kable_styling(bootstrap_options=c("striped","hover","bordered"), full_width=FALSE) %>%
+    column_spec(1, bold=TRUE, color=c(COL_CTRL,COL_TREAT))
+}
+```
+
+```{r gap-results, include=FALSE}
+if (length(gap_c)>1 && length(gap_t)>1) {
+  t_gap_stored <- t.test(gap_t, gap_c)
+  gap_med_c  <- round(median(gap_c), 2)
+  gap_med_t  <- round(median(gap_t), 2)
+  gap_dir    <- ifelse(gap_med_t < gap_med_c, "shorter", "longer")
+  gap_sig    <- t_gap_stored$p.value < 0.05
+  gap_p_txt  <- round(t_gap_stored$p.value, 4)
+  gap_engage <- ifelse(gap_dir == "shorter",
+    "Players returned to the game faster after the patch, a positive engagement signal.",
+    "Players took longer to return after the patch, suggesting the update reduced motivation to play.")
+} else {
+  gap_med_c <- NA; gap_med_t <- NA; gap_dir <- "similar"
+  gap_sig <- FALSE; gap_p_txt <- NA
+  gap_engage <- "Insufficient gap data for comparison."
+}
+```
+
+> **Post-patch inactivity gaps (median: `r gap_med_t` days) were `r gap_dir` than pre-patch gaps (median: `r gap_med_c` days).** `r gap_engage` The significance test (p = `r gap_p_txt`) `r ifelse(!is.na(gap_sig) && gap_sig, "confirms this difference is statistically reliable", "indicates this difference could be random variation")`. Each observation in the density curves is the time between two consecutive matches for the same player. A leftward shift in the green (post-patch) curve means faster return; a rightward shift means longer breaks. This is one of the most direct behavioral signals available for gauging whether a patch was well-received.
+
+### Weekly Match Frequency: Pre-Patch vs Post-Patch
+
+```{r frequency-comparison, fig.height=5}
+player_freq <- matches %>%
+  group_by(account_id, group) %>%
+  summarise(n=n(),
+            span_weeks=as.numeric(difftime(max(match_date),min(match_date),units="weeks"))+1,
+            mpw=n/span_weeks, .groups="drop") %>%
+  filter(n>=3, !is.infinite(mpw), !is.nan(mpw))
+
+freq_meds <- player_freq %>%
+  group_by(group) %>%
+  summarise(med=median(mpw,na.rm=TRUE), .groups="drop")
+
+player_freq %>%
+  filter(mpw<40) %>%
+  ggplot(aes(x=mpw, fill=group, color=group)) +
+  geom_density(alpha=0.32, linewidth=0.9) +
+  geom_vline(data=freq_meds, aes(xintercept=med, color=group),
+             linetype="dashed", linewidth=1) +
+  scale_fill_manual(values=c("Control (Pre-Patch)"   =COL_CTRL,
+                              "Treatment (Post-Patch)"=COL_TREAT)) +
+  scale_color_manual(values=c("Control (Pre-Patch)"  =COL_CTRL,
+                               "Treatment (Post-Patch)"=COL_TREAT)) +
+  labs(title="Weekly Match Frequency: Pre-Patch vs Post-Patch",
+       subtitle="Per-player matches per week within each group's active window",
+       x="Matches per Week", y="Density", fill=NULL, color=NULL) +
+  theme_dota() + theme(legend.position="top")
+```
+
+```{r freq-results, include=FALSE}
+freq_med_c <- round(median(player_freq$mpw[player_freq$group=="Control (Pre-Patch)"],  na.rm=TRUE), 1)
+freq_med_t <- round(median(player_freq$mpw[player_freq$group=="Treatment (Post-Patch)"],na.rm=TRUE), 1)
+freq_dir   <- ifelse(freq_med_t > freq_med_c, "more frequently", "less frequently")
+```
+
+> **Post-patch, players played `r freq_dir` than pre-patch (median `r freq_med_t` vs. `r freq_med_c` matches per week).** Frequency is a more robust engagement signal than individual gap measurements because it integrates behavior across the entire window a player was active in that group. A rightward shift in the green distribution means more matches per week post-patch, indicating a positive engagement response. This metric corroborates or contradicts the inactivity gap finding above.
+
+---
+
+## Section 3: Did the Patch Change Player Behavior?
+
+Beyond performance and engagement, patches can shift the behavioral texture of play: whether players abandon matches early, whether they queue alone or with friends, and how long games actually run.
+
+### Match Duration: Pre-Patch vs Post-Patch
+
+```{r duration-density, fig.height=5}
+dur_meds <- matches %>%
+  group_by(group) %>%
+  summarise(med=median(duration_min,na.rm=TRUE), .groups="drop")
+
+matches %>%
+  filter(!is.na(duration_min), duration_min>5, duration_min<90) %>%
+  ggplot(aes(x=duration_min, fill=group, color=group)) +
+  geom_density(alpha=0.32, linewidth=0.9) +
+  geom_vline(data=dur_meds, aes(xintercept=med, color=group),
+             linetype="dashed", linewidth=1) +
+  scale_fill_manual(values=c("Control (Pre-Patch)"   =COL_CTRL,
+                              "Treatment (Post-Patch)"=COL_TREAT)) +
+  scale_color_manual(values=c("Control (Pre-Patch)"  =COL_CTRL,
+                               "Treatment (Post-Patch)"=COL_TREAT)) +
+  labs(title="Match Duration: Pre-Patch vs Post-Patch",
+       subtitle="Patches affecting objectives or hero power curves change game length.",
+       x="Duration (minutes)", y="Density", fill=NULL, color=NULL) +
+  theme_dota() + theme(legend.position="top")
+```
+
+```{r duration-results, include=FALSE}
+dur_c    <- matches$duration_min[matches$treat_dummy==0 & !is.na(matches$duration_min)]
+dur_t    <- matches$duration_min[matches$treat_dummy==1 & !is.na(matches$duration_min)]
+t_dur    <- t.test(dur_t, dur_c)
+dur_m_c  <- round(median(dur_c), 1)
+dur_m_t  <- round(median(dur_t), 1)
+dur_dir  <- ifelse(dur_m_t > dur_m_c, "longer", "shorter")
+dur_sig  <- t_dur$p.value < 0.05
+dur_p    <- round(t_dur$p.value, 4)
+dur_mech <- ifelse(dur_m_t > dur_m_c,
+  "This is consistent with patches that buff defensive mechanics, late-game heroes, or Roshan objectives, all of which extend the game.",
+  "This is consistent with patches that buff early-game aggression, reduce comeback mechanics, or shorten the snowball window.")
+```
+
+> **Post-patch games ran `r dur_dir` than pre-patch games (median: `r dur_m_t` min vs. `r dur_m_c` min, p = `r dur_p`, `r ifelse(dur_sig, "significant", "not significant")`).** `r dur_mech` Duration is important because it is also a confound for KDA: longer games create more opportunities for kills and assists, which mechanically inflates KDA regardless of how well a player is doing. This is why duration is controlled for in the regression models later.
+
+### Leaver Behavior: Pre-Patch vs Post-Patch
+
+```{r leaver-comparison, fig.height=4.5}
+leave_agg <- matches %>%
+  group_by(group) %>%
+  summarise(rate=mean(left_match,na.rm=TRUE), n=n(),
+            se=sqrt(rate*(1-rate)/n), .groups="drop")
+
+leave_agg %>%
+  ggplot(aes(x=group, y=rate, fill=group)) +
+  geom_col(width=0.45, alpha=0.9, show.legend=FALSE) +
+  geom_errorbar(aes(ymin=pmax(rate-se*1.96,0), ymax=rate+se*1.96),
+                width=0.15, color=DOTA_TEXT, linewidth=0.8) +
+  geom_text(aes(label=paste0(round(rate*100,2),"%")),
+            vjust=-0.7, color=DOTA_GOLD, fontface="bold", size=4) +
+  scale_fill_manual(values=c("Control (Pre-Patch)"   =COL_CTRL,
+                              "Treatment (Post-Patch)"=COL_TREAT)) +
+  scale_y_continuous(labels=percent_format(accuracy=0.01),
+                     expand=expansion(mult=c(0,0.2))) +
+  labs(title="Early Exit Rate: Pre-Patch vs Post-Patch",
+       subtitle="Proportion of matches where leaver_status > 0. Error bars = 95% CI.",
+       x=NULL, y="Leave Rate") + theme_dota()
+
+prop_res <- tryCatch(
+  prop.test(x=round(leave_agg$rate*leave_agg$n), n=leave_agg$n),
+  error=function(e) NULL
+)
+if (!is.null(prop_res)) cat("Proportion test p:", round(prop_res$p.value,4), "\n",
+  ifelse(prop_res$p.value<0.05,"Significant.","Not significant."))
+```
+
+```{r leaver-results, include=FALSE}
+lr_c <- round(leave_agg$rate[leave_agg$group=="Control (Pre-Patch)"] * 100, 2)
+lr_t <- round(leave_agg$rate[leave_agg$group=="Treatment (Post-Patch)"] * 100, 2)
+lr_dir <- ifelse(lr_t > lr_c, "higher", "lower")
+lr_sig <- if (!is.null(prop_res)) prop_res$p.value < 0.05 else FALSE
+lr_interpret <- ifelse(lr_t > lr_c,
+  "An increase in leaver rate is a warning signal: the new patch created conditions players found frustrating enough to abandon mid-game.",
+  "A lower leaver rate post-patch suggests the new environment was broadly acceptable, with fewer players feeling compelled to abandon.")
+```
+
+> **The early exit rate was `r lr_t`% post-patch vs. `r lr_c`% pre-patch, making it `r lr_dir` after the patch (`r ifelse(lr_sig, "significant", "not significant")`).** `r lr_interpret` Even small changes in leaver rate matter at the professional level because abandoning a match carries MMR penalties and disrupts all other players in the game. A sustained increase in leaver rate post-patch is a game health signal that Valve takes seriously.
+
+### Party Play Rate: Pre-Patch vs Post-Patch
+
+```{r party-comparison, fig.height=4.5}
+party_agg <- matches %>%
+  group_by(group) %>%
+  summarise(rate=mean(party_play,na.rm=TRUE), n=n(),
+            se=sqrt(rate*(1-rate)/n), .groups="drop")
+
+party_agg %>%
+  ggplot(aes(x=group, y=rate, fill=group)) +
+  geom_col(width=0.45, alpha=0.9, show.legend=FALSE) +
+  geom_errorbar(aes(ymin=pmax(rate-se*1.96,0), ymax=rate+se*1.96),
+                width=0.15, color=DOTA_TEXT, linewidth=0.8) +
+  geom_text(aes(label=paste0(round(rate*100,1),"%")),
+            vjust=-0.7, color=DOTA_GOLD, fontface="bold", size=4) +
+  scale_fill_manual(values=c("Control (Pre-Patch)"   =COL_CTRL,
+                              "Treatment (Post-Patch)"=COL_TREAT)) +
+  scale_y_continuous(labels=percent_format(accuracy=1),
+                     expand=expansion(mult=c(0,0.2))) +
+  labs(title="Party Play Rate: Pre-Patch vs Post-Patch",
+       subtitle="Proportion of matches with party_size > 1.",
+       x=NULL, y="Party Rate") + theme_dota()
+```
+
+```{r party-results, include=FALSE}
+pr_c <- round(party_agg$rate[party_agg$group=="Control (Pre-Patch)"] * 100, 1)
+pr_t <- round(party_agg$rate[party_agg$group=="Treatment (Post-Patch)"] * 100, 1)
+pr_dir <- ifelse(pr_t > pr_c, "increased", "decreased")
+pr_mech <- ifelse(pr_t > pr_c,
+  "This suggests the patch buffed team-dependent mechanics, making coordination more rewarding.",
+  "This suggests the patch shifted power toward self-sufficient carries, reducing the incentive to coordinate.")
+```
+
+> **Party play `r pr_dir` from `r pr_c`% to `r pr_t`% after the patch.** `r pr_mech` Party play rate is a proxy for how much the meta rewards coordination vs. individual skill. Changes here tell us something about the strategic environment the patch created, beyond the raw performance numbers.
+
+---
+
+## Section 4: The Within-Player Test
+
+The between-group comparisons above are useful but carry a limitation: they compare matches from the pre-patch era to matches from the post-patch era. If the composition of which matches were played (e.g., more tournament matches in one period) differs between eras, that could confound the result.
+
+The within-player analysis removes that problem entirely by comparing **each player to themselves**. For players who have matches on both sides of the patch boundary, their own pre-patch average is subtracted from their post-patch average. Any fixed player characteristic, such as skill level, preferred heroes, or playstyle, cancels out of this difference. What remains is the change that coincided with the patch.
+
+### Slope Chart: Individual Player Trajectories
+
+```{r within-player}
+within_player <- matches %>%
+  group_by(account_id) %>%
+  filter(any(treat_dummy==0) & any(treat_dummy==1)) %>%
+  summarise(
+    pre_kda    = mean(kda[treat_dummy==0], na.rm=TRUE),
+    post_kda   = mean(kda[treat_dummy==1], na.rm=TRUE),
+    kda_diff   = mean(kda[treat_dummy==1],na.rm=TRUE) - mean(kda[treat_dummy==0],na.rm=TRUE),
+    pre_kills  = mean(kills[treat_dummy==0], na.rm=TRUE),
+    post_kills = mean(kills[treat_dummy==1], na.rm=TRUE),
+    pre_deaths = mean(deaths[treat_dummy==0],na.rm=TRUE),
+    post_deaths= mean(deaths[treat_dummy==1],na.rm=TRUE),
+    n_pre  = sum(treat_dummy==0),
+    n_post = sum(treat_dummy==1),
+    .groups = "drop"
+  ) %>%
+  filter(n_pre>=3, n_post>=3, !is.na(pre_kda), !is.na(post_kda))
+
+cat("Players with matches on both sides:", nrow(within_player))
+```
+
+```{r slope-chart, fig.height=6}
+if (nrow(within_player) >= 3) {
+  n_improved <- sum(within_player$kda_diff >= 0)
+  n_declined <- sum(within_player$kda_diff <  0)
+
+  within_player %>%
+    mutate(direction=ifelse(kda_diff>=0,"Improved","Declined")) %>%
+    pivot_longer(c(pre_kda,post_kda), names_to="period", values_to="kda") %>%
+    mutate(period=factor(period, levels=c("pre_kda","post_kda"),
+                          labels=c("Pre-Patch\n(Control)","Post-Patch\n(Treatment)"))) %>%
+    ggplot(aes(x=period, y=kda, group=account_id, color=direction)) +
+    geom_line(linewidth=0.85, alpha=0.65) +
+    geom_point(size=3.5, alpha=0.85) +
+    scale_color_manual(values=c("Improved"=DOTA_GREEN,"Declined"=DOTA_RED),
+                       name="Post-Patch KDA") +
+    labs(title="Within-Player KDA: Pre vs Post-Patch",
+         subtitle=paste0("Each line = one player comparing themselves. ",
+                          n_improved," improved | ", n_declined," declined."),
+         x=NULL, y="Average KDA") +
+    theme_dota() + theme(legend.position="top")
+} else {
+  cat("Insufficient players with data on both sides for slope chart.")
+}
+```
+
+```{r within-results, include=FALSE}
+if (nrow(within_player) >= 3) {
+  pt         <- t.test(within_player$post_kda, within_player$pre_kda, paired=TRUE)
+  n_imp      <- sum(within_player$kda_diff >= 0)
+  n_dec      <- sum(within_player$kda_diff <  0)
+  pct_imp    <- round(n_imp / nrow(within_player) * 100)
+  mean_diff  <- round(mean(within_player$kda_diff), 3)
+  pt_p       <- round(pt$p.value, 4)
+  pt_sig     <- pt$p.value < 0.05
+  pt_dir     <- ifelse(mean_diff > 0, "improved", "declined")
+  pt_concl   <- ifelse(pt_sig,
+    paste0("This is statistically significant (p = ", pt_p, "), confirming the patch had a real causal effect on individual performance."),
+    paste0("This does not reach statistical significance (p = ", pt_p, "), meaning the individual variation is too large to conclude the patch had a consistent directional effect."))
+} else {
+  n_imp <- 0; n_dec <- 0; pct_imp <- 0; mean_diff <- 0
+  pt_p <- NA; pt_sig <- FALSE; pt_dir <- "unchanged"; pt_concl <- "Insufficient data."
+}
+```
+
+> **`r pct_imp`% of players (`r n_imp` out of `r nrow(within_player)`) saw their KDA `r pt_dir` after the patch.** Green lines slope upward (improved); red lines slope downward (declined). Because this comparison is player-to-player with themselves, differences in hero pools, team composition, or match type cannot explain this result. Only the patch and random variation remain as explanations. The balance between green and red lines, and whether the mean shift is significant, determines the strength of the causal conclusion.
+
+### Paired t-Test: Each Player vs Themselves
+
+```{r paired-test}
+if (nrow(within_player) >= 3) {
+  pt2 <- t.test(within_player$post_kda, within_player$pre_kda, paired=TRUE)
+  tibble(
+    Metric       = c("Pre-Patch KDA (avg across players)",
+                     "Post-Patch KDA (avg across players)",
+                     "Mean Change (Post minus Pre)"),
+    Value        = c(round(mean(within_player$pre_kda),  3),
+                     round(mean(within_player$post_kda), 3),
+                     round(mean(within_player$kda_diff), 3))
+  ) %>%
+    kable(caption=paste0(
+      "Paired t-Test | t = ", round(pt2$statistic,3),
+      " | p = ", round(pt2$p.value,4), " | ",
+      ifelse(pt2$p.value<0.05,"SIGNIFICANT","NOT SIGNIFICANT")
+    )) %>%
+    kable_styling(bootstrap_options=c("striped","hover","bordered"), full_width=FALSE)
+}
+```
+
+> **The paired test finds a mean within-player KDA change of `r mean_diff` (Post minus Pre).** `r pt_concl` This is the most important statistical result in the report because it eliminates the main confound of the between-group tests. A significant paired result means the patch itself, rather than a shift in who was playing or what types of matches were being played, drove the performance change.
+
+### Distribution of Individual Changes
+
+```{r within-player-dist, fig.height=4.5}
+if (nrow(within_player) >= 3) {
+  within_player %>%
+    ggplot(aes(x=kda_diff)) +
+    geom_histogram(aes(fill=kda_diff>0), binwidth=0.3, color=DOTA_BG, alpha=0.9) +
+    geom_vline(xintercept=0, color=DOTA_GOLD, linetype="dashed", linewidth=1) +
+    geom_vline(xintercept=mean(within_player$kda_diff),
+               color="white", linetype="dotted", linewidth=0.9) +
+    scale_fill_manual(values=c("TRUE"=DOTA_GREEN,"FALSE"=DOTA_RED),
+                      labels=c("TRUE"="Improved","FALSE"="Declined"), name=NULL) +
+    annotate("text", x=mean(within_player$kda_diff)+0.05, y=Inf,
+             vjust=2, hjust=0, size=3.4, color="white",
+             label=paste0("Mean: ", round(mean(within_player$kda_diff),3))) +
+    labs(title="Within-Player KDA Change (Post minus Pre)",
+         subtitle="Each bar = one player's change in their own average KDA across the patch boundary.",
+         x="KDA Change", y="Players") +
+    theme_dota() + theme(legend.position="top")
+}
+```
+
+> **The distribution shows not just the average direction but the full spread of individual responses.** Players to the right of the gold zero-line improved; those to the left declined. A distribution skewed right with most players showing positive changes, combined with a significant paired t-test, constitutes strong causal evidence that the patch broadly helped performance. A symmetric distribution centered at zero means the patch had no consistent effect across individuals even if group averages differ. The white dotted line marks the population mean change of `r mean_diff` KDA points.
+
+---
+
+## Section 5: Regression Analysis
+
+Regression controls for multiple factors simultaneously and isolates the patch effect more precisely than a simple mean comparison. Three models are compared progressively.
+
+```{r regression}
+reg_data <- matches %>%
+  filter(!is.na(kda),!is.na(duration_min),!is.na(party_play))
+
+m1 <- lm(kda ~ treat_dummy, data=reg_data)
+m2 <- lm(kda ~ treat_dummy + duration_min + party_play, data=reg_data)
+m3 <- lm(kda ~ treat_dummy + duration_min + party_play + kills + deaths, data=reg_data)
+
+fmt_m <- function(mod, lbl) {
+  s <- summary(mod)
+  as.data.frame(coef(s)) %>%
+    rownames_to_column("Term") %>%
+    transmute(Model=lbl, Term,
+              Estimate=round(Estimate,4), SE=round(`Std. Error`,4),
+              t=round(`t value`,3), `p-value`=round(`Pr(>|t|)`,4),
+              Significant=`Pr(>|t|)`<0.05, `R-sq`=round(s$r.squared,4))
+}
+
+reg_treat <- bind_rows(fmt_m(m1,"M1: Raw effect"),
+                        fmt_m(m2,"M2: + Duration + Party"),
+                        fmt_m(m3,"M3: + Kill/Death controls")) %>%
+  filter(Term=="treat_dummy")
+
+reg_treat %>%
+  kable(caption="Treatment Effect on KDA: Patch Coefficient Across Three Models") %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"), full_width=TRUE) %>%
+  column_spec(7, color=ifelse(reg_treat$Significant, DOTA_GREEN, DOTA_RED))
+```
+
+```{r regression-results, include=FALSE}
+m1_coef  <- round(coef(m1)["treat_dummy"], 4)
+m2_coef  <- round(coef(m2)["treat_dummy"], 4)
+m3_coef  <- round(coef(m3)["treat_dummy"], 4)
+m1_sig   <- summary(m1)$coefficients["treat_dummy","Pr(>|t|)"] < 0.05
+m2_sig   <- summary(m2)$coefficients["treat_dummy","Pr(>|t|)"] < 0.05
+m3_sig   <- summary(m3)$coefficients["treat_dummy","Pr(>|t|)"] < 0.05
+stable   <- abs(m1_coef - m3_coef) < abs(m1_coef) * 0.5
+reg_concl <- ifelse(stable,
+  "The coefficient is stable across all three models, indicating the treatment effect is robust and not driven by match duration or combat volume differences between eras.",
+  "The coefficient changes meaningfully across models, suggesting that some of the observed between-group difference is explained by changes in match structure (duration, party composition) rather than the patch itself.")
+```
+
+> **Model 1 estimates the raw patch effect at `r m1_coef` KDA points (`r ifelse(m1_sig,"significant","not significant")`). After controlling for match duration and party play (Model 2), the estimate shifts to `r m2_coef`. With kill and death counts as additional controls (Model 3), it becomes `r m3_coef`.** `r reg_concl` A coefficient that grows when controls are added means the raw comparison was actually understating the patch effect. A coefficient that shrinks to near zero means the original difference was primarily driven by confounders, not the patch.
+
+---
+
+## Statistical Summary
+
+```{r stat-summary}
+run_t_s <- function(var, lbl) {
+  x <- matches[[var]][matches$treat_dummy==1 & !is.na(matches[[var]])]
+  y <- matches[[var]][matches$treat_dummy==0 & !is.na(matches[[var]])]
+  if (length(x)<2||length(y)<2) return(NULL)
+  tt <- t.test(x,y)
+  tibble(Outcome=lbl, Control=round(mean(y),3), Treatment=round(mean(x),3),
+         Delta=round(mean(x)-mean(y),3), `p-value`=round(tt$p.value,4),
+         Sig=tt$p.value<0.05,
+         Direction=ifelse(tt$p.value>=0.05,"No change",
+                   ifelse(mean(x)>mean(y),"Increased post-patch","Decreased post-patch")))
+}
+gap_row <- if (length(gap_c)>1&&length(gap_t)>1) {
+  tt <- t.test(gap_t,gap_c)
+  tibble(Outcome="Inactivity Gap (days)", Control=round(mean(gap_c),3),
+         Treatment=round(mean(gap_t),3), Delta=round(mean(gap_t)-mean(gap_c),3),
+         `p-value`=round(tt$p.value,4), Sig=tt$p.value<0.05,
+         Direction=ifelse(tt$p.value>=0.05,"No change",
+                   ifelse(mean(gap_t)>mean(gap_c),"Increased post-patch","Decreased post-patch")))
+} else NULL
+
+paired_row <- if (nrow(within_player)>=3) {
+  pt3 <- t.test(within_player$post_kda, within_player$pre_kda, paired=TRUE)
+  tibble(Outcome="KDA (Within-Player, Paired)",
+         Control=round(mean(within_player$pre_kda),3),
+         Treatment=round(mean(within_player$post_kda),3),
+         Delta=round(mean(within_player$kda_diff),3),
+         `p-value`=round(pt3$p.value,4), Sig=pt3$p.value<0.05,
+         Direction=ifelse(pt3$p.value>=0.05,"No change",
+                   ifelse(mean(within_player$kda_diff)>0,
+                          "Improved post-patch","Declined post-patch")))
+} else NULL
+
+all_tests <- bind_rows(
+  run_t_s("kda","KDA (Between-Group)"),
+  run_t_s("kills","Kills"),
+  run_t_s("deaths","Deaths"),
+  run_t_s("assists","Assists"),
+  run_t_s("duration_min","Duration (min)"),
+  gap_row, paired_row
+)
+
+all_tests %>%
+  kable(col.names=c("Outcome","Control Mean","Treatment Mean",
+                     "Delta","p-value","Significant","Direction"),
+        caption="Complete Statistical Summary: All Tests") %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"), full_width=TRUE) %>%
+  column_spec(6, color=ifelse(all_tests$Sig, DOTA_GREEN, DOTA_RED))
+```
+
+---
+
+## Key Insights and Findings
+
+```{r key-insights-compute, include=FALSE}
+n_sig_total <- sum(all_tests$Sig, na.rm=TRUE)
+n_tests     <- nrow(all_tests)
+sig_outcomes <- all_tests %>% filter(Sig) %>% pull(Outcome)
+sig_list     <- if (length(sig_outcomes)>0) paste(sig_outcomes, collapse=", ") else "none"
+
+perf_sig  <- any(all_tests$Sig[all_tests$Outcome %in% c("KDA (Between-Group)","Kills","Deaths","Assists")], na.rm=TRUE)
+eng_sig   <- any(all_tests$Sig[all_tests$Outcome == "Inactivity Gap (days)"], na.rm=TRUE)
+within_sig_final <- if(nrow(within_player)>=3) pt_sig else FALSE
+
+headline <- if (n_sig_total == 0) {
+  "The patch did not produce statistically significant changes in any measured outcome."
+} else if (n_sig_total <= 2) {
+  paste0("The patch produced limited but measurable changes, with ", n_sig_total,
+         " of ", n_tests, " outcomes reaching statistical significance.")
+} else {
+  paste0("The patch had a broad impact, with ", n_sig_total, " of ", n_tests,
+         " outcomes showing statistically significant changes.")
+}
+```
+
+<div class="insight-box">
+**Overall Verdict:** `r headline`
+</div>
+
+### Performance
+
+> `r ifelse(kda_sig, paste0("KDA changed significantly (p = ", kda_p_txt, "). Post-patch players averaged ", round(mean(kda_t),2), " KDA vs. ", round(mean(kda_c),2), " pre-patch, a shift of ", round(mean(kda_t)-mean(kda_c),3), " KDA points. Component analysis showed ", sig_components, " of 3 sub-metrics (kills, deaths, assists) also changed significantly."), paste0("KDA did not change significantly (p = ", kda_p_txt, "). The ", round(abs(mean(kda_t)-mean(kda_c)),3), " KDA point difference between groups is within the range of random variation."))`
+
+### Engagement
+
+> `r ifelse(!is.na(gap_sig) && gap_sig, paste0("The patch affected how quickly players returned. Post-patch inactivity gaps were ", gap_dir, " (median ", gap_med_t, " days vs. ", gap_med_c, " pre-patch, p = ", gap_p_txt, "). ", gap_engage), paste0("No significant change in return frequency was detected (p = ", gap_p_txt, "). Players returned at roughly the same pace before and after the patch."))`
+
+### Behavior
+
+> Post-patch leaver rate was `r lr_t`% vs. `r lr_c`% pre-patch (`r ifelse(lr_sig, "significant", "not significant")`). Match duration was `r dur_dir` by `r round(abs(dur_m_t - dur_m_c), 1)` minutes (`r ifelse(dur_sig, "significant", "not significant")`). Party play `r pr_dir` from `r pr_c`% to `r pr_t`%.
+
+### The Cleanest Causal Test: Within-Player Result
+
+> `r ifelse(nrow(within_player)>=3, paste0("Among the ", nrow(within_player), " players with matches on both sides of the patch boundary, ", pct_imp, "% (", n_imp, " players) saw their KDA ", pt_dir, " after the patch. The mean within-player change was ", mean_diff, " KDA points. ", pt_concl), "Insufficient players had matches on both sides for a within-player comparison.")`
+
+### Summary Scorecard
+
+```{r scorecard}
+all_tests %>%
+  select(Outcome, Delta, `p-value`, Sig, Direction) %>%
+  mutate(
+    Result = case_when(
+      Sig & Delta > 0 ~ "Positive shift",
+      Sig & Delta < 0 ~ "Negative shift",
+      TRUE            ~ "No significant change"
+    )
+  ) %>%
+  kable(
+    col.names = c("Outcome","Change (Delta)","p-value","Significant","Direction","Result"),
+    caption   = "Findings Scorecard"
+  ) %>%
+  kable_styling(bootstrap_options=c("striped","hover","bordered"), full_width=TRUE) %>%
+  column_spec(4, color=ifelse(all_tests$Sig, DOTA_GREEN, DOTA_RED)) %>%
+  column_spec(6, bold=TRUE,
+              color=case_when(
+                all_tests$Sig & all_tests$Delta > 0 ~ DOTA_GREEN,
+                all_tests$Sig & all_tests$Delta < 0 ~ DOTA_RED,
+                TRUE ~ DOTA_MUTED
+              ))
+```
+
+### The Bottom Line
+
+`r headline` The outcomes that did change tell a specific story about what the patch altered in the game environment: `r ifelse(length(sig_outcomes)>0, paste0("significant shifts appeared in ", sig_list, "."), "no outcomes reached the significance threshold.")` The within-player analysis, which controls for fixed player skill and playstyle, `r ifelse(within_sig_final, paste0("confirms a genuine causal effect: players themselves performed differently after the patch."), "does not find a statistically reliable individual-level shift, suggesting the between-group differences may partly reflect compositional changes in match types across the two eras rather than the patch alone.")` The regression models `r ifelse(stable, "reinforce this finding with a stable treatment coefficient across all specifications.", "show sensitivity to controls, indicating that some of the raw difference is explained by changes in match structure across eras.")`
+
+---
+
+## Robustness and Limitations
+
+**Design strengths:** The patch is mandatory and simultaneous, removing self-selection. Multiple outcomes are tested for convergent evidence. The within-player paired design controls for all fixed player characteristics.
+
+**Limitations:** Any secular trend (tournament cycles, seasonal patterns, roster changes) coinciding with the patch will be absorbed into the treatment estimate. Version field gaps require a temporal fallback in some samples, which reduces treatment specificity. Players are still adapting in the first weeks post-patch, so early measurements may understate the full long-run effect. Effect heterogeneity by hero role or team composition cannot be assessed with available data.
+
+---
+
+## Executive Overview
+
+**Dataset:** `r comma(nrow(matches))` match records from `r n_distinct(matches$account_id)` professional players sourced live from the OpenDota API.
+
+**Treatment:** `r treat_label`. Patch updates are mandatory and simultaneous, satisfying the key assumption for a quasi-experimental design.
+
+**How the split was made:** Each match's `version` field was used to assign it to either the post-patch (treatment) or pre-patch (control) group. When version data was insufficiently available, a temporal median cutoff was applied.
+
+**What was tested:** KDA, kills, deaths, assists (performance); inactivity gap, weekly frequency (engagement); match duration, leaver rate, party play rate (behavior). A within-player paired t-test was added as the strongest causal test.
+
+**Headline finding:** `r headline` The outcomes showing significant changes were: `r sig_list`. The within-player paired analysis `r ifelse(within_sig_final, paste0("confirmed a real causal effect at p = ", pt_p, "."), paste0("did not reach significance (p = ", pt_p, "), tempering the between-group results."))` Regression models showed the treatment coefficient was `r ifelse(stable, "stable across specifications, supporting a robust causal interpretation", "sensitive to controls, suggesting partial confounding by match structural changes")`.

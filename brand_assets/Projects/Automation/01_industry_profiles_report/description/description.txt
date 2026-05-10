@@ -1,0 +1,1 @@
+Automated data pulling and report generation for 18 industry profiles, processing 2M+ rows of data. Built a scalable data pipeline that reduced reporting time from approximately one month to a single execution — a 95%+ efficiency gain — while improving consistency and reliability.

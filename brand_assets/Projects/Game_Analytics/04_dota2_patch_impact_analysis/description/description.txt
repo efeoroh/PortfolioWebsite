@@ -1,0 +1,1 @@
+Analyzed gameplay patch effects using historical match data to track changes in hero performance and player behavior over time. Used trend analysis and visual reporting to identify balance shifts, with statistical testing confirming which updates had meaningful competitive impact.

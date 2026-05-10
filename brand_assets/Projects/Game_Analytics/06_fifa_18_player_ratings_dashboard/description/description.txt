@@ -1,0 +1,1 @@
+Interactive Power BI dashboard analyzing FIFA 18 player ratings, positional distributions, and performance attributes using Kaggle dataset. Built visuals to surface key insights across player groups, leagues, and nationalities.

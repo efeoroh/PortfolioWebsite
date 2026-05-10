@@ -1,0 +1,1 @@
+Developed a custom code + Power BI dashboard using Kaggle-sourced EA SPORTS FC 25 player data to analyze player distributions, positional trends, and performance patterns. Built interactive visuals and automated metrics to surface key roster insights, with findings highlighting meaningful relationships between player attributes and overall ratings.

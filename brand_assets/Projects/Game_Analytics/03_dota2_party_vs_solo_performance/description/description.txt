@@ -1,0 +1,1 @@
+Evaluated how party play impacts player performance and match outcomes using behavioral and statistical analysis. Designed dashboards to compare collaboration vs solo dynamics, with findings identifying which gameplay contexts significantly influenced success.

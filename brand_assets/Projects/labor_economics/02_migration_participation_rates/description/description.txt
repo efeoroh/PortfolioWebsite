@@ -1,0 +1,1 @@
+Applied counterfactual economic modelling on 2M+ labour force records to quantify the impact of migration on Alberta's labour force participation. Produced a structured analytical report using R Markdown, translating complex results into clear, policy-relevant insights.

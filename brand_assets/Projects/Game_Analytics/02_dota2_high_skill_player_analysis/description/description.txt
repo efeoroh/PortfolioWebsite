@@ -1,0 +1,1 @@
+Analyzed high-skill player behavior using large-scale match data to identify gameplay patterns and performance trends. Built dashboards to explore decision-making and engagement, with statistical validation confirming which behaviors drove consistent high performance.

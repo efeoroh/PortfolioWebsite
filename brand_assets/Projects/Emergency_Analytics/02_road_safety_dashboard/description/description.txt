@@ -1,0 +1,1 @@
+Developed a geospatial risk analytics dashboard in Tableau to assess road safety patterns and support emergency response planning. Processed large-scale accident datasets to identify high-risk conditions across vehicle types, weather, and road surfaces, with advanced interactive visualizations enabling rapid identification of critical risk drivers.

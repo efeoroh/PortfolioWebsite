@@ -1,0 +1,1 @@
+Designed a forward-looking economic analysis assessing how Canadian crude prices respond to net-zero transition scenarios and U.S. policy shifts. Combined API-sourced data, scenario modelling, and advanced visualization to translate complex market dynamics into decision-ready insights for stakeholders evaluating risk, pricing volatility, and long-term competitiveness.

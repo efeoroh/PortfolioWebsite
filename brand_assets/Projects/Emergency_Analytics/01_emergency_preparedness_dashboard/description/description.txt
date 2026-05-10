@@ -1,0 +1,1 @@
+Developed an automated geospatial analytics pipeline and Power BI dashboard to assess emergency preparedness across Canadian provinces using Statistics Canada data. Integrated R and Python to enable custom visualizations beyond native Power BI capabilities. Delivered a decision-ready tool highlighting regional disparities in preparedness for evidence-based public safety planning.

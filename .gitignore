@@ -1,0 +1,9 @@
+node_modules/
+temporary screenshots/
+.DS_Store
+**/.DS_Store
+package-lock.json
+*.log
+.Rhistory
+.claude/
+CLAUDE.md

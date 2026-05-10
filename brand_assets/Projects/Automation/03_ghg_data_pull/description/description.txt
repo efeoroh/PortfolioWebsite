@@ -1,0 +1,1 @@
+Automated the extraction and cleaning of 1M+ rows of greenhouse gas emissions data used in a GHG analytics dashboard. The workflow fully automated the data refresh pipeline for a dashboard requiring annual updates, eliminating manual data collection and ensuring reproducible updates each reporting cycle.
