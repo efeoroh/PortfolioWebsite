@@ -1,0 +1,1 @@
+Real-time energy market dashboard built on a StatsCan API pipeline. Features dynamic visualizations, automated data refresh, and an AI-powered insights generator that produces contextual analysis directly from live dashboard metrics.
