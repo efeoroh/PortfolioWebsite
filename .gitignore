@@ -7,3 +7,7 @@ package-lock.json
 .Rhistory
 .claude/
 CLAUDE.md
+
+# Large video files (>100MB)
+*.mov
+*.mp4
