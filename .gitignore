@@ -9,4 +9,3 @@ package-lock.json
 CLAUDE.md
 
 # Large video files (>100MB)
-*.mp4
