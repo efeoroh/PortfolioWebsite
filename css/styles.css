@@ -41,7 +41,7 @@ h1,h2,h3,h4{font-family:'Playfair Display',Georgia,serif;color:#0A1628;line-heig
 .hero-image-wrap{display:flex;justify-content:center;align-items:center}
 .headshot-ring{position:relative;width:340px;height:340px;border-radius:50%;padding:4px;background:linear-gradient(135deg,#C19A3E 0%,#E8D5A3 40%,rgba(193,154,62,0.3) 70%,#C19A3E 100%);box-shadow:0 4px 16px rgba(193,154,62,0.25),0 16px 48px rgba(10,22,40,0.15)}
 .headshot-ring::before{content:'';position:absolute;inset:-8px;border-radius:50%;background:rgba(193,154,62,0.08)}
-.headshot-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:center top;border:3px solid #F4F2EE;display:block}
+.headshot-ring img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:center 25%;border:3px solid #F4F2EE;display:block}
 
 /* SECTIONS */
 .section{padding:5rem 2rem}
