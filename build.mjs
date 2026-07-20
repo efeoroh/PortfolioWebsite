@@ -14,10 +14,7 @@ const CATEGORIES = {
       ['Dashboards',          '01_financial-assurance'],
       ['labor_economics',     '01_skilled_trades_dashboard'],
       ['Energy_Analytics',    '00_energy_market_intelligence_dashboard'],
-      ['Emergency_Analytics', '01_emergency_preparedness_dashboard'],
       ['Emergency_Analytics', '02_road_safety_dashboard'],
-      ['Game_Analytics',      '01_fc25_player_intelligence_dashboard'],
-      ['Game_Analytics',      '02_dota2_high_skill_player_analysis'],
       ['Game_Analytics',      '06_fifa_18_player_ratings_dashboard'],
       ['RealEstate_Analytics','01_property_management_dashboard'],
       ['RealEstate_Analytics','03_airbnb_market_analysis'],
@@ -43,6 +40,7 @@ const CATEGORIES = {
     projects: [
       ['labor_economics',     '02_migration_participation_rates'],
       ['RealEstate_Analytics','02_impact_of_covid_edmonton'],
+      ['Game_Analytics',      '02_dota2_high_skill_player_analysis'],
       ['Game_Analytics',      '05_gaming_crm_campaign_effectiveness'],
       ['Game_Analytics',      '03_dota2_party_vs_solo_performance'],
       ['Game_Analytics',      '04_dota2_patch_impact_analysis'],
