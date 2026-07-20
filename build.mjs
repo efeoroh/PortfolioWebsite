@@ -6,13 +6,58 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECTS_BASE = join(__dirname, 'brand_assets', 'Projects');
 
 const CATEGORIES = {
-  'labor-economics':       { folder: 'labor_economics',      title: 'Labor Economics',        num: '01', desc: 'Research and analysis on labor market dynamics, workforce supply and demand, participation rates, and employment patterns across industries and regions.' },
-  'energy-analytics':      { folder: 'Energy_Analytics',     title: 'Energy Analytics',        num: '02', desc: "Quantitative analysis of Canadian crude oil markets, electricity generation, energy infrastructure, and the policy forces shaping the sector's energy transition." },
-  'automation':            { folder: 'Automation',           title: 'Automation',              num: '03', desc: 'Python pipelines, data extraction tools, and automated reporting workflows that make data collection scalable and analysis fully reproducible.' },
-  'emergency-analytics':   { folder: 'Emergency_Analytics',  title: 'Emergency Analytics',     num: '04', desc: 'Data analysis and visualization supporting emergency preparedness planning, road safety intelligence, and public safety resource allocation decisions.' },
-  'game-analytics':        { folder: 'Game_Analytics',       title: 'Game Analytics',          num: '05', desc: 'Data-driven exploration of player performance, game mechanics, and market dynamics in gaming and sports datasets.' },
-  'real-estate-analytics': { folder: 'RealEstate_Analytics', title: 'Real Estate Analytics',   num: '06', desc: 'Market analysis of housing prices, Airbnb economics, and property portfolio performance across Canadian cities.' },
-  'other':                 { folder: 'other',                title: 'Other',                   num: '07', desc: 'Miscellaneous analytical and visualization work spanning music, consumer data, and other domains.' },
+  'dashboards': {
+    title: 'Dashboards',
+    num: '01',
+    desc: 'Interactive analytics tools built on Power BI, Tableau, and the web — synthesising data across financial systems, energy markets, emergency preparedness, real estate, and sport into decision-ready visual intelligence.',
+    projects: [
+      ['Dashboards',          '01_financial-assurance'],
+      ['labor_economics',     '01_skilled_trades_dashboard'],
+      ['Energy_Analytics',    '00_energy_market_intelligence_dashboard'],
+      ['Emergency_Analytics', '01_emergency_preparedness_dashboard'],
+      ['Emergency_Analytics', '02_road_safety_dashboard'],
+      ['Game_Analytics',      '01_fc25_player_intelligence_dashboard'],
+      ['Game_Analytics',      '02_dota2_high_skill_player_analysis'],
+      ['Game_Analytics',      '06_fifa_18_player_ratings_dashboard'],
+      ['RealEstate_Analytics','01_property_management_dashboard'],
+      ['RealEstate_Analytics','03_airbnb_market_analysis'],
+      ['other',               '01_spotify_analytics_dashboard'],
+    ]
+  },
+  'reports': {
+    title: 'Reports',
+    num: '02',
+    desc: 'Analytical reports combining R Markdown, Python, and large-scale datasets to surface evidence-based insights on energy markets, labour economics, and policy-relevant economic questions.',
+    projects: [
+      ['Energy_Analytics',  '01_canadian_crude_price_outlook'],
+      ['Energy_Analytics',  '02_canadian_energy_infrastructure'],
+      ['Energy_Analytics',  '03_canadian_electricity_emissions'],
+      ['labor_economics',   '03_hiring_demand_bulletins'],
+      ['labor_economics',   '04_industry_profiles_report'],
+    ]
+  },
+  'research': {
+    title: 'Research',
+    num: '03',
+    desc: 'Statistical and econometric analyses applying causal inference, A/B testing, and behavioural modelling to labour markets, gaming dynamics, and housing economics.',
+    projects: [
+      ['labor_economics',   '02_migration_participation_rates'],
+      ['Game_Analytics',    '05_gaming_crm_campaign_effectiveness'],
+      ['Game_Analytics',    '03_dota2_party_vs_solo_performance'],
+      ['Game_Analytics',    '04_dota2_patch_impact_analysis'],
+      ['RealEstate_Analytics','02_impact_of_covid_edmonton'],
+    ]
+  },
+  'automation': {
+    title: 'Automation',
+    num: '04',
+    desc: 'Python pipelines, cloud workflows, and data extraction tools that automate recurring data collection and reporting — making analytics reproducible, scalable, and hands-free.',
+    projects: [
+      ['Automation', '01_industry_profiles_report'],
+      ['Automation', '02_lfs_indigenous_pipeline'],
+      ['Automation', '03_ghg_data_pull'],
+    ]
+  },
 };
 
 function esc(s) {
@@ -71,22 +116,16 @@ async function readProject(projPath, dirName, catFolder) {
   return { title, desc, thumb, demo, demoExt, keyword };
 }
 
-async function loadProjects(catFolder) {
-  try {
-    const catDir = join(PROJECTS_BASE, catFolder);
-    const entries = await readdir(catDir, { withFileTypes: true });
-    const dirs = [];
-    for (const e of entries) {
-      if (!e.isDirectory() || e.name.startsWith('.')) continue;
-      if (/^\d/.test(e.name) && await exists(join(catDir, e.name, 'description'))) dirs.push(e);
-    }
-    dirs.sort((a, b) => {
-      const na = parseInt(a.name.match(/^(\d+)/)?.[1] ?? '999');
-      const nb = parseInt(b.name.match(/^(\d+)/)?.[1] ?? '999');
-      return na - nb || a.name.localeCompare(b.name);
-    });
-    return await Promise.all(dirs.map(e => readProject(join(catDir, e.name), e.name, catFolder)));
-  } catch { return []; }
+async function loadProjects(projects) {
+  const result = [];
+  for (const [catFolder, dirName] of projects) {
+    const projPath = join(PROJECTS_BASE, catFolder, dirName);
+    try {
+      const proj = await readProject(projPath, dirName, catFolder);
+      result.push(proj);
+    } catch {}
+  }
+  return result;
 }
 
 const NAV = (active) => `<nav class="site-nav" role="navigation">
@@ -173,7 +212,7 @@ ${FOOTER}
 await mkdir(join(__dirname, 'projects'), { recursive: true });
 
 for (const [slug, cat] of Object.entries(CATEGORIES)) {
-  const projects = await loadProjects(cat.folder);
+  const projects = await loadProjects(cat.projects);
   const html = renderPage(cat, projects);
   await writeFile(join(__dirname, 'projects', `${slug}.html`), html, 'utf8');
   console.log(`  ✓ projects/${slug}.html (${projects.length} projects)`);
