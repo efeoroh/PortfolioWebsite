@@ -29,11 +29,11 @@ const CATEGORIES = {
     num: '02',
     desc: 'Analytical reports combining R Markdown, Python, and large-scale datasets to surface evidence-based insights on energy markets, labour economics, and policy-relevant economic questions.',
     projects: [
+      ['labor_economics',   '03_hiring_demand_bulletins'],
+      ['labor_economics',   '04_industry_profiles_report'],
       ['Energy_Analytics',  '01_canadian_crude_price_outlook'],
       ['Energy_Analytics',  '02_canadian_energy_infrastructure'],
       ['Energy_Analytics',  '03_canadian_electricity_emissions'],
-      ['labor_economics',   '03_hiring_demand_bulletins'],
-      ['labor_economics',   '04_industry_profiles_report'],
     ]
   },
   'research': {
@@ -41,11 +41,11 @@ const CATEGORIES = {
     num: '03',
     desc: 'Statistical and econometric analyses applying causal inference, A/B testing, and behavioural modelling to labour markets, gaming dynamics, and housing economics.',
     projects: [
-      ['labor_economics',   '02_migration_participation_rates'],
-      ['Game_Analytics',    '05_gaming_crm_campaign_effectiveness'],
-      ['Game_Analytics',    '03_dota2_party_vs_solo_performance'],
-      ['Game_Analytics',    '04_dota2_patch_impact_analysis'],
+      ['labor_economics',     '02_migration_participation_rates'],
       ['RealEstate_Analytics','02_impact_of_covid_edmonton'],
+      ['Game_Analytics',      '05_gaming_crm_campaign_effectiveness'],
+      ['Game_Analytics',      '03_dota2_party_vs_solo_performance'],
+      ['Game_Analytics',      '04_dota2_patch_impact_analysis'],
     ]
   },
   'automation': {

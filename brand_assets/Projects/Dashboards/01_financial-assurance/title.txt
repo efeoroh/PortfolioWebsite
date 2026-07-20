@@ -1,1 +1,1 @@
-Financial Assurance Analytics Platform | End-to-End Cloud Data Pipeline with Google BigQuery & Power BI
+End-to-End Cloud Data Pipeline with Google BigQuery & Power BI
