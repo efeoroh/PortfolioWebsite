@@ -9,7 +9,7 @@ const CATEGORIES = {
   'dashboards': {
     title: 'Dashboards',
     num: '01',
-    desc: 'Interactive analytics tools built on Power BI, Tableau, and the web — synthesising data across financial systems, energy markets, emergency preparedness, real estate, and sport into decision-ready visual intelligence.',
+    desc: 'Interactive, self-serve analytical tools built on Power BI, Tableau, Python, and R. Each synthesises data from multiple sources, stores it in cloud platforms such as Google BigQuery or Databricks, performs dimensional modelling to produce fact and dimension tables, and builds a semantic model in Power BI or Tableau, delivering well-designed visualisations that communicate clear insights for executive decisions.',
     projects: [
       ['Dashboards',          '01_financial-assurance'],
       ['labor_economics',     '01_skilled_trades_dashboard'],
@@ -27,7 +27,7 @@ const CATEGORIES = {
   'reports': {
     title: 'Reports',
     num: '02',
-    desc: 'Analytical reports combining R Markdown, Python, and large-scale datasets to surface evidence-based insights on energy markets, labour economics, and policy-relevant economic questions.',
+    desc: 'Analytical reports combining R, Python, and large-scale datasets to deliver complex, detailed insights into concise briefing notes and reporting. Designed to answer executive questions, profile industries, and surface evidence-based insights from data across multiple sectors.',
     projects: [
       ['labor_economics',   '03_hiring_demand_bulletins'],
       ['labor_economics',   '04_industry_profiles_report'],
@@ -39,7 +39,7 @@ const CATEGORIES = {
   'research': {
     title: 'Research',
     num: '03',
-    desc: 'Statistical and econometric analyses applying causal inference, A/B testing, and behavioural modelling to labour markets, gaming dynamics, and housing economics.',
+    desc: 'Took structured and unstructured data from multiple sources and applied advanced statistical and quantitative techniques to predict and describe the data available, enabling informed decisions. Techniques include A/B testing, machine learning modelling, economic modelling, and fraud classification.',
     projects: [
       ['labor_economics',     '02_migration_participation_rates'],
       ['RealEstate_Analytics','02_impact_of_covid_edmonton'],
@@ -51,7 +51,7 @@ const CATEGORIES = {
   'automation': {
     title: 'Automation',
     num: '04',
-    desc: 'Python pipelines, cloud workflows, and data extraction tools that automate recurring data collection and reporting — making analytics reproducible, scalable, and hands-free.',
+    desc: 'Boosted productivity by automating business processes so that teams can focus on more creative tasks, enabling scalable and hands-free analytics. Some of these are built with the help of modern AI tools such as Claude AI and Microsoft Copilot.',
     projects: [
       ['Automation', '01_industry_profiles_report'],
       ['Automation', '02_lfs_indigenous_pipeline'],
