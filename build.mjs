@@ -12,50 +12,50 @@ const PROJECTS_BASE = join(__dirname, 'brand_assets', 'Projects');
 
 const CATEGORIES = {
   dashboards: {
-    title: 'Dashboards',
-    desc: 'Self-serve Power BI and Tableau tools built on modelled data from BigQuery, Databricks and public APIs.',
+    title: 'Economic dashboards',
+    desc: 'Power BI tools built on governed, modelled data from Databricks, BigQuery and public APIs.',
     projects: [
-      ['Dashboards',           '02_youth_labour_market_information', 'New'],
-      ['Energy_Analytics',     '00_energy_market_intelligence_dashboard'],
-      ['Dashboards',           '01_financial-assurance'],
-      ['labor_economics',      '01_skilled_trades_dashboard'],
-      ['RealEstate_Analytics', '01_property_management_dashboard'],
-      ['RealEstate_Analytics', '03_airbnb_market_analysis'],
-    ],
-  },
-  interactive: {
-    title: 'Interactive',
-    desc: 'Web-based data stories with scroll-driven narrative, animated charts and maps.',
-    projects: [
-      ['Interactive_Viz', '01_gift_trade_ledger', 'New'],
+      ['Dashboards',       '02_youth_labour_market_information'],
+      ['labor_economics',  '01_skilled_trades_dashboard'],
+      ['Energy_Analytics', '00_energy_market_intelligence_dashboard'],
+      ['Dashboards',       '01_financial-assurance'],
     ],
   },
   reports: {
-    title: 'Reports',
-    desc: 'Analytical reports and briefing notes that turn large datasets into executive-ready findings.',
+    title: 'Economic reports and research',
+    desc: 'Briefings, profiles and modelling that turn large labour and energy datasets into findings.',
     projects: [
-      ['labor_economics',  '03_hiring_demand_bulletins'],
-      ['labor_economics',  '04_industry_profiles_report'],
-      ['Energy_Analytics', '01_canadian_crude_price_outlook'],
-      ['Energy_Analytics', '02_canadian_energy_infrastructure'],
-      ['Energy_Analytics', '03_canadian_electricity_emissions'],
-    ],
-  },
-  research: {
-    title: 'Research',
-    desc: 'Statistical and economic modelling on labour and housing data.',
-    projects: [
+      ['labor_economics',      '03_hiring_demand_bulletins'],
+      ['labor_economics',      '04_industry_profiles_report'],
       ['labor_economics',      '02_migration_participation_rates'],
+      ['Energy_Analytics',     '01_canadian_crude_price_outlook'],
+      ['Energy_Analytics',     '02_canadian_energy_infrastructure'],
+      ['Energy_Analytics',     '03_canadian_electricity_emissions'],
       ['RealEstate_Analytics', '02_impact_of_covid_edmonton'],
     ],
   },
   automation: {
-    title: 'Automation',
+    title: 'Data engineering and automation',
     desc: 'Pipelines that replace recurring manual reporting with a single run.',
     projects: [
       ['Automation', '01_industry_profiles_report'],
       ['Automation', '02_lfs_indigenous_pipeline'],
       ['Automation', '03_ghg_data_pull'],
+    ],
+  },
+  interactive: {
+    title: 'Interactive data stories',
+    desc: 'Web-based stories with scroll-driven narrative, animated charts and maps.',
+    projects: [
+      ['Interactive_Viz', '01_gift_trade_ledger'],
+    ],
+  },
+  other: {
+    title: 'Other projects',
+    desc: 'Earlier dashboards on property and short-term rental markets.',
+    projects: [
+      ['RealEstate_Analytics', '01_property_management_dashboard'],
+      ['RealEstate_Analytics', '03_airbnb_market_analysis'],
     ],
   },
 };
@@ -126,11 +126,11 @@ function renderCard(proj, cat, badge) {
   if (proj.video && k !== 'video') {
     actions.push(`<button type="button" class="act soft" data-video="${esc(proj.video)}" data-title="${t}">Watch demo</button>`);
   }
-  const tag = proj.keyword ? proj.keyword.split('|').map(s => s.trim()).join(' · ') : CATEGORIES[cat].title;
+  const tag = proj.keyword ? proj.keyword.split('|').map(s => s.trim()).join(' · ') : '';
   return `<article class="card" data-cat="${cat}">
   ${thumb}
   <div class="card-body">
-    <span class="tag">${esc(tag)}</span>
+    ${tag ? `<span class="tag">${esc(tag)}</span>` : ''}
     <h3>${t}</h3>
     ${proj.desc ? `<p class="desc">${esc(proj.desc)}</p>` : ''}
     <div class="actions">${actions.join('')}</div>
@@ -188,13 +188,14 @@ export const FOOTER = `<footer class="footer">
 </html>
 `;
 
-function renderHome(all) {
-  const total = all.length;
-  const counts = Object.fromEntries(Object.keys(CATEGORIES).map(k => [k, all.filter(c => c.cat === k).length]));
-  const filters = [`<button type="button" class="filter" data-cat="all" aria-pressed="true">All <span class="n">${total}</span></button>`]
-    .concat(Object.entries(CATEGORIES).map(([k, c]) =>
-      `<button type="button" class="filter" data-cat="${k}" aria-pressed="false">${esc(c.title)} <span class="n">${counts[k]}</span></button>`)).join('\n        ');
-  return `${HEAD('Efe Peter Oroh | Analytics Engineer', 'Analytics engineer building Databricks and BigQuery pipelines and Power BI dashboards, applied as an economic statistician.')}
+function renderHome(groups) {
+  const sections = groups.map(g => `      <div class="group" id="${g.slug}">
+        <div class="group-head"><h3>${esc(g.cat.title)}</h3><span class="n mono">${String(g.cards.length).padStart(2, '0')}</span></div>
+        <div class="grid ${({ dashboards: 'two', reports: 'four', interactive: 'wide', other: 'small' })[g.slug] || ''}">
+${g.cards.join('\n')}
+        </div>
+      </div>`).join('\n');
+  return `${HEAD('Efe Peter Oroh | Analytics Engineer', 'Analytics engineer building governed Databricks and BigQuery pipelines and Power BI solutions, applied as an economic statistician.')}
 ${NAV('home')}
 <main>
   <section class="hero">
@@ -217,24 +218,17 @@ ${NAV('home')}
   <section class="flow" aria-label="How I build">
     <div class="wrap">
       <div class="flow-grid">
-        <div class="flow-step"><h3><span class="mono">01</span>Ingest</h3><p>APIs, web scraping and scheduled Python and R jobs.</p></div>
-        <div class="flow-step"><h3><span class="mono">02</span>Model</h3><p>Databricks and BigQuery, SQL and dimensional models.</p></div>
-        <div class="flow-step"><h3><span class="mono">03</span>Serve</h3><p>Power BI dashboards, D3.js stories and automated reports.</p></div>
+        <div class="flow-step"><h3><span class="mono">01</span>Ingest</h3><p>Public and internal APIs, web scraping, scheduled Python and R jobs.</p></div>
+        <div class="flow-step"><h3><span class="mono">02</span>Model and govern</h3><p>Databricks and BigQuery, governed tables, SQL and dimensional models.</p></div>
+        <div class="flow-step"><h3><span class="mono">03</span>Serve</h3><p>Power BI semantic models and dashboards, automated reports, D3.js stories.</p></div>
       </div>
     </div>
   </section>
 
   <section class="work" id="work">
     <div class="wrap">
-      <div class="work-head">
-        <div><div class="label">Portfolio</div><h2>Selected work</h2></div>
-        <div class="filters" role="group" aria-label="Filter projects">
-        ${filters}
-        </div>
-      </div>
-      <div class="grid">
-${all.map(c => c.html).join('\n')}
-      </div>
+      <div class="work-head"><div><div class="label">Portfolio</div><h2>Selected work</h2></div></div>
+${sections}
     </div>
   </section>
 </main>
@@ -262,19 +256,17 @@ ${cards.join('\n')}
 ${FOOTER}`;
 }
 
-const all = [];
+const groups = [];
 await mkdir(join(__dirname, 'projects'), { recursive: true });
 for (const [slug, cat] of Object.entries(CATEGORIES)) {
   const cards = [];
   for (const [folder, dir, badge] of cat.projects) {
-    try {
-      const proj = await readProject(folder, dir);
-      const html = renderCard(proj, slug, badge);
-      cards.push(html); all.push({ cat: slug, html });
-    } catch (e) { console.warn('skipped', folder, dir, e.message); }
+    try { cards.push(renderCard(await readProject(folder, dir), slug, badge)); }
+    catch (e) { console.warn('skipped', folder, dir, e.message); }
   }
+  groups.push({ slug, cat, cards });
   await writeFile(join(__dirname, 'projects', `${slug}.html`), renderCategory(slug, cat, cards), 'utf8');
   console.log(`  projects/${slug}.html (${cards.length})`);
 }
-await writeFile(join(__dirname, 'index.html'), renderHome(all), 'utf8');
-console.log(`  index.html (${all.length} projects)\nBuild complete.`);
+await writeFile(join(__dirname, 'index.html'), renderHome(groups), 'utf8');
+console.log(`  index.html (${groups.reduce((n, g) => n + g.cards.length, 0)} projects)\nBuild complete.`);
