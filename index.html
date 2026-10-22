@@ -1,172 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Efe Peter Oroh — Economist &amp; Data Scientist</title>
-<meta name="description" content="Economist specializing in data science, AI automation, and data visualization.">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Efe Peter Oroh | Analytics Engineer</title>
+<meta name="description" content="Analytics engineer building Databricks and BigQuery pipelines and Power BI dashboards, applied as an economic statistician.">
+<meta property="og:title" content="Efe Peter Oroh | Analytics Engineer">
+<meta property="og:description" content="Analytics engineer building Databricks and BigQuery pipelines and Power BI dashboards, applied as an economic statistician.">
+<meta property="og:image" content="/brand_assets/Headshot/headshot_2026.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="css/styles.css">
+<link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
-
-<nav class="site-nav" role="navigation">
-  <div class="nav-inner">
-    <a href="/" class="nav-brand">Efe Peter Oroh</a>
-    <div class="nav-links" id="navLinks">
-      <a href="/" class="active">Home</a>
-      <a href="#projects">Projects</a>
+<header class="nav">
+  <div class="wrap">
+    <a href="/" class="brand"><span class="brand-mark">EO</span>Efe Peter Oroh</a>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="/#work">Work</a>
       <a href="/about.html">About</a>
-      <a href="/about.html#resume" class="nav-cta">Resume</a>
-    </div>
-    <button class="nav-mobile-toggle" aria-label="Toggle menu" aria-expanded="false"
-      onclick="const m=document.getElementById('navLinks');const o=m.classList.toggle('open');this.setAttribute('aria-expanded',o);">
-      <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <a href="mailto:efeogheneoroh@gmail.com">Contact</a>
+      <a href="/brand_assets/resume/EfeOroh_Resume.pdf" class="btn btn-solid" target="_blank" rel="noopener">Resume</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
     </button>
   </div>
-</nav>
+</header>
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow label"><span class="dot"></span>Analytics Engineer · Edmonton, AB</div>
+        <h1>I build the data pipelines and dashboards <span>behind better decisions.</span></h1>
+        <p class="sub">Databricks and BigQuery pipelines, modelled in SQL and served in Power BI. Applied every day as an economic statistician.</p>
+        <div class="ctas">
+          <a href="#work" class="btn btn-solid">See the work</a>
+          <a href="/brand_assets/resume/EfeOroh_Resume.pdf" class="btn btn-line" target="_blank" rel="noopener">Resume</a>
+        </div>
+      </div>
+      <figure class="portrait" style="margin:0">
+        <img src="/brand_assets/Headshot/headshot_2026.jpg" alt="Efe Peter Oroh" width="900" height="900">
+      </figure>
+    </div>
+  </section>
 
-<!-- HERO -->
-<section id="hero" class="hero">
-  <div class="hero-inner">
-    <div>
-      <span class="hero-eyebrow">Economist · Data Scientist</span>
-      <h1 class="hero-name">Efe Peter Oroh</h1>
-      <div class="section-divider"></div>
-      <p class="hero-bio">Economist specializing in data science applications, AI automation, and data visualization. Experienced in building scalable data pipelines and delivering decision-ready insights.</p>
-      <div class="hero-ctas">
-        <a href="#projects" class="btn-primary">View Projects <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1v12M1 7l6 6 6-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a href="/about.html#resume" class="btn-secondary">Download Resume <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 11.5h9M7 1.5v7M4 5.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  <section class="flow" aria-label="How I build">
+    <div class="wrap">
+      <div class="flow-grid">
+        <div class="flow-step"><h3><span class="mono">01</span>Ingest</h3><p>APIs, web scraping and scheduled Python and R jobs.</p></div>
+        <div class="flow-step"><h3><span class="mono">02</span>Model</h3><p>Databricks and BigQuery, SQL and dimensional models.</p></div>
+        <div class="flow-step"><h3><span class="mono">03</span>Serve</h3><p>Power BI dashboards, D3.js stories and automated reports.</p></div>
       </div>
     </div>
-    <div class="hero-image-wrap">
-      <div class="headshot-ring">
-        <img src="brand_assets/Headshot/new_headshot.png" alt="Efe Peter Oroh">
+  </section>
+
+  <section class="work" id="work">
+    <div class="wrap">
+      <div class="work-head">
+        <div><div class="label">Portfolio</div><h2>Selected work</h2></div>
+        <div class="filters" role="group" aria-label="Filter projects">
+        <button type="button" class="filter" data-cat="all" aria-pressed="true">All <span class="n">17</span></button>
+        <button type="button" class="filter" data-cat="dashboards" aria-pressed="false">Dashboards <span class="n">6</span></button>
+        <button type="button" class="filter" data-cat="interactive" aria-pressed="false">Interactive <span class="n">1</span></button>
+        <button type="button" class="filter" data-cat="reports" aria-pressed="false">Reports <span class="n">5</span></button>
+        <button type="button" class="filter" data-cat="research" aria-pressed="false">Research <span class="n">2</span></button>
+        <button type="button" class="filter" data-cat="automation" aria-pressed="false">Automation <span class="n">3</span></button>
+        </div>
       </div>
-    </div>
+      <div class="grid">
+<article class="card" data-cat="dashboards">
+  <button type="button" class="thumb" data-video="/brand_assets/Projects/Dashboards/02_youth_labour_market_information/demo/youth_lmi.mp4" data-title="Youth Labour Market Information Dashboard" aria-label="Watch Youth Labour Market Information Dashboard demo"><img src="/brand_assets/Projects/Dashboards/02_youth_labour_market_information/thumbnail/youth_lmi.jpg" alt="" loading="lazy"><span class="play"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z" fill="currentColor"/></svg></span><span class="badge">New</span></button>
+  <div class="card-body">
+    <span class="tag">Power BI · Executive Insights</span>
+    <h3>Youth Labour Market Information Dashboard</h3>
+    <p class="desc">Power BI dashboard tracking the youth labour market across provinces, with filters for geography, age, gender and date. KPI cards, provincial comparisons, trend lines and top industries sit beside an executive insights panel that summarizes the latest movements in plain language.</p>
+    <div class="actions"><button type="button" class="act" data-video="/brand_assets/Projects/Dashboards/02_youth_labour_market_information/demo/youth_lmi.mp4" data-title="Youth Labour Market Information Dashboard">Watch demo</button></div>
   </div>
-</section>
-
-<!-- QUICK NAV -->
-<section class="section bg-white">
-  <div class="section-inner">
-    <span class="section-label">Explore</span>
-    <h2 class="section-title">What I Do</h2>
-    <div class="quick-nav-grid">
-      <a href="#projects" class="quick-nav-card">
-        <div class="qnc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="2" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/><rect x="11" y="11" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.5"/></svg></div>
-        <div class="qnc-title">Projects</div>
-        <p class="qnc-desc">Data science work spanning economics, energy, automation, and more.</p>
-        <span class="qnc-arrow">→</span>
-      </a>
-      <a href="/about.html#experience" class="quick-nav-card">
-        <div class="qnc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="2" y="6" width="16" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M7 6V5a2 2 0 012-2h2a2 2 0 012 2v1M2 11h16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-        <div class="qnc-title">Work Experience</div>
-        <p class="qnc-desc">Professional background in research, analytics, and economic analysis.</p>
-        <span class="qnc-arrow">→</span>
-      </a>
-      <a href="/about.html" class="quick-nav-card">
-        <div class="qnc-icon"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="6" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M3 18c0-3.866 3.134-7 7-7s7 3.134 7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-        <div class="qnc-title">About Me</div>
-        <p class="qnc-desc">Background, interests, and the perspective I bring to the work.</p>
-        <span class="qnc-arrow">→</span>
-      </a>
-    </div>
+</article>
+<article class="card" data-cat="dashboards">
+  <button type="button" class="thumb" data-video="/brand_assets/Projects/Energy_Analytics/ENERGY_MARKET_INTELLIGENCE_DASH/demo/energydash.mp4" data-title="Energy Market Intelligence Dashboard" aria-label="Watch Energy Market Intelligence Dashboard demo"><img src="/brand_assets/Projects/Energy_Analytics/ENERGY_MARKET_INTELLIGENCE_DASH/thumbnail/thumbnail.png" alt="" loading="lazy"><span class="play"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z" fill="currentColor"/></svg></span></button>
+  <div class="card-body">
+    <span class="tag">Energy Intelligence · AI Insights</span>
+    <h3>Energy Market Intelligence Dashboard</h3>
+    <p class="desc">Real-time energy market dashboard built on a StatsCan API pipeline. Features dynamic visualizations, automated data refresh, and an AI-powered insights generator that produces contextual analysis directly from live dashboard metrics.</p>
+    <div class="actions"><button type="button" class="act" data-video="/brand_assets/Projects/Energy_Analytics/ENERGY_MARKET_INTELLIGENCE_DASH/demo/energydash.mp4" data-title="Energy Market Intelligence Dashboard">Watch demo</button></div>
   </div>
-</section>
-
-<!-- SKILLS -->
-<section class="section">
-  <div class="section-inner">
-    <span class="section-label">Technical Stack</span>
-    <h2 class="section-title">Skills &amp; Tools</h2>
-    <p class="section-subtitle">Tools and methodologies I use to turn data into insight.</p>
-    <div class="skills-group">
-      <div class="skills-group-label">Data Visualization</div>
-      <div class="skills-flex">
-        <span class="skill-badge"><span class="skill-dot"></span>Power BI</span>
-        <span class="skill-badge"><span class="skill-dot"></span>Tableau</span>
-      </div>
-    </div>
-    <div class="skills-group" style="margin-top:1.75rem">
-      <div class="skills-group-label">Programming &amp; Analysis</div>
-      <div class="skills-flex">
-        <span class="skill-badge"><span class="skill-dot"></span>Python</span>
-        <span class="skill-badge"><span class="skill-dot"></span>R</span>
-        <span class="skill-badge"><span class="skill-dot"></span>SQL</span>
-      </div>
-    </div>
-    <div class="skills-group" style="margin-top:1.75rem">
-      <div class="skills-group-label">Methods &amp; Engineering</div>
-      <div class="skills-flex">
-        <span class="skill-badge"><span class="skill-dot"></span>Data Pipelines</span>
-        <span class="skill-badge"><span class="skill-dot"></span>Machine Learning</span>
-        <span class="skill-badge"><span class="skill-dot"></span>Automation</span>
-      </div>
-    </div>
+</article>
+<article class="card" data-cat="dashboards">
+  <button type="button" class="thumb" data-video="/brand_assets/Projects/Dashboards/01_financial-assurance/demo/FinancialAssurance%20pipeline.mp4" data-title="End-to-End Cloud Data Pipeline" aria-label="Watch End-to-End Cloud Data Pipeline demo"><img src="/brand_assets/Projects/Dashboards/01_financial-assurance/thumbnail/pipeline%20image.png" alt="" loading="lazy"><span class="play"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z" fill="currentColor"/></svg></span></button>
+  <div class="card-body">
+    <span class="tag">Cloud Analytics · BigQuery · Power BI · Dimensional Modelling</span>
+    <h3>End-to-End Cloud Data Pipeline</h3>
+    <p class="desc">Built an end-to-end data pipeline synthesising financial data from multiple sources (OSFI, Bank of Canada, StatsCan APIs) into Google BigQuery using Python ETL with scheduled refreshes on Google Cloud. From there, designed fact and dimension tables through dimensional modelling, queried with SQL, and fed the data into a Power BI semantic model with DAX measures, producing a scalable executive dashboard that gives insights regarding which financial institutions should be prioritized for assurance review based on emerging financial risk indicators.</p>
+    <div class="actions"><button type="button" class="act" data-video="/brand_assets/Projects/Dashboards/01_financial-assurance/demo/FinancialAssurance%20pipeline.mp4" data-title="End-to-End Cloud Data Pipeline">Watch demo</button></div>
   </div>
-</section>
-
-<!-- PROJECTS -->
-<section id="projects" class="section bg-white">
-  <div class="section-inner">
-    <span class="section-label">Portfolio</span>
-    <h2 class="section-title">Projects</h2>
-    <p class="section-subtitle">Select a category to explore work across economics, data science, and analytics.</p>
-    <div class="projects-hub-wrap">
-      <div class="hub-orbit-ring"></div>
-      <div class="projects-hub">
-
-        <a href="/projects/reports" class="project-cat-card hub-reports" target="_blank" rel="noopener noreferrer">
-          <img class="pcc-image" src="brand_assets/Projects/Energy_Analytics/Shipment_Pipeline_Royalty_Analysis/thumbail/PipelineAnalysis.png" alt="Reports" loading="lazy">
-          <div class="pcc-overlay"></div><div class="pcc-color-treatment"></div>
-          <div class="pcc-content"><div class="pcc-number">02</div><div class="pcc-title">Reports</div></div>
-          <div class="pcc-view">→</div>
-        </a>
-
-        <a href="/projects/dashboards" class="project-cat-card hub-center" target="_blank" rel="noopener noreferrer">
-          <img class="pcc-image" src="brand_assets/Projects/Energy_Analytics/ENERGY_MARKET_INTELLIGENCE_DASH/thumbnail/thumbnail.png" alt="Dashboards" loading="lazy">
-          <div class="pcc-overlay"></div><div class="pcc-color-treatment"></div>
-          <div class="pcc-content"><div class="pcc-number">01</div><div class="pcc-title">Dashboards</div></div>
-          <div class="pcc-view">→</div>
-        </a>
-
-        <a href="/projects/research" class="project-cat-card hub-research" target="_blank" rel="noopener noreferrer">
-          <img class="pcc-image" src="brand_assets/Projects/Labour_Economics/impactofMigrationNew.png" alt="Research" loading="lazy">
-          <div class="pcc-overlay"></div><div class="pcc-color-treatment"></div>
-          <div class="pcc-content"><div class="pcc-number">03</div><div class="pcc-title">Research</div></div>
-          <div class="pcc-view">→</div>
-        </a>
-
-        <a href="/projects/automation" class="project-cat-card hub-automation" target="_blank" rel="noopener noreferrer">
-          <img class="pcc-image" src="brand_assets/Projects/Automation/ai-automation-thumbnail.jpeg" alt="Automation" loading="lazy">
-          <div class="pcc-overlay"></div><div class="pcc-color-treatment"></div>
-          <div class="pcc-content"><div class="pcc-number">04</div><div class="pcc-title">Automation</div></div>
-          <div class="pcc-view">→</div>
-        </a>
-
+</article>
+<article class="card" data-cat="dashboards">
+  <button type="button" class="thumb" data-video="/brand_assets/Projects/Labour_Economics/SkilledTradesDashboard/ST%20dash.mp4" data-title="Skilled Trades Dashboard" aria-label="Watch Skilled Trades Dashboard demo"><img src="/brand_assets/Projects/Labour_Economics/SkilledTradesDashboard/ST%20dash%20Apprentices.png" alt="" loading="lazy"><span class="play"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z" fill="currentColor"/></svg></span></button>
+  <div class="card-body">
+    <span class="tag">Dashboards</span>
+    <h3>Skilled Trades Dashboard</h3>
+    <p class="desc">Designed a geospatial Power BI dashboard using proxy data, integrating GIS tools and shapefiles to analyze and visualize skilled trades labour market trends. Delivered interactive, map-driven insights to support decision-making across regions and occupations.</p>
+    <div class="actions"><button type="button" class="act" data-video="/brand_assets/Projects/Labour_Economics/SkilledTradesDashboard/ST%20dash.mp4" data-title="Skilled Trades Dashboard">Watch demo</button></div>
+  </div>
+</article>
+<article class="card" data-cat="dashboards">
+  <button type="button" class="thumb" data-video="/brand_assets/Projects/RealEstate_Analytics/propertymanagement/demo/Property%20Management%20Dash.mp4" data-title="Property Management Dashboard" aria-label="Watch Property Management Dashboard demo"><img src="/brand_assets/Projects/RealEstate_Analytics/propertymanagement/thumbnail/Property%20Management%20Dash%20picture.png" alt="" loading="lazy"><span class="play"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z" fill="currentColor"/></svg></span></button>
+  <div class="card-body">
+    <span class="tag">Dashboards</span>
+    <h3>Property Management Dashboard</h3>
+    <p class="desc">Interactive dashboard analyzing property performance, tenant trends, and operational metrics for real estate management decision-making.</p>
+    <div class="actions"><button type="button" class="act" data-video="/brand_assets/Projects/RealEstate_Analytics/propertymanagement/demo/Property%20Management%20Dash.mp4" data-title="Property Management Dashboard">Watch demo</button></div>
+  </div>
+</article>
+<article class="card" data-cat="dashboards">
+  <a class="thumb" href="https://public.tableau.com/views/AirbnbStoryGlobalReachUnveiled/AirbnbStory?:language=en-GB&amp;:sid=&amp;:redirect=auth&amp;:display_count=n&amp;:origin=viz_share_link" target="_blank" rel="noopener" aria-label="Airbnb Market Analysis"><img src="/brand_assets/Projects/RealEstate_Analytics/Real%20Estate%7C%20Airbnb%20Story/thumbnail/Real%20Estate%7C%20Airbnb%20Story.png" alt="" loading="lazy"></a>
+  <div class="card-body">
+    <span class="tag">Dashboards</span>
+    <h3>Airbnb Market Analysis</h3>
+    <p class="desc">Interactive Tableau story analyzing global Airbnb market trends, pricing dynamics, geographic distribution, and listing behavior to uncover actionable insights for hosts and investors.</p>
+    <div class="actions"><a class="act" href="https://public.tableau.com/views/AirbnbStoryGlobalReachUnveiled/AirbnbStory?:language=en-GB&amp;:sid=&amp;:redirect=auth&amp;:display_count=n&amp;:origin=viz_share_link" target="_blank" rel="noopener">Open live <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4.5 3H9v4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </div>
+</article>
+<article class="card" data-cat="interactive">
+  <a class="thumb" href="/viz/gift-trade-ledger.html" target="_blank" rel="noopener" aria-label="Gift Trade Ledger"><img src="/brand_assets/Projects/Interactive_Viz/01_gift_trade_ledger/thumbnail/gift_trade_ledger.jpg" alt="" loading="lazy"><span class="play"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z" fill="currentColor"/></svg></span><span class="badge">New</span></a>
+  <div class="card-body">
+    <span class="tag">D3.js · Scroll Storytelling</span>
+    <h3>Gift Trade Ledger</h3>
+    <p class="desc">Scroll-driven data story built on a real UK online retailer's 12-month transaction log. Animated charts and a world map change as you scroll, then an explorer lets you pick any market and rewrites the KPIs, charts and executive brief on the fly.</p>
+    <div class="actions"><a class="act" href="/viz/gift-trade-ledger.html" target="_blank" rel="noopener">Open live <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4.5 3H9v4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a><button type="button" class="act soft" data-video="/brand_assets/Projects/Interactive_Viz/01_gift_trade_ledger/demo/gift_trade_ledger.mp4" data-title="Gift Trade Ledger">Watch demo</button></div>
+  </div>
+</article>
+<article class="card" data-cat="reports">
+  <a class="thumb" href="/brand_assets/Projects/Labour_Economics/Hiring%20Demand%20Bulletin_March%202025.pdf" target="_blank" rel="noopener" aria-label="Hiring Demand Bulletins"><img src="/brand_assets/Projects/Labour_Economics/IndustryProfilesThumbnail.png" alt="" loading="lazy"></a>
+  <div class="card-body">
+    <span class="tag">Reports</span>
+    <h3>Hiring Demand Bulletins</h3>
+    <p class="desc">Owned and delivered Hiring Demand Bulletin, providing a comprehensive view of labour demand across regions and industries. Synthesized large-scale labour market data into concise, executive-ready insights for stakeholders.</p>
+    <div class="actions"><a class="act" href="/brand_assets/Projects/Labour_Economics/Hiring%20Demand%20Bulletin_March%202025.pdf" target="_blank" rel="noopener">Read report <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4.5 3H9v4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </div>
+</article>
+<article class="card" data-cat="reports">
+  <button type="button" class="thumb" data-video="/brand_assets/Projects/labor_economics/IndustryProfiles_Report/demo%3Alink/IP_Automation.mp4" data-title="Industry Profiles Report" aria-label="Watch Industry Profiles Report demo"><img src="/brand_assets/Projects/labor_economics/IndustryProfiles_Report/thumbail/Thumbnail.png" alt="" loading="lazy"><span class="play"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z" fill="currentColor"/></svg></span></button>
+  <div class="card-body">
+    <span class="tag">Reports</span>
+    <h3>Industry Profiles Report</h3>
+    <p class="desc">Automated data pulling and report generation for 18 industry profiles, processing 2M+ rows of data. Built a scalable data pipeline that reduced reporting time from approximately one month to a single execution, a 95%+ efficiency gain, while improving consistency and reliability.</p>
+    <div class="actions"><button type="button" class="act" data-video="/brand_assets/Projects/labor_economics/IndustryProfiles_Report/demo%3Alink/IP_Automation.mp4" data-title="Industry Profiles Report">Watch demo</button></div>
+  </div>
+</article>
+<article class="card" data-cat="reports">
+  <a class="thumb" href="/brand_assets/Projects/Energy_Analytics/CanadianCrudePrice_TradeVulnerability/demo%3Alink/CanadianCrudePrice_TradeVulnerability.html" target="_blank" rel="noopener" aria-label="Canadian Crude Price Outlook"><img src="/brand_assets/Projects/Energy_Analytics/CanadianCrudePrice_TradeVulnerability/thumbail/crude_trade_vulnerability.png" alt="" loading="lazy"></a>
+  <div class="card-body">
+    <span class="tag">Reports</span>
+    <h3>Canadian Crude Price Outlook</h3>
+    <p class="desc">Designed a forward-looking economic analysis assessing how Canadian crude prices respond to net-zero transition scenarios and U.S. policy shifts. Combined API-sourced data, scenario modelling, and advanced visualization to translate complex market dynamics into decision-ready insights for stakeholders evaluating risk, pricing volatility, and long-term competitiveness.</p>
+    <div class="actions"><a class="act" href="/brand_assets/Projects/Energy_Analytics/CanadianCrudePrice_TradeVulnerability/demo%3Alink/CanadianCrudePrice_TradeVulnerability.html" target="_blank" rel="noopener">Read report <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4.5 3H9v4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </div>
+</article>
+<article class="card" data-cat="reports">
+  <a class="thumb" href="/brand_assets/Projects/Energy_Analytics/Shipment_Pipeline_Royalty_Analysis/demo%3Alink/Shipment_Pipeline_Royalty_Analysis.html" target="_blank" rel="noopener" aria-label="Canadian Energy Infrastructure"><img src="/brand_assets/Projects/Energy_Analytics/Shipment_Pipeline_Royalty_Analysis/thumbail/PipelineAnalysis.png" alt="" loading="lazy"></a>
+  <div class="card-body">
+    <span class="tag">Reports</span>
+    <h3>Canadian Energy Infrastructure</h3>
+    <p class="desc">Developed a data-driven analysis integrating large-scale energy datasets to quantify how pipeline constraints impact crude shipments and provincial royalty revenues. Built an end-to-end analytical workflow in R, combining API-based data pulls with structured transformations and state-of-the-art visualizations to surface bottlenecks and revenue sensitivities in Canada's energy system.</p>
+    <div class="actions"><a class="act" href="/brand_assets/Projects/Energy_Analytics/Shipment_Pipeline_Royalty_Analysis/demo%3Alink/Shipment_Pipeline_Royalty_Analysis.html" target="_blank" rel="noopener">Read report <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4.5 3H9v4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </div>
+</article>
+<article class="card" data-cat="reports">
+  <a class="thumb" href="/brand_assets/Projects/Energy_Analytics/Canada_Electricity_Generation_Emissions_Analysis/demo%3Alink/Canada_Electricity_Generation_Emissions_Analysis.html" target="_blank" rel="noopener" aria-label="Canadian Electricity Emissions"><img src="/brand_assets/Projects/Energy_Analytics/Canada_Electricity_Generation_Emissions_Analysis/thumbail/Electricity_Analysis.png" alt="" loading="lazy"></a>
+  <div class="card-body">
+    <span class="tag">Reports</span>
+    <h3>Canadian Electricity Emissions</h3>
+    <p class="desc">Constructed a comprehensive analytical framework to evaluate Canada's evolving electricity mix, linking generation sources to emissions outcomes under changing demand conditions. Leveraged large datasets and automated pipelines to produce high-impact visualizations and an R Markdown report, enabling clear interpretation of decarbonization trade-offs for energy policy and market analysis.</p>
+    <div class="actions"><a class="act" href="/brand_assets/Projects/Energy_Analytics/Canada_Electricity_Generation_Emissions_Analysis/demo%3Alink/Canada_Electricity_Generation_Emissions_Analysis.html" target="_blank" rel="noopener">Read report <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4.5 3H9v4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </div>
+</article>
+<article class="card" data-cat="research">
+  <a class="thumb" href="/brand_assets/Projects/Labour_Economics/final_analysis_impactofmigration.html" target="_blank" rel="noopener" aria-label="Migration Participation Rates"><img src="/brand_assets/Projects/Labour_Economics/impactofMigrationNew.png" alt="" loading="lazy"></a>
+  <div class="card-body">
+    <span class="tag">Research</span>
+    <h3>Migration Participation Rates</h3>
+    <p class="desc">Applied counterfactual economic modelling on 2M+ labour force records to quantify the impact of migration on Alberta's labour force participation. Produced a structured analytical report using R Markdown, translating complex results into clear, policy-relevant insights.</p>
+    <div class="actions"><a class="act" href="/brand_assets/Projects/Labour_Economics/final_analysis_impactofmigration.html" target="_blank" rel="noopener">Read report <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4.5 3H9v4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </div>
+</article>
+<article class="card" data-cat="research">
+  <a class="thumb" href="/brand_assets/Projects/RealEstate_Analytics/impactofcovid/demo/RealEstate%7C%20Impact%20of%20Covid%2019.pdf" target="_blank" rel="noopener" aria-label="Impact Of COVID Edmonton"><img src="/brand_assets/Projects/RealEstate_Analytics/impactofcovid/thumbnail/Impact0fCovid19.png" alt="" loading="lazy"></a>
+  <div class="card-body">
+    <span class="tag">Research</span>
+    <h3>Impact Of COVID Edmonton</h3>
+    <p class="desc">1st Place Winner. Competition involving Masters+ students tasked with analyzing City of Edmonton datasets. I led Section 5, the core descriptive analysis, conducting large-scale exploratory analysis that identified key structural changes in housing demand and price dynamics, informing the predictive models built by the team.</p>
+    <div class="actions"><a class="act" href="/brand_assets/Projects/RealEstate_Analytics/impactofcovid/demo/RealEstate%7C%20Impact%20of%20Covid%2019.pdf" target="_blank" rel="noopener">Read report <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4.5 3H9v4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>
+  </div>
+</article>
+<article class="card" data-cat="automation">
+  <button type="button" class="thumb" data-video="/brand_assets/Projects/Automation/IndustryProfiles_Report_Automation/demo%3Alink/IP_Automation.mp4" data-title="Industry Profiles Report" aria-label="Watch Industry Profiles Report demo"><img src="/brand_assets/Projects/Automation/IndustryProfiles_Report_Automation/thumbail/Thumbnail.png" alt="" loading="lazy"><span class="play"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z" fill="currentColor"/></svg></span></button>
+  <div class="card-body">
+    <span class="tag">Automation</span>
+    <h3>Industry Profiles Report</h3>
+    <p class="desc">Automated the data pull process for 126 recurring annual industry profile outputs, reducing weeks of manual extraction, cleaning, and formatting work to a single execution completed in minutes.</p>
+    <div class="actions"><button type="button" class="act" data-video="/brand_assets/Projects/Automation/IndustryProfiles_Report_Automation/demo%3Alink/IP_Automation.mp4" data-title="Industry Profiles Report">Watch demo</button></div>
+  </div>
+</article>
+<article class="card" data-cat="automation">
+  <div class="thumb"><div class="ph"><span>Automation</span><b>LFS Indigenous Pipeline</b></div></div>
+  <div class="card-body">
+    <span class="tag">Automation</span>
+    <h3>LFS Indigenous Pipeline</h3>
+    <p class="desc">Automated the extraction and processing of 5M+ rows of Indigenous statistical data used in multiple recurring analytical reports, reducing reporting time by 90%+.</p>
+    <div class="actions"><span class="act soon">Demo on request</span></div>
+  </div>
+</article>
+<article class="card" data-cat="automation">
+  <button type="button" class="thumb" data-video="/brand_assets/Projects/Automation/GHG_Data_Pull/demo%3Alink/Webscraping%20research%20project%20(2)%20(1).mp4" data-title="GHG Data Pull" aria-label="Watch GHG Data Pull demo"><img src="/brand_assets/Projects/Automation/GHG_Data_Pull/thumbail/GHGDataPull.png" alt="" loading="lazy"><span class="play"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z" fill="currentColor"/></svg></span></button>
+  <div class="card-body">
+    <span class="tag">Automation</span>
+    <h3>GHG Data Pull</h3>
+    <p class="desc">Automated the extraction and cleaning of 1M+ rows of greenhouse gas emissions data used in a GHG analytics dashboard. The workflow fully automated the data refresh pipeline for a dashboard requiring annual updates, eliminating manual data collection and ensuring reproducible updates each reporting cycle.</p>
+    <div class="actions"><button type="button" class="act" data-video="/brand_assets/Projects/Automation/GHG_Data_Pull/demo%3Alink/Webscraping%20research%20project%20(2)%20(1).mp4" data-title="GHG Data Pull">Watch demo</button></div>
+  </div>
+</article>
       </div>
     </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="site-footer" role="contentinfo">
-  <div class="footer-inner">
-    <div>
-      <div class="footer-name">Efe Peter Oroh</div>
-      <div class="footer-tagline">Economist · Data Scientist</div>
-    </div>
-    <nav class="footer-links">
-      <a href="mailto:efeogheneoroh@gmail.com"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M1 3.5l6 4 6-4M2 12h11a1 1 0 001-1V4a1 1 0 00-1-1H2a1 1 0 00-1 1v7a1 1 0 001 1z" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg>Email</a>
-      <a href="https://www.linkedin.com/in/efe-oroh/" target="_blank" rel="noopener noreferrer"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="1" y="1" width="13" height="13" rx="2" stroke="currentColor" stroke-width="1.1"/><path d="M4 6.5V11M4 4v.01M7 6.5V11M7 8.5C7 7.5 7.75 6.5 9 6.5S11 7.5 11 8.5V11" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>LinkedIn</a>
-      <a href="https://efeoroh.github.io/" target="_blank" rel="noopener noreferrer"><svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1a6.5 6.5 0 00-2.055 12.668c.325.06.443-.14.443-.312v-1.094c-1.803.392-2.183-.87-2.183-.87-.295-.748-.72-.948-.72-.948-.588-.402.045-.394.045-.394.65.046.992.668.992.668.577.99 1.514.703 1.882.537.059-.417.226-.703.411-.864-1.44-.163-2.952-.72-2.952-3.204 0-.708.252-1.286.668-1.739-.067-.163-.29-.823.063-1.715 0 0 .545-.174 1.783.664a6.2 6.2 0 013.248 0c1.238-.838 1.782-.664 1.782-.664.354.892.13 1.552.064 1.715.416.453.667 1.031.667 1.739 0 2.49-1.515 3.04-2.958 3.2.233.2.44.598.44 1.205v1.787c0 .173.118.375.447.311A6.501 6.501 0 007.5 1z" stroke="currentColor" stroke-width="1.1"/></svg>GitHub</a>
+  </section>
+</main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="who"><b>Efe Peter Oroh</b><span>Analytics Engineer · Edmonton, Alberta</span></div>
+    <nav aria-label="Contact">
+      <a href="mailto:efeogheneoroh@gmail.com">efeogheneoroh@gmail.com</a>
+      <a href="https://www.linkedin.com/in/efe-oroh/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/efeoroh" target="_blank" rel="noopener">GitHub</a>
     </nav>
   </div>
-  <hr class="footer-divider">
-  <p class="footer-copy">© 2026 Efe Peter Oroh. All rights reserved.</p>
 </footer>
-
+<dialog class="player" id="player" aria-label="Project demo">
+  <video controls playsinline preload="none"></video>
+  <div class="bar"><span></span><button type="button">Close</button></div>
+</dialog>
+<script src="/js/site.js" defer></script>
 </body>
 </html>

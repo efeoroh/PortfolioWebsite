@@ -1,0 +1,1 @@
+Scroll-driven data story built on a real UK online retailer's 12-month transaction log. Animated charts and a world map change as you scroll, then an explorer lets you pick any market and rewrites the KPIs, charts and executive brief on the fly.

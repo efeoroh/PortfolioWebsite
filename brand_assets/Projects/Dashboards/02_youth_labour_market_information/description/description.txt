@@ -1,0 +1,1 @@
+Power BI dashboard tracking the youth labour market across provinces, with filters for geography, age, gender and date. KPI cards, provincial comparisons, trend lines and top industries sit beside an executive insights panel that summarizes the latest movements in plain language.
