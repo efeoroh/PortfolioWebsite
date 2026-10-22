@@ -1,8 +1,8 @@
-// Builds index.html and projects/<category>.html from the folders in brand_assets/Projects.
+// Builds index.html from the folders in brand_assets/Projects.
 // Each project folder can hold: title.txt, keyword.txt, description/description.txt,
 // thumbnail/ref.txt (or an image in thumbnail/), demo/ref.txt (file in the repo) or demo/url.txt (link),
 // and video.txt (an extra demo video shown next to a live link).
-// To add, remove or reorder projects, edit CATEGORIES below and run: node build.mjs
+// To change what is featured or listed, edit FEATURED and MORE below, then run: node build.mjs
 import { readFile, readdir, writeFile, mkdir } from 'fs/promises';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
@@ -10,55 +10,29 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROJECTS_BASE = join(__dirname, 'brand_assets', 'Projects');
 
-const CATEGORIES = {
-  dashboards: {
-    title: 'Economic dashboards',
-    desc: 'Power BI tools built on governed, modelled data from Databricks, BigQuery and public APIs.',
-    projects: [
-      ['Dashboards',       '02_youth_labour_market_information'],
-      ['labor_economics',  '01_skilled_trades_dashboard'],
-      ['Energy_Analytics', '00_energy_market_intelligence_dashboard'],
-      ['Dashboards',       '01_financial-assurance'],
-    ],
-  },
-  reports: {
-    title: 'Economic reports and research',
-    desc: 'Briefings, profiles and modelling that turn large labour and energy datasets into findings.',
-    projects: [
-      ['labor_economics',      '03_hiring_demand_bulletins'],
-      ['labor_economics',      '04_industry_profiles_report'],
-      ['labor_economics',      '02_migration_participation_rates'],
-      ['Energy_Analytics',     '01_canadian_crude_price_outlook'],
-      ['Energy_Analytics',     '02_canadian_energy_infrastructure'],
-      ['Energy_Analytics',     '03_canadian_electricity_emissions'],
-      ['RealEstate_Analytics', '02_impact_of_covid_edmonton'],
-    ],
-  },
-  automation: {
-    title: 'Data engineering and automation',
-    desc: 'Pipelines that replace recurring manual reporting with a single run.',
-    projects: [
-      ['Automation', '01_industry_profiles_report'],
-      ['Automation', '02_lfs_indigenous_pipeline'],
-      ['Automation', '03_ghg_data_pull'],
-    ],
-  },
-  interactive: {
-    title: 'Interactive data stories',
-    desc: 'Web-based stories with scroll-driven narrative, animated charts and maps.',
-    projects: [
-      ['Interactive_Viz', '01_gift_trade_ledger'],
-    ],
-  },
-  other: {
-    title: 'Other projects',
-    desc: 'Earlier dashboards on property and short-term rental markets.',
-    projects: [
-      ['RealEstate_Analytics', '01_property_management_dashboard'],
-      ['RealEstate_Analytics', '03_airbnb_market_analysis'],
-    ],
-  },
-};
+// The four headline projects, in order.
+const FEATURED = [
+  ['Dashboards',       '02_youth_labour_market_information'],
+  ['labor_economics',  '01_skilled_trades_dashboard'],
+  ['labor_economics',  '02_migration_participation_rates'],
+  ['Energy_Analytics', '00_energy_market_intelligence_dashboard'],
+];
+
+// Everything else, shown as a compact list.
+const MORE = [
+  ['labor_economics',      '03_hiring_demand_bulletins'],
+  ['labor_economics',      '04_industry_profiles_report'],
+  ['Energy_Analytics',     '01_canadian_crude_price_outlook'],
+  ['Energy_Analytics',     '02_canadian_energy_infrastructure'],
+  ['Energy_Analytics',     '03_canadian_electricity_emissions'],
+  ['RealEstate_Analytics', '02_impact_of_covid_edmonton'],
+  ['Dashboards',           '01_financial-assurance'],
+  ['Automation',           '02_lfs_indigenous_pipeline'],
+  ['Automation',           '03_ghg_data_pull'],
+  ['Interactive_Viz',      '01_gift_trade_ledger'],
+  ['RealEstate_Analytics', '01_property_management_dashboard'],
+  ['RealEstate_Analytics', '03_airbnb_market_analysis'],
+];
 
 const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const encPath = raw => raw.split('/').map(s => encodeURIComponent(s)).join('/');
@@ -101,41 +75,51 @@ async function readProject(catFolder, dirName) {
 
 const ICON_PLAY = '<svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M4 2.5v9l7.5-4.5z" fill="currentColor"/></svg>';
 const ARROW = '<svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 9l6-6M4.5 3H9v4.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const BLANK = ' target="_blank" rel="noopener"';
 
-function renderCard(proj, cat, badge) {
-  const t = esc(proj.title);
+function primary(proj) {
   const k = proj.demo ? kind(proj.demo) : null;
-  const blank = ' target="_blank" rel="noopener"';
-  const img = proj.thumb
-    ? `<img src="${esc(proj.thumb)}" alt="" loading="lazy">`
-    : `<div class="ph"><span>${esc(CATEGORIES[cat].title)}</span><b>${t}</b></div>`;
-  const play = (k === 'video' || proj.video) ? `<span class="play">${ICON_PLAY}</span>` : '';
-  const badgeHtml = badge ? `<span class="badge">${esc(badge)}</span>` : '';
-  let thumb, actions = [];
-  if (k === 'video') {
-    thumb = `<button type="button" class="thumb" data-video="${esc(proj.demo)}" data-title="${t}" aria-label="Watch ${t} demo">${img}${play}${badgeHtml}</button>`;
-    actions.push(`<button type="button" class="act" data-video="${esc(proj.demo)}" data-title="${t}">Watch demo</button>`);
-  } else if (proj.demo) {
-    const label = proj.external ? 'Open live' : k === 'pdf' ? 'Read report' : k === 'image' ? 'View dashboard' : proj.video ? 'Open live' : 'Read report';
-    thumb = `<a class="thumb" href="${esc(proj.demo)}"${blank} aria-label="${t}">${img}${play}${badgeHtml}</a>`;
-    actions.push(`<a class="act" href="${esc(proj.demo)}"${blank}>${label} ${ARROW}</a>`);
-  } else {
-    thumb = `<div class="thumb">${img}${badgeHtml}</div>`;
-    actions.push('<span class="act soon">Demo on request</span>');
+  if (k === 'video') return { type: 'video', href: proj.demo, label: 'Watch demo' };
+  if (proj.demo) {
+    const label = proj.external || proj.video ? 'Open live' : k === 'image' ? 'View dashboard' : 'Read report';
+    return { type: 'link', href: proj.demo, label };
   }
-  if (proj.video && k !== 'video') {
-    actions.push(`<button type="button" class="act soft" data-video="${esc(proj.video)}" data-title="${t}">Watch demo</button>`);
-  }
+  return null;
+}
+
+function renderFeature(proj, i) {
+  const t = esc(proj.title);
+  const p = primary(proj);
+  const img = proj.thumb ? `<img src="${esc(proj.thumb)}" alt="" loading="${i < 2 ? 'eager' : 'lazy'}">` : '';
+  const play = p && p.type === 'video' ? `<span class="play">${ICON_PLAY}</span>` : '';
+  const thumb = !p ? `<div class="thumb">${img}</div>`
+    : p.type === 'video'
+      ? `<button type="button" class="thumb" data-video="${esc(p.href)}" data-title="${t}" aria-label="Watch ${t} demo">${img}${play}</button>`
+      : `<a class="thumb" href="${esc(p.href)}"${BLANK} aria-label="${t}">${img}</a>`;
+  const act = !p ? '' : p.type === 'video'
+    ? `<button type="button" class="act" data-video="${esc(p.href)}" data-title="${t}">${p.label}</button>`
+    : `<a class="act" href="${esc(p.href)}"${BLANK}>${p.label} ${ARROW}</a>`;
   const tag = proj.keyword ? proj.keyword.split('|').map(s => s.trim()).join(' · ') : '';
-  return `<article class="card" data-cat="${cat}">
+  return `<article class="card feature">
   ${thumb}
   <div class="card-body">
-    ${tag ? `<span class="tag">${esc(tag)}</span>` : ''}
+    <div class="card-top"><span class="idx mono">0${i + 1}</span>${tag ? `<span class="tag">${esc(tag)}</span>` : ''}</div>
     <h3>${t}</h3>
     ${proj.desc ? `<p class="desc">${esc(proj.desc)}</p>` : ''}
-    <div class="actions">${actions.join('')}</div>
+    <div class="actions">${act}</div>
   </div>
 </article>`;
+}
+
+function renderMini(proj) {
+  const t = esc(proj.title);
+  const p = primary(proj);
+  const img = proj.thumb ? `<img src="${esc(proj.thumb)}" alt="" loading="lazy">` : '<span class="mini-ph"></span>';
+  const what = !p ? 'On request' : p.type === 'video' ? 'Demo video' : p.label.replace('Read ', '').replace('Open ', '').replace(/^\w/, c => c.toUpperCase());
+  const inner = `<span class="mini-thumb">${img}</span><span class="mini-text"><b>${t}</b><span class="mono">${esc(what)}</span></span>`;
+  if (!p) return `<div class="mini">${inner}</div>`;
+  if (p.type === 'video') return `<button type="button" class="mini" data-video="${esc(p.href)}" data-title="${t}">${inner}</button>`;
+  return `<a class="mini" href="${esc(p.href)}"${BLANK}>${inner}</a>`;
 }
 
 const HEAD = (title, desc) => `<!DOCTYPE html>
@@ -154,13 +138,13 @@ const HEAD = (title, desc) => `<!DOCTYPE html>
 </head>
 <body>`;
 
-export const NAV = active => `<header class="nav">
+const NAV = `<header class="nav">
   <div class="wrap">
     <a href="/" class="brand"><span class="brand-mark">EO</span>Efe Peter Oroh</a>
     <nav class="nav-links" id="navLinks" aria-label="Main">
-      <a href="/#work"${active === 'work' ? ' aria-current="page"' : ''}>Work</a>
-      <a href="/about.html"${active === 'about' ? ' aria-current="page"' : ''}>About</a>
-      <a href="mailto:efeogheneoroh@gmail.com">Contact</a>
+      <a href="/#work">Work</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about.html">About</a>
       <a href="/brand_assets/resume/EfeOroh_Resume.pdf" class="btn btn-solid" target="_blank" rel="noopener">Resume</a>
     </nav>
     <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
@@ -169,7 +153,7 @@ export const NAV = active => `<header class="nav">
   </div>
 </header>`;
 
-export const FOOTER = `<footer class="footer">
+const FOOTER = `<footer class="footer">
   <div class="wrap">
     <div class="who"><b>Efe Peter Oroh</b><span>Analytics Engineer · Edmonton, Alberta</span></div>
     <nav aria-label="Contact">
@@ -188,85 +172,65 @@ export const FOOTER = `<footer class="footer">
 </html>
 `;
 
-function renderHome(groups) {
-  const sections = groups.map(g => `      <div class="group" id="${g.slug}">
-        <div class="group-head"><h3>${esc(g.cat.title)}</h3><span class="n mono">${String(g.cards.length).padStart(2, '0')}</span></div>
-        <div class="grid ${({ dashboards: 'two', reports: 'four', interactive: 'wide', other: 'small' })[g.slug] || ''}">
-${g.cards.join('\n')}
-        </div>
-      </div>`).join('\n');
-  return `${HEAD('Efe Peter Oroh | Analytics Engineer', 'Analytics engineer building governed Databricks and BigQuery pipelines and Power BI solutions, applied as an economic statistician.')}
-${NAV('home')}
+async function load(list) {
+  const out = [];
+  for (const [folder, dir] of list) {
+    try { out.push(await readProject(folder, dir)); } catch (e) { console.warn('skipped', folder, dir, e.message); }
+  }
+  return out;
+}
+
+const featured = await load(FEATURED);
+const more = await load(MORE);
+const approach = await readFile(join(__dirname, 'partials', 'approach.html'), 'utf8');
+
+const html = `${HEAD('Efe Peter Oroh | Analytics Engineer', 'Analytics engineer building Databricks pipelines, modelled in SQL and served in Power BI.')}
+${NAV}
 <main>
   <section class="hero">
     <div class="wrap">
-      <div>
-        <div class="eyebrow label"><span class="dot"></span>Analytics Engineer · Edmonton, AB</div>
-        <h1>I build the data pipelines and dashboards <span>behind better decisions.</span></h1>
-        <p class="sub">Databricks and BigQuery pipelines, modelled in SQL and served in Power BI. Applied every day as an economic statistician.</p>
+      <div class="hero-text">
+        <div class="eyebrow label"><span class="dot"></span>Efe Peter Oroh · Edmonton, AB</div>
+        <h1>Analytics<br>Engineer</h1>
+        <p class="sub">I build Databricks pipelines, modelled in SQL and served in Power BI. Applied every day as an economic statistician.</p>
         <div class="ctas">
           <a href="#work" class="btn btn-solid">See the work</a>
-          <a href="/brand_assets/resume/EfeOroh_Resume.pdf" class="btn btn-line" target="_blank" rel="noopener">Resume</a>
+          <a href="#approach" class="btn btn-line">How I build</a>
         </div>
       </div>
-      <figure class="portrait" style="margin:0">
+      <figure class="portrait">
         <img src="/brand_assets/Headshot/headshot_2026.jpg" alt="Efe Peter Oroh" width="900" height="900">
       </figure>
     </div>
   </section>
 
-  <section class="flow" aria-label="How I build">
+  <section class="work" id="work">
     <div class="wrap">
-      <div class="flow-grid">
-        <div class="flow-step"><h3><span class="mono">01</span>Ingest</h3><p>Public and internal APIs, web scraping, scheduled Python and R jobs.</p></div>
-        <div class="flow-step"><h3><span class="mono">02</span>Model and govern</h3><p>Databricks and BigQuery, governed tables, SQL and dimensional models.</p></div>
-        <div class="flow-step"><h3><span class="mono">03</span>Serve</h3><p>Power BI semantic models and dashboards, automated reports, D3.js stories.</p></div>
+      <div class="section-head"><div class="label">Selected work</div><h2>Featured projects</h2></div>
+      <div class="grid two">
+${featured.map(renderFeature).join('\n')}
       </div>
     </div>
   </section>
 
-  <section class="work" id="work">
+${approach}
+  <section class="more" id="more">
     <div class="wrap">
-      <div class="work-head"><div><div class="label">Portfolio</div><h2>Selected work</h2></div></div>
-${sections}
+      <div class="section-head"><div class="label">Archive</div><h2>Other economic reports and research</h2></div>
+      <div class="mini-grid">
+${more.map(renderMini).join('\n')}
+      </div>
     </div>
   </section>
 </main>
 ${FOOTER}`;
-}
 
-function renderCategory(slug, cat, cards) {
-  return `${HEAD(`${cat.title} | Efe Peter Oroh`, cat.desc)}
-${NAV('work')}
-<main>
-  <section class="page-head">
-    <div class="wrap">
-      <a class="back" href="/#work">← All work</a>
-      <div class="label">${esc(cat.title)}</div>
-      <h1>${esc(cat.title)}</h1>
-      <p>${esc(cat.desc)}</p>
-    </div>
-  </section>
-  <section class="section">
-    <div class="wrap"><div class="grid">
-${cards.join('\n')}
-    </div></div>
-  </section>
-</main>
-${FOOTER}`;
-}
+await writeFile(join(__dirname, 'index.html'), html, 'utf8');
 
-const groups = [];
+// Old category links now point to the homepage.
 await mkdir(join(__dirname, 'projects'), { recursive: true });
-for (const [slug, cat] of Object.entries(CATEGORIES)) {
-  const cards = [];
-  for (const [folder, dir, badge] of cat.projects) {
-    try { cards.push(renderCard(await readProject(folder, dir), slug, badge)); }
-    catch (e) { console.warn('skipped', folder, dir, e.message); }
-  }
-  groups.push({ slug, cat, cards });
-  await writeFile(join(__dirname, 'projects', `${slug}.html`), renderCategory(slug, cat, cards), 'utf8');
-  console.log(`  projects/${slug}.html (${cards.length})`);
+for (const slug of ['dashboards', 'reports', 'research', 'automation', 'interactive', 'other']) {
+  await writeFile(join(__dirname, 'projects', `${slug}.html`),
+    `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta http-equiv="refresh" content="0; url=/#work"><link rel="canonical" href="/"><title>Efe Peter Oroh</title></head><body><a href="/#work">Go to work</a></body></html>\n`, 'utf8');
 }
-await writeFile(join(__dirname, 'index.html'), renderHome(groups), 'utf8');
-console.log(`  index.html (${groups.reduce((n, g) => n + g.cards.length, 0)} projects)\nBuild complete.`);
+console.log(`index.html: ${featured.length} featured, ${more.length} more. Build complete.`);

@@ -1,0 +1,136 @@
+  <section class="approach" id="approach" aria-labelledby="approachTitle">
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M1 1L9 5L1 9" fill="none" stroke="#7ab8f0" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </marker>
+      </defs>
+    </svg>
+    <div class="wrap">
+      <div class="approach-head">
+        <div>
+          <div class="label">How I build</div>
+          <h2 id="approachTitle">My approach</h2>
+        </div>
+        <div class="slide-ctrl">
+          <button type="button" class="nav-btn" data-dir="-1" aria-label="Previous step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="nav-btn" data-dir="1" aria-label="Next step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+
+      <ol class="steps-nav" aria-label="Steps">
+        <li><button type="button" data-go="0" aria-current="step"><span>01</span>Ingest</button></li>
+        <li><button type="button" data-go="1"><span>02</span>Govern</button></li>
+        <li><button type="button" data-go="2"><span>03</span>Refine</button></li>
+        <li><button type="button" data-go="3"><span>04</span>Model</button></li>
+        <li><button type="button" data-go="4"><span>05</span>Automate</button></li>
+        <li><button type="button" data-go="5"><span>06</span>Serve</button></li>
+      </ol>
+      <div class="progress" aria-hidden="true"><span></span></div>
+
+      <div class="track" tabindex="0" aria-label="Approach, six steps">
+
+        <article class="slide">
+          <div class="slide-text"><span class="mono">01 · Ingest</span><h3>Every source, one landing zone.</h3></div>
+          <svg class="dia" viewBox="0 0 560 270" role="img" aria-label="Four sources flow into a landing zone">
+            <g class="node"><rect x="16" y="22" width="178" height="38" rx="9"/><text x="34" y="46">Statistics Canada API</text></g>
+            <g class="node"><rect x="16" y="78" width="178" height="38" rx="9"/><text x="34" y="102">Bank of Canada API</text></g>
+            <g class="node"><rect x="16" y="134" width="178" height="38" rx="9"/><text x="34" y="158">Web scraping</text></g>
+            <g class="node"><rect x="16" y="190" width="178" height="38" rx="9"/><text x="34" y="214">Excel and CSV drops</text></g>
+            <path class="flow" d="M194 41 C 270 41, 270 135, 344 135"/>
+            <path class="flow" d="M194 97 C 260 97, 270 135, 344 135"/>
+            <path class="flow" d="M194 153 C 260 153, 270 135, 344 135"/>
+            <path class="flow" d="M194 209 C 270 209, 270 135, 344 135" marker-end="url(#ah)"/>
+            <g class="node hot"><rect x="350" y="88" width="192" height="94" rx="12"/>
+              <text class="t-big" x="446" y="128" text-anchor="middle">Landing zone</text>
+              <text class="t-sub" x="446" y="152" text-anchor="middle">raw files, as delivered</text></g>
+          </svg>
+        </article>
+
+        <article class="slide">
+          <div class="slide-text"><span class="mono">02 · Govern</span><h3>Delta tables. Every read and write is tracked.</h3></div>
+          <svg class="dia" viewBox="0 0 560 270" role="img" aria-label="A versioned Delta table with an access log">
+            <text class="t-cap" x="104" y="36" text-anchor="middle">DELTA TABLE</text>
+            <g class="node hot"><rect x="20" y="50" width="168" height="44" rx="9"/><text x="38" y="77">version 3 · today</text></g>
+            <g class="node"><rect x="20" y="104" width="168" height="44" rx="9"/><text x="38" y="131">version 2</text></g>
+            <g class="node"><rect x="20" y="158" width="168" height="44" rx="9"/><text x="38" y="185">version 1</text></g>
+            <path class="flow" d="M188 126 L 226 126" marker-end="url(#ah)"/>
+            <g class="panel"><rect x="232" y="30" width="310" height="200" rx="12"/></g>
+            <text class="t-strong" x="252" y="60">Unity Catalog access log</text>
+            <text class="t-cap" x="252" y="90">WHO</text><text class="t-cap" x="370" y="90">ACTION</text><text class="t-cap" x="470" y="90">WHEN</text>
+            <line class="rule" x1="252" y1="100" x2="522" y2="100"/>
+            <text x="252" y="128">analyst</text><text x="370" y="128">read</text><text class="t-sub" x="470" y="128">09:02</text>
+            <text x="252" y="160">pipeline</text><text x="370" y="160">write</text><text class="t-sub" x="470" y="160">06:00</text>
+            <text x="252" y="192">viewer</text><text class="t-deny" x="370" y="192">denied</text><text class="t-sub" x="470" y="192">11:40</text>
+          </svg>
+        </article>
+
+        <article class="slide">
+          <div class="slide-text"><span class="mono">03 · Refine</span><h3>Bronze to silver to gold.</h3></div>
+          <svg class="dia" viewBox="0 0 560 270" role="img" aria-label="Medallion architecture: bronze, silver, gold">
+            <g class="medal bronze"><rect x="16" y="64" width="158" height="118" rx="14"/><text class="t-medal" x="95" y="112" text-anchor="middle">Bronze</text><text class="t-sub" x="95" y="140" text-anchor="middle">raw, as landed</text></g>
+            <g class="medal silver"><rect x="201" y="64" width="158" height="118" rx="14"/><text class="t-medal" x="280" y="112" text-anchor="middle">Silver</text><text class="t-sub" x="280" y="140" text-anchor="middle">cleaned and joined</text></g>
+            <g class="medal gold"><rect x="386" y="64" width="158" height="118" rx="14"/><text class="t-medal" x="465" y="112" text-anchor="middle">Gold</text><text class="t-sub" x="465" y="140" text-anchor="middle">analytics-ready</text></g>
+            <path class="flow" d="M174 123 L 196 123" marker-end="url(#ah)"/>
+            <path class="flow" d="M359 123 L 381 123" marker-end="url(#ah)"/>
+            <defs><linearGradient id="ramp" x1="0" x2="1"><stop offset="0" stop-color="#b07a4a"/><stop offset=".5" stop-color="#9fb1c4"/><stop offset="1" stop-color="#d9b55a"/></linearGradient></defs>
+            <rect x="16" y="214" width="528" height="4" rx="2" fill="url(#ramp)" opacity=".7"/>
+            <text class="t-sub" x="16" y="244">raw</text><text class="t-sub" x="544" y="244" text-anchor="end">ready for analytics</text>
+          </svg>
+        </article>
+
+        <article class="slide">
+          <div class="slide-text"><span class="mono">04 · Model</span><h3>Gold is a star schema, built for fast loads.</h3></div>
+          <svg class="dia" viewBox="0 0 560 270" role="img" aria-label="Star schema: one fact table and four dimensions">
+            <line class="link" x1="168" y1="52" x2="208" y2="112"/>
+            <line class="link" x1="392" y1="52" x2="352" y2="112"/>
+            <line class="link" x1="168" y1="218" x2="208" y2="160"/>
+            <line class="link" x1="392" y1="218" x2="352" y2="160"/>
+            <g class="node"><rect x="20" y="30" width="148" height="44" rx="9"/><text class="m" x="94" y="57" text-anchor="middle">dim_date</text></g>
+            <g class="node"><rect x="392" y="30" width="148" height="44" rx="9"/><text class="m" x="466" y="57" text-anchor="middle">dim_geography</text></g>
+            <g class="node"><rect x="20" y="196" width="148" height="44" rx="9"/><text class="m" x="94" y="223" text-anchor="middle">dim_industry</text></g>
+            <g class="node"><rect x="392" y="196" width="148" height="44" rx="9"/><text class="m" x="466" y="223" text-anchor="middle">dim_occupation</text></g>
+            <g class="node hot"><rect x="200" y="100" width="160" height="72" rx="12"/><text class="m" x="280" y="132" text-anchor="middle">fact_labour_force</text><text class="t-sub" x="280" y="154" text-anchor="middle">measures</text></g>
+          </svg>
+        </article>
+
+        <article class="slide">
+          <div class="slide-text"><span class="mono">05 · Automate</span><h3>One scheduled job, with change data capture.</h3></div>
+          <svg class="dia" viewBox="0 0 560 270" role="img" aria-label="Four notebooks chained in a scheduled job">
+            <rect class="frame" x="16" y="30" width="528" height="196" rx="14"/>
+            <text class="t-acc" x="36" y="58">DATABRICKS JOB</text>
+            <g class="t-sub"><circle cx="446" cy="54" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M446 50v4l3 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></g>
+            <text class="t-sub" x="460" y="58">daily 06:00</text>
+            <g class="node"><rect x="36" y="86" width="104" height="54" rx="9"/><text class="m" x="88" y="118" text-anchor="middle">ingest</text></g>
+            <g class="node"><rect x="164" y="86" width="104" height="54" rx="9"/><text class="m" x="216" y="118" text-anchor="middle">bronze</text></g>
+            <g class="node"><rect x="292" y="86" width="104" height="54" rx="9"/><text class="m" x="344" y="118" text-anchor="middle">silver</text></g>
+            <g class="node hot"><rect x="420" y="86" width="104" height="54" rx="9"/><text class="m" x="472" y="118" text-anchor="middle">gold</text></g>
+            <path class="flow" d="M140 113 L 160 113" marker-end="url(#ah)"/>
+            <path class="flow" d="M268 113 L 288 113" marker-end="url(#ah)"/>
+            <path class="flow" d="M396 113 L 416 113" marker-end="url(#ah)"/>
+            <text class="t-acc" x="36" y="192">CDC</text>
+            <text class="t-sub" x="76" y="192">only new and changed rows run</text>
+            <g class="rows"><rect x="330" y="178" width="16" height="16" rx="3"/><rect x="352" y="178" width="16" height="16" rx="3"/><rect class="on" x="374" y="178" width="16" height="16" rx="3"/><rect x="396" y="178" width="16" height="16" rx="3"/><rect x="418" y="178" width="16" height="16" rx="3"/><rect class="on" x="440" y="178" width="16" height="16" rx="3"/><rect x="462" y="178" width="16" height="16" rx="3"/><rect x="484" y="178" width="16" height="16" rx="3"/><rect class="on" x="506" y="178" width="16" height="16" rx="3"/></g>
+          </svg>
+        </article>
+
+        <article class="slide">
+          <div class="slide-text"><span class="mono">06 · Serve</span><h3>Connect, model, publish.</h3></div>
+          <svg class="dia" viewBox="0 0 560 270" role="img" aria-label="Gold tables to Power BI connector to semantic model to Power BI Service">
+            <g class="medal gold"><rect x="12" y="98" width="108" height="74" rx="12"/><text class="t-strong" x="66" y="130" text-anchor="middle">Gold</text><text class="t-sub" x="66" y="150" text-anchor="middle">tables</text></g>
+            <path class="flow" d="M120 135 L 146 135" marker-end="url(#ah)"/>
+            <g class="node"><rect x="150" y="113" width="122" height="44" rx="22"/><text class="m" x="211" y="132" text-anchor="middle">Databricks</text><text class="t-sub" x="211" y="148" text-anchor="middle">connector</text></g>
+            <path class="flow" d="M272 135 L 298 135" marker-end="url(#ah)"/>
+            <g class="node"><rect x="302" y="92" width="104" height="86" rx="12"/>
+              <path d="M354 108 l16 9 v18 l-16 9 l-16 -9 v-18 z" fill="none" stroke="#7ab8f0" stroke-width="1.5"/>
+              <text class="t-sub" x="354" y="166" text-anchor="middle">semantic model</text></g>
+            <path class="flow" d="M406 135 L 432 135" marker-end="url(#ah)"/>
+            <g class="node hot"><rect x="436" y="70" width="112" height="130" rx="12"/>
+              <rect class="bar" x="456" y="140" width="12" height="28" rx="2"/><rect class="bar" x="474" y="124" width="12" height="44" rx="2"/><rect class="bar" x="492" y="112" width="12" height="56" rx="2"/><rect class="bar" x="510" y="98" width="12" height="70" rx="2"/>
+              <text class="t-sub" x="492" y="190" text-anchor="middle">Power BI Service</text></g>
+          </svg>
+        </article>
+
+      </div>
+    </div>
+  </section>
