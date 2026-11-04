@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Financial Risk and Assurance Pipeline | Efe Peter Oroh</title>
+<meta name="description" content="Bank of Canada, Statistics Canada and OSFI data in BigQuery on a quarterly schedule, ranking institutions by assurance risk.">
+<meta property="og:title" content="Financial Risk and Assurance Pipeline | Efe Peter Oroh">
+<meta property="og:description" content="Bank of Canada, Statistics Canada and OSFI data in BigQuery on a quarterly schedule, ranking institutions by assurance risk.">
+<meta property="og:image" content="/brand_assets/Headshot/headshot_about.webp">
+<meta name="theme-color" content="#fbf7ef">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M1 1L9 5L1 9" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker><linearGradient id="ramp" x1="0" x2="1"><stop offset="0" stop-color="#b9763e"/><stop offset=".5" stop-color="#8b9aab"/><stop offset="1" stop-color="#cfa22a"/></linearGradient></defs></svg>
+<header class="nav">
+  <div class="wrap">
+    <a href="/" class="brand"><span class="brand-mark">EO</span>Efe Peter Oroh</a>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="/#work" aria-current="page">Work</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about.html">About</a>
+      <a href="/brand_assets/resume/EfeOroh_Resume.pdf" class="btn btn-solid" target="_blank" rel="noopener">Resume</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+<main class="t-ocean">
+  <header class="p-head">
+    <div class="wrap">
+      <div>
+        <a class="back" href="/#work">← All work</a>
+        <h1>Financial Risk and Assurance Pipeline</h1>
+        <p class="lede">Bank of Canada, Statistics Canada and OSFI data in BigQuery on a quarterly schedule, ranking institutions by assurance risk.</p>
+        <span class="tag">BigQuery · Power BI</span>
+      </div>
+      <div class="mat"><img src="/brand_assets/Projects/Dashboards/01_financial-assurance/thumbnail/pipeline%20image.png" alt="Financial Risk and Assurance Pipeline"></div>
+    </div>
+  </header>
+
+  <section class="section" style="padding-block:0 24px">
+    <div class="wrap"><dl class="meta"><div><dt>Role</dt><dd>Solo build: pipeline, model and report</dd></div><div><dt>Stack</dt><dd>Google Cloud (Scheduler, Functions, Storage), BigQuery SQL, Power BI, DAX</dd></div><div><dt>Data</dt><dd>Bank of Canada Valet API, Statistics Canada API, OSFI data via open.canada.ca</dd></div><div><dt>Refresh</dt><dd>Quarterly, Cloud Scheduler</dd></div></dl></div>
+  </section>
+
+  <section class="section">
+    <div class="wrap two-col">
+      <div><div class="kicker">Context</div><h2>Why it mattered</h2></div>
+      <div class="prose"><p>Supervisors need an early read on which institutions are drifting toward trouble. The signals are public but scattered: balance sheets and credit losses from OSFI, rates from the Bank of Canada, and household debt indicators from Statistics Canada.</p><p>This project pulls all three into Google BigQuery on a quarterly schedule, models them as a star schema, and serves a Power BI dashboard that ranks institutions by an assurance risk score and explains what changed.</p></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="ask"><div class="kicker">The question</div><blockquote>Which financial institutions should be prioritized for assurance review, based on emerging financial risk indicators?</blockquote><ul><li>Is credit risk rising across the system?</li><li>How do impaired loans move against the policy rate?</li><li>Which institutions score highest on risk?</li></ul></div>
+    </div>
+  </section>
+
+  <div class="band-sea" id="approach">
+    <svg class="wave-top" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+    <section class="section">
+      <div class="wrap">
+    <div class="slider" id="solution-slider">
+      <div class="slider-head">
+        <div><div class="kicker">Approach</div><h2 id="solution-title">How I solved it</h2></div>
+        <div class="slide-ctrl">
+          <button type="button" class="nav-btn" data-dir="-1" aria-label="Previous step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="nav-btn" data-dir="1" aria-label="Next step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <ol class="steps-nav" aria-label="Steps"><li><button type="button" data-go="0" aria-current="step"><span>01</span>Ingest</button></li><li><button type="button" data-go="1"><span>02</span>Layer</button></li><li><button type="button" data-go="2"><span>03</span>Model</button></li><li><button type="button" data-go="3"><span>04</span>Schedule</button></li><li><button type="button" data-go="4"><span>05</span>Serve</button></li></ol>
+      <div class="progress" aria-hidden="true"><span></span></div>
+      <div class="track" tabindex="0" aria-label="How I solved it, 5 steps">
+        <article class="slide on" aria-label="Step 1: Ingest">
+          <div class="slide-text"><span class="step-k">01 · Ingest</span><h3>Three public APIs.</h3><p>Cloud Functions call the Bank of Canada Valet API, the Statistics Canada API and the open.canada.ca data API, and land raw files in Cloud Storage.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Three public APIs."><g class="pop" style="--i:0"><rect class="bx" x="14" y="22" width="226" height="34" rx="9"/><text class="tl" x="28" y="44">Bank of Canada Valet API</text></g><path class="flow" d="M240 39 C 300 39, 300 140, 344 140"/><g class="pop" style="--i:1"><rect class="bx" x="14" y="123" width="226" height="34" rx="9"/><text class="tl" x="28" y="145">Statistics Canada API</text></g><path class="flow" d="M240 140 C 300 140, 300 140, 344 140"/><g class="pop" style="--i:2"><rect class="bx" x="14" y="224" width="226" height="34" rx="9"/><text class="tl" x="28" y="246">OSFI via open.canada.ca</text></g><path class="flow" d="M240 241 C 300 241, 300 140, 344 140" marker-end="url(#ah)"/><g class="pop" style="--i:3"><rect class="bx ocean hot" x="350" y="90" width="196" height="100" rx="14"/><text class="tb" x="448" y="134" text-anchor="middle">Cloud Storage</text><text class="ts" x="448" y="158" text-anchor="middle">raw landing</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 2: Layer">
+          <div class="slide-text"><span class="step-k">02 · Layer</span><h3>Raw, staging, analytics.</h3><p>BigQuery datasets mirror the medallion idea: raw tables per source, a staging layer that cleans and standardises, and an analytics layer for reporting.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Raw, staging, analytics."><g class="pop" style="--i:0"><rect class="bx medal bronze" x="14" y="56" width="160" height="128" rx="14"/><text class="tmed bronze" x="94" y="104" text-anchor="middle">Raw</text><text class="ts" x="94" y="132.5" text-anchor="middle">boc_raw, osfi_raw,</text><text class="ts" x="94" y="147.5" text-anchor="middle">statscan_raw</text></g><path class="flow" d="M176 120 L 196 120" marker-end="url(#ah)"/><g class="pop" style="--i:1"><rect class="bx medal silver" x="200" y="56" width="160" height="128" rx="14"/><text class="tmed silver" x="280" y="104" text-anchor="middle">Staging</text><text class="ts" x="280" y="132.5" text-anchor="middle">cleaned and</text><text class="ts" x="280" y="147.5" text-anchor="middle">standardised</text></g><path class="flow" d="M362 120 L 382 120" marker-end="url(#ah)"/><g class="pop" style="--i:2"><rect class="bx medal gold" x="386" y="56" width="160" height="128" rx="14"/><text class="tmed gold" x="466" y="104" text-anchor="middle">Analytics</text><text class="ts" x="466" y="132.5" text-anchor="middle">conformed</text><text class="ts" x="466" y="147.5" text-anchor="middle">star schema</text></g><rect class="ramp" x="14" y="214" width="532" height="5" rx="2.5"/><text class="ts" x="14" y="244">as ingested</text><text class="ts" x="546" y="244" text-anchor="end">ready for Power BI</text></svg>
+        </article>
+        <article class="slide" aria-label="Step 3: Model">
+          <div class="slide-text"><span class="step-k">03 · Model</span><h3>Five facts, three dimensions.</h3><p>Balance sheet, income statement, credit losses, household stress and macro conditions, all keyed to date, institution and metric.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Five facts, three dimensions."><line class="link" x1="280" y1="140" x2="94" y2="50"/><line class="link" x1="280" y1="140" x2="466" y2="50"/><line class="link" x1="280" y1="140" x2="280" y2="244"/><g class="pop" style="--i:1"><rect class="bx" x="16" y="30" width="156" height="40" rx="9"/><text class="tm" x="94" y="55" text-anchor="middle">dim_date</text></g><g class="pop" style="--i:2"><rect class="bx" x="388" y="30" width="156" height="40" rx="9"/><text class="tm" x="466" y="55" text-anchor="middle">dim_institution</text></g><g class="pop" style="--i:3"><rect class="bx" x="202" y="224" width="156" height="40" rx="9"/><text class="tm" x="280" y="249" text-anchor="middle">dim_metric</text></g><g class="pop" style="--i:0"><rect class="bx coral hot" x="188" y="102" width="184" height="76" rx="14"/><text class="tm b" x="280" y="136" text-anchor="middle">fact tables</text><text class="ts" x="280" y="151" text-anchor="middle">balance sheet, income,</text><text class="ts" x="280" y="165" text-anchor="middle">credit losses, stress, macro</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 4: Schedule">
+          <div class="slide-text"><span class="step-k">04 · Schedule</span><h3>Quarterly, without anyone pressing run.</h3><p>Cloud Scheduler triggers the refresh on the 20th of January, April, July and October at 6:00, Edmonton time.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Quarterly, without anyone pressing run."><rect class="frame" x="16" y="22" width="528" height="206" rx="14"/><text class="tc acc" x="34" y="50">CLOUD SCHEDULER</text><g class="ts"><circle cx="452.6" cy="46" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M452.6 42v4l3 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></g><text class="ts" x="526" y="50" text-anchor="end">quarterly</text><g class="pop" style="--i:0"><rect class="bx" x="34" y="76" width="109.5" height="58" rx="10"/><text class="tm small" x="88.8" y="102" text-anchor="middle">Cloud</text><text class="tm small" x="88.8" y="116" text-anchor="middle">Functions</text></g><path class="flow" d="M144.5 105 L 158.5 105" marker-end="url(#ah)"/><g class="pop" style="--i:1"><rect class="bx" x="161.5" y="76" width="109.5" height="58" rx="10"/><text class="tm small" x="216.3" y="102" text-anchor="middle">raw</text><text class="tm small" x="216.3" y="116" text-anchor="middle">landing</text></g><path class="flow" d="M272 105 L 286 105" marker-end="url(#ah)"/><g class="pop" style="--i:2"><rect class="bx" x="289" y="76" width="109.5" height="58" rx="10"/><text class="tm small" x="343.8" y="102" text-anchor="middle">BigQuery</text><text class="tm small" x="343.8" y="116" text-anchor="middle">SQL</text></g><path class="flow" d="M399.5 105 L 413.5 105" marker-end="url(#ah)"/><g class="pop" style="--i:3"><rect class="bx ocean hot" x="416.5" y="76" width="109.5" height="58" rx="10"/><text class="tm small" x="471.3" y="102" text-anchor="middle">analytics</text><text class="tm small" x="471.3" y="116" text-anchor="middle">tables</text></g><text class="tc acc" x="34" y="178">CRON</text><text class="ts" x="77.6" y="178">0 6 20 1,4,7,10 *</text><text class="tm small" x="34" y="204">quarterly-financial-assurance-refresh</text></svg>
+        </article>
+        <article class="slide" aria-label="Step 5: Serve">
+          <div class="slide-text"><span class="step-k">05 · Serve</span><h3>Rank, then explain.</h3><p>KPIs, an institution risk table and executive insights that state what moved since the last reporting period.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Rank, then explain."><rect class="panel" x="10" y="8" width="540" height="264" rx="12"/><text class="tb" x="24" y="36">FINANCIAL RISK AND ASSURANCE INTELLIGENCE</text><g class="pop" style="--i:1"><rect class="bx " x="24" y="50" width="120.5" height="66" rx="9"/><text class="tc small" x="34" y="69">INSTITUTIONS</text><text class="tkpi" x="34" y="96">6</text></g><g class="pop" style="--i:2"><rect class="bx coral" x="154.5" y="50" width="120.5" height="66" rx="9"/><text class="tc small" x="164.5" y="69">AVG RISK SCORE</text><text class="tkpi" x="164.5" y="96">51.7%</text></g><g class="pop" style="--i:3"><rect class="bx " x="285" y="50" width="120.5" height="66" rx="9"/><text class="tc small" x="295" y="69">IMPAIRED LOANS</text><text class="tkpi" x="295" y="96">0.54%</text></g><g class="pop" style="--i:4"><rect class="bx " x="415.5" y="50" width="120.5" height="66" rx="9"/><text class="tc small" x="425.5" y="69">POLICY RATE</text><text class="tkpi" x="425.5" y="96">2.25%</text></g><g class="pop" style="--i:5"><rect class="bx sand" x="24" y="130" width="236" height="122" rx="9"/><text class="tc acc" x="36" y="150">EXECUTIVE INSIGHT</text><text class="ts dark" x="36" y="170">Asset quality is deteriorating.</text><text class="ts dark" x="36" y="185">The average impaired loan ratio</text><text class="ts dark" x="36" y="200">rose 7.80% from the previous</text><text class="ts dark" x="36" y="215">reporting period.</text></g><rect class="bx" x="272" y="130" width="264" height="122" rx="9"/><path class="ln draw ocean" pathLength="1" d="M282 199.5 L309.1 185.7 L336.2 191 L363.3 178.3 L390.4 182.5 L417.6 169.8 L444.7 174 L471.8 161.3 L498.9 165.6 L526 152.8"/></svg>
+        </article>
+      </div>
+    </div>
+      </div>
+    </section>
+    <svg class="wave-bottom" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+  </div>
+
+  <section class="section" style="padding-top:88px">
+    <div class="wrap">
+      <div class="section-head"><div><div class="kicker">Outcome</div><h2>What it delivers</h2></div></div>
+      <div class="outcome"><div class="out"><b>3 APIs</b><span>Bank of Canada, Statistics Canada and OSFI in one warehouse</span></div><div class="out"><b>8 tables</b><span>five facts and three dimensions in the analytics layer</span></div><div class="out"><b>Quarterly</b><span>Cloud Scheduler refresh, no manual pulls</span></div><div class="out"><b>Ranked</b><span>institutions ordered by an assurance risk score</span></div></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="demo-card">
+        <div><div class="kicker">Demo</div><h2>See it for yourself</h2><p>A short screen recording of the finished work. It only plays when you press the button.</p><div class="ctas"><button type="button" class="btn btn-solid" data-video="/brand_assets/Projects/Dashboards/01_financial-assurance/demo/FinancialAssurance%20pipeline.mp4" data-title="Financial Risk and Assurance Pipeline"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1v8l7-4z" fill="currentColor"/></svg> Watch the demo</button></div></div>
+        <img src="/brand_assets/Projects/Dashboards/01_financial-assurance/thumbnail/pipeline%20image.png" alt="Financial Risk and Assurance Pipeline preview" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap next">
+      <a href="/work/edmonton-housing-after-covid.html"><span class="nl">← Previous</span><b>Housing Shifts in Post-COVID Edmonton</b></a>
+      <a href="/work/lfs-indigenous-pipeline.html" style="text-align:right"><span class="nl">Next →</span><b>LFS Indigenous Data Pipeline</b></a>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="who"><b>Efe Peter Oroh</b><span>Analytics Engineer · Edmonton, Alberta</span></div>
+    <nav aria-label="Contact">
+      <a href="mailto:efeogheneoroh@gmail.com">efeogheneoroh@gmail.com</a>
+      <a href="https://www.linkedin.com/in/efe-oroh/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/efeoroh" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+<dialog class="player" id="player" aria-label="Project demo">
+  <video controls playsinline preload="none"></video>
+  <div class="bar"><span></span><button type="button">Close</button></div>
+</dialog>
+<script src="/js/site.js" defer></script>
+</body>
+</html>

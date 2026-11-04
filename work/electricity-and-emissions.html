@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Canada's Electricity Mix and Emissions | Efe Peter Oroh</title>
+<meta name="description" content="How Canada's power mix changed, what it did to emissions, and how Alberta's market sets the price of power.">
+<meta property="og:title" content="Canada's Electricity Mix and Emissions | Efe Peter Oroh">
+<meta property="og:description" content="How Canada's power mix changed, what it did to emissions, and how Alberta's market sets the price of power.">
+<meta property="og:image" content="/brand_assets/Headshot/headshot_about.webp">
+<meta name="theme-color" content="#fbf7ef">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M1 1L9 5L1 9" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker><linearGradient id="ramp" x1="0" x2="1"><stop offset="0" stop-color="#b9763e"/><stop offset=".5" stop-color="#8b9aab"/><stop offset="1" stop-color="#cfa22a"/></linearGradient></defs></svg>
+<header class="nav">
+  <div class="wrap">
+    <a href="/" class="brand"><span class="brand-mark">EO</span>Efe Peter Oroh</a>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="/#work" aria-current="page">Work</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about.html">About</a>
+      <a href="/brand_assets/resume/EfeOroh_Resume.pdf" class="btn btn-solid" target="_blank" rel="noopener">Resume</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+<main class="t-sun">
+  <header class="p-head">
+    <div class="wrap">
+      <div>
+        <a class="back" href="/#work">← All work</a>
+        <h1>Canada's Electricity Mix and Emissions</h1>
+        <p class="lede">How Canada's power mix changed, what it did to emissions, and how Alberta's market sets the price of power.</p>
+        <span class="tag">R · Energy transition</span>
+      </div>
+      <div class="mat"><img src="/brand_assets/Projects/Energy_Analytics/Canada_Electricity_Generation_Emissions_Analysis/thumbail/Electricity_Analysis.png" alt="Canada's Electricity Mix and Emissions"></div>
+    </div>
+  </header>
+
+  <section class="section" style="padding-block:0 24px">
+    <div class="wrap"><dl class="meta"><div><dt>Role</dt><dd>Analysis and report</dd></div><div><dt>Stack</dt><dd>R, ggplot2, R Markdown</dd></div><div><dt>Data</dt><dd>National GHG Inventory 2025, ECCC projections, AESO merit order data</dd></div><div><dt>Date</dt><dd>March 2025</dd></div></dl></div>
+  </section>
+
+  <section class="section">
+    <div class="wrap two-col">
+      <div><div class="kicker">Context</div><h2>Why it mattered</h2></div>
+      <div class="prose"><p>Canada's power sector has cut its emissions sharply while generating about the same amount of electricity. The story is in the mix: which fuels replaced coal, which provinces still emit the most, and how Alberta's market decides which plants run.</p><p>The report uses Canada's National Greenhouse Gas Inventory (2025), Environment and Climate Change Canada's reference case projections, and Alberta Electric System Operator offer data, all processed and charted in R.</p></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="ask"><div class="kicker">The question</div><blockquote>How has Canada's power mix changed, what has that done to emissions, and how does Alberta's market set the price of power?</blockquote><ul><li>What replaced coal in Alberta?</li><li>Which provinces drive electricity emissions, now and to 2040?</li><li>Why do prices spike when demand is high?</li></ul></div>
+    </div>
+  </section>
+
+  <div class="band-sea" id="approach">
+    <svg class="wave-top" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+    <section class="section">
+      <div class="wrap">
+    <div class="slider" id="solution-slider">
+      <div class="slider-head">
+        <div><div class="kicker">Approach</div><h2 id="solution-title">How I solved it</h2></div>
+        <div class="slide-ctrl">
+          <button type="button" class="nav-btn" data-dir="-1" aria-label="Previous step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="nav-btn" data-dir="1" aria-label="Next step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <ol class="steps-nav" aria-label="Steps"><li><button type="button" data-go="0" aria-current="step"><span>01</span>Sources</button></li><li><button type="button" data-go="1"><span>02</span>Mix</button></li><li><button type="button" data-go="2"><span>03</span>Emissions</button></li><li><button type="button" data-go="3"><span>04</span>Provinces</button></li><li><button type="button" data-go="4"><span>05</span>Merit order</button></li></ol>
+      <div class="progress" aria-hidden="true"><span></span></div>
+      <div class="track" tabindex="0" aria-label="How I solved it, 5 steps">
+        <article class="slide on" aria-label="Step 1: Sources">
+          <div class="slide-text"><span class="step-k">01 · Sources</span><h3>Inventory, projections, market offers.</h3><p>Generation and emissions history, the federal reference case, and hourly offers from Alberta's power pool.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Inventory, projections, market offers."><g class="pop" style="--i:0"><rect class="bx" x="14" y="22" width="226" height="34" rx="9"/><text class="tl small" x="28" y="44">National GHG Inventory 2025</text></g><path class="flow" d="M240 39 C 300 39, 300 140, 344 140"/><g class="pop" style="--i:1"><rect class="bx" x="14" y="123" width="226" height="34" rx="9"/><text class="tl" x="28" y="145">ECCC reference case</text></g><path class="flow" d="M240 140 C 300 140, 300 140, 344 140"/><g class="pop" style="--i:2"><rect class="bx" x="14" y="224" width="226" height="34" rx="9"/><text class="tl" x="28" y="246">AESO merit order data</text></g><path class="flow" d="M240 241 C 300 241, 300 140, 344 140" marker-end="url(#ah)"/><g class="pop" style="--i:3"><rect class="bx sun hot" x="350" y="90" width="196" height="100" rx="14"/><text class="tb" x="448" y="134" text-anchor="middle">R pipeline</text><text class="ts" x="448" y="151" text-anchor="middle">clean, reshape,</text><text class="ts" x="448" y="165" text-anchor="middle">chart</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 2: Mix">
+          <div class="slide-text"><span class="step-k">02 · Mix</span><h3>Alberta swapped coal for gas and wind.</h3><p>Coal produced over 80% of Alberta's power in the early 1990s and roughly 15 to 20% by 2023, while total output stayed just under 60 TWh.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Alberta swapped coal for gas and wind."><line class="grid" x1="46" x2="546" y1="224" y2="224"/><text class="ts" x="38" y="228" text-anchor="end">0%</text><line class="grid" x1="46" x2="546" y1="129" y2="129"/><text class="ts" x="38" y="133" text-anchor="end">50%</text><line class="grid" x1="46" x2="546" y1="34" y2="34"/><text class="ts" x="38" y="38" text-anchor="end">100%</text><line class="axis" x1="46" x2="546" y1="224" y2="224"/><text class="ts" x="171" y="244" text-anchor="middle">Early 1990s</text><rect class="bar ink grow" style="--i:0" x="127" y="66.3" width="88" height="157.7" rx="2"/><g class="pop" style="--i:2"><text class="ts inv" x="171" y="149.2" text-anchor="middle">83%</text></g><rect class="bar sand grow" style="--i:0" x="127" y="43.5" width="88" height="22.8" rx="2"/><g class="pop" style="--i:2"><text class="ts inv" x="171" y="58.9" text-anchor="middle">12%</text></g><rect class="bar jungle grow" style="--i:0" x="127" y="37.8" width="88" height="5.7" rx="2"/><rect class="bar ocean grow" style="--i:0" x="127" y="34" width="88" height="3.8" rx="2"/><text class="ts" x="421" y="244" text-anchor="middle">2023</text><rect class="bar ink grow" style="--i:1" x="377" y="191.7" width="88" height="32.3" rx="2"/><g class="pop" style="--i:3"><text class="ts inv" x="421" y="211.9" text-anchor="middle">17%</text></g><rect class="bar sand grow" style="--i:1" x="377" y="81.5" width="88" height="110.2" rx="2"/><g class="pop" style="--i:3"><text class="ts inv" x="421" y="140.6" text-anchor="middle">58%</text></g><rect class="bar jungle grow" style="--i:1" x="377" y="39.7" width="88" height="41.8" rx="2"/><g class="pop" style="--i:3"><text class="ts inv" x="421" y="64.6" text-anchor="middle">22%</text></g><rect class="bar ocean grow" style="--i:1" x="377" y="34" width="88" height="5.7" rx="2"/><rect class="bar ink" x="46" y="10" width="11" height="11" rx="2"/><text class="ts" x="62" y="20">Coal</text><rect class="bar sand" x="98.4" y="10" width="11" height="11" rx="2"/><text class="ts" x="114.4" y="20">Natural gas</text><rect class="bar jungle" x="197" y="10" width="11" height="11" rx="2"/><text class="ts" x="213" y="20">Renewables</text><rect class="bar ocean" x="289" y="10" width="11" height="11" rx="2"/><text class="ts" x="305" y="20">Other</text><text class="ts" x="46" y="276">Alberta, share of generation, approximate</text></svg>
+        </article>
+        <article class="slide" aria-label="Step 3: Emissions">
+          <div class="slide-text"><span class="step-k">03 · Emissions</span><h3>Half the emissions, and falling.</h3><p>National electricity emissions fell from just under 120 Mt in the mid-2000s to under 60 Mt by 2020, and the reference case projects about 10 to 15 Mt by the late 2030s.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Half the emissions, and falling."><line class="grid" x1="46" x2="442" y1="244" y2="244"/><text class="ts" x="38" y="248" text-anchor="end">0 Mt</text><line class="grid" x1="46" x2="442" y1="135.5" y2="135.5"/><text class="ts" x="38" y="139.5" text-anchor="end">60 Mt</text><line class="grid" x1="46" x2="442" y1="27" y2="27"/><text class="ts" x="38" y="31" text-anchor="end">120 Mt</text><text class="ts" x="46" y="264" text-anchor="middle">2005</text><text class="ts" x="159.1" y="264" text-anchor="middle">2015</text><text class="ts" x="272.3" y="264" text-anchor="middle">2025</text><text class="ts" x="442" y="264" text-anchor="middle">2040</text><line class="axis" x1="46" x2="442" y1="244" y2="244"/><line class="mark" x1="249.7" x2="249.7" y1="18" y2="244"/><text class="ts" x="255.7" y="32">projection</text><path class="ln draw coral" pathLength="1" style="--i:0" d="M46 34.3 L68.6 30.7 L102.6 72.2 L125.2 95.7 L159.1 108.4 L193.1 131.9 L215.7 148.2 L238.3 159"/><circle class="dot coral pop" style="--i:3" cx="238.3" cy="159" r="4"/><g class="pop" style="--i:4"><text class="ts b coral" x="452" y="163">history</text></g><path class="ln draw jungle dash" pathLength="1" style="--i:1" d="M238.3 159 L272.3 171.7 L328.9 213.3 L385.4 216.9 L442 225.9"/><circle class="dot jungle pop" style="--i:4" cx="442" cy="225.9" r="4"/><g class="pop" style="--i:5"><text class="ts b jungle" x="452" y="229.9">reference case</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 4: Provinces">
+          <div class="slide-text"><span class="step-k">04 · Provinces</span><h3>A few provinces emit most of it.</h3><p>Alberta accounts for about 40 to 45% of electricity emissions, Saskatchewan 20 to 25% and Ontario 15 to 20%. Hydro-heavy provinces contribute little.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="A few provinces emit most of it."><line class="grid" x1="46" x2="546" y1="224" y2="224"/><text class="ts" x="38" y="228" text-anchor="end">0%</text><line class="grid" x1="46" x2="546" y1="120" y2="120"/><text class="ts" x="38" y="124" text-anchor="end">25%</text><line class="grid" x1="46" x2="546" y1="16" y2="16"/><text class="ts" x="38" y="20" text-anchor="end">50%</text><line class="axis" x1="46" x2="546" y1="224" y2="224"/><text class="ts" x="108.5" y="244" text-anchor="middle">Alberta</text><rect class="bar coral grow" style="--i:0" x="74.5" y="49.3" width="68" height="174.7" rx="2"/><g class="pop" style="--i:2"><text class="ts b" x="108.5" y="43.3" text-anchor="middle">about 42%</text></g><text class="ts" x="233.5" y="244" text-anchor="middle">Saskatchewan</text><rect class="bar coral grow" style="--i:1" x="199.5" y="132.5" width="68" height="91.5" rx="2"/><g class="pop" style="--i:3"><text class="ts b" x="233.5" y="126.5" text-anchor="middle">about 22%</text></g><text class="ts" x="358.5" y="244" text-anchor="middle">Ontario</text><rect class="bar coral grow" style="--i:2" x="324.5" y="153.3" width="68" height="70.7" rx="2"/><g class="pop" style="--i:4"><text class="ts b" x="358.5" y="147.3" text-anchor="middle">about 17%</text></g><text class="ts" x="483.5" y="244" text-anchor="middle">Rest of Canada</text><rect class="bar coral grow" style="--i:3" x="449.5" y="145" width="68" height="79" rx="2"/><g class="pop" style="--i:5"><text class="ts b" x="483.5" y="139" text-anchor="middle">about 19%</text></g><text class="ts" x="46" y="276">Share of electricity emissions, approximate</text></svg>
+        </article>
+        <article class="slide" aria-label="Step 5: Merit order">
+          <div class="slide-text"><span class="step-k">05 · Merit order</span><h3>Cheapest first; the last unit sets the price.</h3><p>Offers are stacked from lowest to highest price. On 11 to 14 January 2024, demand sat on the steep end of the stack and the pool price climbed toward the $1,000 per MWh cap.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Cheapest first; the last unit sets the price."><line class="axis" x1="50" x2="520" y1="236" y2="236"/><line class="axis" x1="50" x2="50" y1="30" y2="236"/><text class="ts" x="50" y="20">price ($/MWh)</text><text class="ts" x="520" y="258" text-anchor="end">offered generation (GW)</text><rect class="bar jungle grow" style="--i:0" x="50" y="230" width="40" height="6"/><rect class="bar ink grow" style="--i:1" x="90" y="226" width="50" height="10"/><rect class="bar sand grow" style="--i:2" x="140" y="214" width="180" height="22"/><rect class="bar sand grow" style="--i:3" x="320" y="176" width="60" height="60"/><rect class="bar sun grow" style="--i:4" x="380" y="116" width="40" height="120"/><rect class="bar coral grow" style="--i:5" x="420" y="40" width="40" height="196"/><line class="mark dem" x1="440" x2="440" y1="30" y2="236"/><g class="pop" style="--i:8"><text class="ts b coral" x="468" y="88.5">hourly</text><text class="ts b coral" x="468" y="103.5">demand</text></g><line class="hline coral" x1="50" x2="520" y1="42" y2="42"/><g class="pop" style="--i:9"><text class="ts b coral" x="200" y="35">pool price set here</text></g><g class="pop" style="--i:10"><rect class="bar jungle" x="60" y="116" width="11" height="11" rx="2"/><text class="ts" x="76" y="126">wind, hydro</text></g><g class="pop" style="--i:11"><rect class="bar ink" x="160.6" y="116" width="11" height="11" rx="2"/><text class="ts" x="176.6" y="126">coal</text></g><g class="pop" style="--i:12"><rect class="bar sand" x="215" y="116" width="11" height="11" rx="2"/><text class="ts" x="231" y="126">gas</text></g><g class="pop" style="--i:13"><rect class="bar coral" x="262.8" y="116" width="11" height="11" rx="2"/><text class="ts" x="278.8" y="126">peaking units</text></g></svg>
+        </article>
+      </div>
+    </div>
+      </div>
+    </section>
+    <svg class="wave-bottom" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+  </div>
+
+  <section class="section" style="padding-top:88px">
+    <div class="wrap">
+      <div class="section-head"><div><div class="kicker">Outcome</div><h2>What it delivers</h2></div></div>
+      <div class="outcome"><div class="out"><b>About 50%</b><span>fall in national electricity emissions, mid-2000s to 2020</span></div><div class="out"><b>10 to 15 Mt</b><span>projected by the late 2030s under the reference case</span></div><div class="out"><b>80%+ coal</b><span>in Alberta's early 1990s generation, down to roughly 15 to 20% by 2023</span></div><div class="out"><b>About 10%</b><span>of Canada's electricity is generated in Alberta</span></div></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="demo-card">
+        <div><div class="kicker">Demo</div><h2>See it for yourself</h2><p>The full report, with every chart and the written analysis.</p><div class="ctas"><a class="btn btn-solid" href="/brand_assets/Projects/Energy_Analytics/Canada_Electricity_Generation_Emissions_Analysis/demo%3Alink/Canada_Electricity_Generation_Emissions_Analysis.html" target="_blank" rel="noopener">Read the report <svg width="13" height="13" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></div>
+        <img src="/brand_assets/Projects/Energy_Analytics/Canada_Electricity_Generation_Emissions_Analysis/thumbail/Electricity_Analysis.png" alt="Canada's Electricity Mix and Emissions preview" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap next">
+      <a href="/work/pipeline-capacity-and-royalties.html"><span class="nl">← Previous</span><b>Pipeline Capacity and Royalty Revenue</b></a>
+      <a href="/work/edmonton-housing-after-covid.html" style="text-align:right"><span class="nl">Next →</span><b>Housing Shifts in Post-COVID Edmonton</b></a>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="who"><b>Efe Peter Oroh</b><span>Analytics Engineer · Edmonton, Alberta</span></div>
+    <nav aria-label="Contact">
+      <a href="mailto:efeogheneoroh@gmail.com">efeogheneoroh@gmail.com</a>
+      <a href="https://www.linkedin.com/in/efe-oroh/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/efeoroh" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+<dialog class="player" id="player" aria-label="Project demo">
+  <video controls playsinline preload="none"></video>
+  <div class="bar"><span></span><button type="button">Close</button></div>
+</dialog>
+<script src="/js/site.js" defer></script>
+</body>
+</html>

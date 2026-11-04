@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Greenhouse Gas Facility Data Pull | Efe Peter Oroh</title>
+<meta name="description" content="A Selenium scraper that collects every facility's emissions, owner and location for a Power BI emissions map.">
+<meta property="og:title" content="Greenhouse Gas Facility Data Pull | Efe Peter Oroh">
+<meta property="og:description" content="A Selenium scraper that collects every facility's emissions, owner and location for a Power BI emissions map.">
+<meta property="og:image" content="/brand_assets/Headshot/headshot_about.webp">
+<meta name="theme-color" content="#fbf7ef">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M1 1L9 5L1 9" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker><linearGradient id="ramp" x1="0" x2="1"><stop offset="0" stop-color="#b9763e"/><stop offset=".5" stop-color="#8b9aab"/><stop offset="1" stop-color="#cfa22a"/></linearGradient></defs></svg>
+<header class="nav">
+  <div class="wrap">
+    <a href="/" class="brand"><span class="brand-mark">EO</span>Efe Peter Oroh</a>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="/#work" aria-current="page">Work</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about.html">About</a>
+      <a href="/brand_assets/resume/EfeOroh_Resume.pdf" class="btn btn-solid" target="_blank" rel="noopener">Resume</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+<main class="t-ocean">
+  <header class="p-head">
+    <div class="wrap">
+      <div>
+        <a class="back" href="/#work">← All work</a>
+        <h1>Greenhouse Gas Facility Data Pull</h1>
+        <p class="lede">A Selenium scraper that collects every facility's emissions, owner and location for a Power BI emissions map.</p>
+        <span class="tag">Python · Web scraping</span>
+      </div>
+      <div class="mat"><img src="/brand_assets/Projects/Automation/GHG_Data_Pull/thumbail/GHGDataPull.png" alt="Greenhouse Gas Facility Data Pull"></div>
+    </div>
+  </header>
+
+  <section class="section" style="padding-block:0 24px">
+    <div class="wrap"><dl class="meta"><div><dt>Role</dt><dd>Built the scraper</dd></div><div><dt>Stack</dt><dd>Python, Selenium, pandas, Jupyter, Power BI</dd></div><div><dt>Data</dt><dd>Environment and Climate Change Canada, Greenhouse Gas Reporting Program</dd></div><div><dt>Scale</dt><dd>1M+ rows</dd></div></dl></div>
+  </section>
+
+  <section class="section">
+    <div class="wrap two-col">
+      <div><div class="kicker">Context</div><h2>Why it mattered</h2></div>
+      <div class="prose"><p>Environment and Climate Change Canada publishes facility-level greenhouse gas emissions through a search page. Results come ten rows at a time, and details like the parent company, ownership share and coordinates sit on a separate page for each facility.</p><p>That data fed a Power BI dashboard mapping emission sources, which needed refreshing every reporting year. I wrote a Python scraper that collects all of it in one run.</p></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="ask"><div class="kicker">The question</div><blockquote>How can facility emissions, owners and locations be refreshed every reporting cycle without copying them by hand?</blockquote><ul><li>How do we page through every result for every year?</li><li>How do we capture fields that only exist on detail pages?</li></ul></div>
+    </div>
+  </section>
+
+  <div class="band-sea" id="approach">
+    <svg class="wave-top" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+    <section class="section">
+      <div class="wrap">
+    <div class="slider" id="solution-slider">
+      <div class="slider-head">
+        <div><div class="kicker">Approach</div><h2 id="solution-title">How I solved it</h2></div>
+        <div class="slide-ctrl">
+          <button type="button" class="nav-btn" data-dir="-1" aria-label="Previous step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="nav-btn" data-dir="1" aria-label="Next step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <ol class="steps-nav" aria-label="Steps"><li><button type="button" data-go="0" aria-current="step"><span>01</span>Target</button></li><li><button type="button" data-go="1"><span>02</span>Scrape</button></li><li><button type="button" data-go="2"><span>03</span>Loop</button></li><li><button type="button" data-go="3"><span>04</span>Serve</button></li></ol>
+      <div class="progress" aria-hidden="true"><span></span></div>
+      <div class="track" tabindex="0" aria-label="How I solved it, 4 steps">
+        <article class="slide on" aria-label="Step 1: Target">
+          <div class="slide-text"><span class="step-k">01 · Target</span><h3>Two kinds of page.</h3><p>The search results list emissions by gas; each facility's own page holds the owner, address and coordinates.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Two kinds of page."><g class="pop" style="--i:0"><rect class="bx" x="14" y="22" width="226" height="34" rx="9"/><text class="tl" x="28" y="44">GHGRP facility search</text></g><path class="flow" d="M240 39 C 300 39, 300 140, 344 140"/><g class="pop" style="--i:1"><rect class="bx" x="14" y="123" width="226" height="34" rx="9"/><text class="tl" x="28" y="145">Facility detail pages</text></g><path class="flow" d="M240 140 C 300 140, 300 140, 344 140"/><g class="pop" style="--i:2"><rect class="bx" x="14" y="224" width="226" height="34" rx="9"/><text class="tl" x="28" y="246">NPRI identifiers</text></g><path class="flow" d="M240 241 C 300 241, 300 140, 344 140" marker-end="url(#ah)"/><g class="pop" style="--i:3"><rect class="bx ocean hot" x="350" y="90" width="196" height="100" rx="14"/><text class="tb" x="448" y="134" text-anchor="middle">Python scraper</text><text class="ts" x="448" y="158" text-anchor="middle">Selenium + pandas</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 2: Scrape">
+          <div class="slide-text"><span class="step-k">02 · Scrape</span><h3>Every page, every field.</h3><p>For 2021 alone, the search returns 1,731 facility reports across 174 pages. The scraper walks every page and opens every facility.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Every page, every field."><rect class="panel" x="14" y="20" width="250" height="236" rx="12"/><rect class="bar-top" x="14" y="20" width="250" height="30" rx="12"/><circle class="dotc" cx="30" cy="35" r="4"/><circle class="dotc" cx="44" cy="35" r="4"/><circle class="dotc" cx="58" cy="35" r="4"/><text class="tm tiny" x="72" y="39">climate-change.canada.ca</text><text class="tb" x="28" y="74">1,731 reports for 2021</text><g class="pop" style="--i:0"><rect class="row alt" x="28" y="88" width="222" height="18" rx="4"/></g><g class="pop" style="--i:1"><rect class="row" x="28" y="112" width="222" height="18" rx="4"/></g><g class="pop" style="--i:2"><rect class="row alt" x="28" y="136" width="222" height="18" rx="4"/></g><g class="pop" style="--i:3"><rect class="row" x="28" y="160" width="222" height="18" rx="4"/></g><g class="pop" style="--i:4"><rect class="row alt" x="28" y="184" width="222" height="18" rx="4"/></g><g class="pop" style="--i:5"><rect class="row" x="28" y="208" width="222" height="18" rx="4"/></g><g class="pop" style="--i:7"><rect class="chip" x="130" y="234" width="120" height="14" rx="7"/><text class="ts tiny" x="190" y="245" text-anchor="middle">next page × 174</text></g><path class="flow" d="M264 140 C 300 140, 300 140, 330 140" marker-end="url(#ah)"/><g class="pop" style="--i:8"><rect class="bx ocean hot" x="336" y="30" width="210" height="216" rx="12"/><text class="tc acc" x="350" y="54">DATAFRAME</text></g><g class="pop" style="--i:9"><text class="tm small" x="350" y="80">Year, GHGRP ID, NPRI ID</text></g><g class="pop" style="--i:10"><text class="tm small" x="350" y="100">Company and facility</text></g><g class="pop" style="--i:11"><text class="tm small" x="350" y="120">NAICS, city, province</text></g><g class="pop" style="--i:12"><text class="tm small" x="350" y="140">CO2, CH4, N2O (t CO2e)</text></g><g class="pop" style="--i:13"><text class="tm small" x="350" y="160">HFCs, PFCs, SF6, total</text></g><g class="pop" style="--i:14"><text class="tm small" x="350" y="180">Parent company, ownership %</text></g><g class="pop" style="--i:15"><text class="tm small" x="350" y="200">Address, latitude, longitude</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 3: Loop">
+          <div class="slide-text"><span class="step-k">03 · Loop</span><h3>Year by year.</h3><p>For each reporting year: search, paginate, open each facility in a new tab, read its fields, close it, append the row.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Year by year."><g class="pop" style="--i:0"><rect class="bx" x="14" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="69.3" y="135.5" text-anchor="middle">Choose year</text><text class="ts" x="69.3" y="156.5" text-anchor="middle">search form</text></g><path class="flow" d="M126.5 142 L 150.5 142" marker-end="url(#ah)"/><g class="pop" style="--i:1"><rect class="bx" x="154.5" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="209.8" y="135.5" text-anchor="middle">Paginate</text><text class="ts" x="209.8" y="156.5" text-anchor="middle">10 rows a page</text></g><path class="flow" d="M267 142 L 291 142" marker-end="url(#ah)"/><g class="pop" style="--i:2"><rect class="bx" x="295" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="350.3" y="135.5" text-anchor="middle">Open facility</text><text class="ts" x="350.3" y="156.5" text-anchor="middle">detail tab</text></g><path class="flow" d="M407.5 142 L 431.5 142" marker-end="url(#ah)"/><g class="pop" style="--i:3"><rect class="bx ocean hot" x="435.5" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="490.8" y="135.5" text-anchor="middle">Append</text><text class="ts" x="490.8" y="156.5" text-anchor="middle">to DataFrame</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 4: Serve">
+          <div class="slide-text"><span class="step-k">04 · Serve</span><h3>Into the emissions map.</h3><p>The cleaned table loads into Power BI, where latitude and longitude place each facility on the map.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Into the emissions map."><g class="pop" style="--i:0"><rect class="bx medal gold" x="12" y="98" width="108" height="76" rx="12"/><text class="tb" x="66" y="132" text-anchor="middle">DataFrame</text><text class="ts" x="66" y="152" text-anchor="middle">clean export</text></g><path class="flow" d="M120 136 L 146 136" marker-end="url(#ah)"/><g class="pop" style="--i:1"><rect class="bx" x="150" y="112" width="124" height="48" rx="24"/><text class="tm" x="212" y="132" text-anchor="middle">Power BI</text><text class="ts" x="212" y="149" text-anchor="middle">import</text></g><path class="flow" d="M274 136 L 300 136" marker-end="url(#ah)"/><g class="pop" style="--i:2"><rect class="bx jungle" x="304" y="92" width="106" height="88" rx="12"/><path class="cube" d="M357 108 l16 9 v18 l-16 9 l-16 -9 v-18 z"/><path class="cube" d="M341 117 l16 9 l16 -9 M357 126 v18"/><text class="ts" x="357" y="166" text-anchor="middle">facility model</text></g><path class="flow" d="M410 136 L 436 136" marker-end="url(#ah)"/><g class="pop" style="--i:3"><rect class="bx ocean hot" x="440" y="68" width="108" height="136" rx="12"/><rect class="bar grow" style="--i:4" x="458" y="142" width="12" height="28" rx="2"/><rect class="bar grow" style="--i:5" x="476" y="126" width="12" height="44" rx="2"/><rect class="bar grow" style="--i:6" x="494" y="112" width="12" height="58" rx="2"/><rect class="bar grow" style="--i:7" x="512" y="96" width="12" height="74" rx="2"/><text class="ts" x="494" y="192" text-anchor="middle">Emissions map</text></g></svg>
+        </article>
+      </div>
+    </div>
+      </div>
+    </section>
+    <svg class="wave-bottom" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+  </div>
+
+  <section class="section" style="padding-top:88px">
+    <div class="wrap">
+      <div class="section-head"><div><div class="kicker">Outcome</div><h2>What it delivers</h2></div></div>
+      <div class="outcome"><div class="out"><b>1M+</b><span>rows collected and cleaned</span></div><div class="out"><b>1,731</b><span>facility reports for 2021 alone, each with its own page</span></div><div class="out"><b>1 run</b><span>per reporting year instead of manual copying</span></div><div class="out"><b>3 years</b><span>of use for the team's emissions mapping dashboard</span></div></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="demo-card">
+        <div><div class="kicker">Demo</div><h2>See it for yourself</h2><p>A short screen recording of the finished work. It only plays when you press the button.</p><div class="ctas"><button type="button" class="btn btn-solid" data-video="/brand_assets/Projects/Automation/GHG_Data_Pull/demo%3Alink/Webscraping%20research%20project%20(2)%20(1).mp4" data-title="Greenhouse Gas Facility Data Pull"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1v8l7-4z" fill="currentColor"/></svg> Watch the demo</button></div></div>
+        <img src="/brand_assets/Projects/Automation/GHG_Data_Pull/thumbail/GHGDataPull.png" alt="Greenhouse Gas Facility Data Pull preview" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap next">
+      <a href="/work/lfs-indigenous-pipeline.html"><span class="nl">← Previous</span><b>LFS Indigenous Data Pipeline</b></a>
+      <a href="/work/gift-trade-ledger.html" style="text-align:right"><span class="nl">Next →</span><b>Gift Trade Ledger</b></a>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="who"><b>Efe Peter Oroh</b><span>Analytics Engineer · Edmonton, Alberta</span></div>
+    <nav aria-label="Contact">
+      <a href="mailto:efeogheneoroh@gmail.com">efeogheneoroh@gmail.com</a>
+      <a href="https://www.linkedin.com/in/efe-oroh/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/efeoroh" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+<dialog class="player" id="player" aria-label="Project demo">
+  <video controls playsinline preload="none"></video>
+  <div class="bar"><span></span><button type="button">Close</button></div>
+</dialog>
+<script src="/js/site.js" defer></script>
+</body>
+</html>

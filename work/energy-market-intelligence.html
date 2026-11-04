@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Energy Market Intelligence Dashboard | Efe Peter Oroh</title>
+<meta name="description" content="Four Statistics Canada energy indicators in one Power BI model, with a monthly executive summary written automatically for each province.">
+<meta property="og:title" content="Energy Market Intelligence Dashboard | Efe Peter Oroh">
+<meta property="og:description" content="Four Statistics Canada energy indicators in one Power BI model, with a monthly executive summary written automatically for each province.">
+<meta property="og:image" content="/brand_assets/Headshot/headshot_about.webp">
+<meta name="theme-color" content="#fbf7ef">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M1 1L9 5L1 9" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker><linearGradient id="ramp" x1="0" x2="1"><stop offset="0" stop-color="#b9763e"/><stop offset=".5" stop-color="#8b9aab"/><stop offset="1" stop-color="#cfa22a"/></linearGradient></defs></svg>
+<header class="nav">
+  <div class="wrap">
+    <a href="/" class="brand"><span class="brand-mark">EO</span>Efe Peter Oroh</a>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="/#work" aria-current="page">Work</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about.html">About</a>
+      <a href="/brand_assets/resume/EfeOroh_Resume.pdf" class="btn btn-solid" target="_blank" rel="noopener">Resume</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+<main class="t-sun">
+  <header class="p-head">
+    <div class="wrap">
+      <div>
+        <a class="back" href="/#work">← All work</a>
+        <h1>Energy Market Intelligence Dashboard</h1>
+        <p class="lede">Four Statistics Canada energy indicators in one Power BI model, with a monthly executive summary written automatically for each province.</p>
+        <span class="tag">Power BI · API pipeline</span>
+      </div>
+      <div class="mat"><img src="/brand_assets/Projects/Energy_Analytics/ENERGY_MARKET_INTELLIGENCE_DASH/thumbnail/thumbnail.png" alt="Energy Market Intelligence Dashboard"></div>
+    </div>
+  </header>
+
+  <section class="section" style="padding-block:0 24px">
+    <div class="wrap"><dl class="meta"><div><dt>Role</dt><dd>Pipeline, model and report</dd></div><div><dt>Stack</dt><dd>Python, Statistics Canada API, Power BI, DAX</dd></div><div><dt>Data</dt><dd>Electricity price index, natural gas distribution, generation by technology, CPI energy</dd></div><div><dt>Refresh</dt><dd>Automated, monthly</dd></div></dl></div>
+  </section>
+
+  <section class="section">
+    <div class="wrap two-col">
+      <div><div class="kicker">Context</div><h2>Why it mattered</h2></div>
+      <div class="prose"><p>Electricity prices, natural gas demand, the generation mix and energy inflation move together, but Statistics Canada publishes them as separate tables with different units and release timing. Reading them side by side for one province meant opening four tables and doing the arithmetic by hand.</p><p>This dashboard pulls all four through the Statistics Canada API into one model, switches between Canada and the provinces in a click, splits large and small electricity consumers, and writes a short executive summary of what changed this month.</p></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="ask"><div class="kicker">The question</div><blockquote>For a chosen province and month, what changed in power prices, gas demand, low-emission supply and energy inflation, and what does it mean?</blockquote><ul><li>Are electricity prices rising for large or small consumers?</li><li>Is natural gas demand spiking, and why?</li><li>Is low-emission generation gaining share?</li></ul></div>
+    </div>
+  </section>
+
+  <div class="band-sea" id="approach">
+    <svg class="wave-top" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+    <section class="section">
+      <div class="wrap">
+    <div class="slider" id="solution-slider">
+      <div class="slider-head">
+        <div><div class="kicker">Approach</div><h2 id="solution-title">How I solved it</h2></div>
+        <div class="slide-ctrl">
+          <button type="button" class="nav-btn" data-dir="-1" aria-label="Previous step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="nav-btn" data-dir="1" aria-label="Next step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <ol class="steps-nav" aria-label="Steps"><li><button type="button" data-go="0" aria-current="step"><span>01</span>Ingest</button></li><li><button type="button" data-go="1"><span>02</span>Align</button></li><li><button type="button" data-go="2"><span>03</span>Model</button></li><li><button type="button" data-go="3"><span>04</span>Measure</button></li><li><button type="button" data-go="4"><span>05</span>Explain</button></li><li><button type="button" data-go="5"><span>06</span>Refresh</button></li></ol>
+      <div class="progress" aria-hidden="true"><span></span></div>
+      <div class="track" tabindex="0" aria-label="How I solved it, 6 steps">
+        <article class="slide on" aria-label="Step 1: Ingest">
+          <div class="slide-text"><span class="step-k">01 · Ingest</span><h3>Four tables through one API.</h3><p>A Python pipeline requests each table from the Statistics Canada REST endpoints, so a new release needs no downloads.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Four tables through one API."><g class="pop" style="--i:0"><rect class="bx" x="14" y="22" width="226" height="34" rx="9"/><text class="tl" x="28" y="44">Electricity price index</text></g><path class="flow" d="M240 39 C 300 39, 300 140, 344 140"/><g class="pop" style="--i:1"><rect class="bx" x="14" y="89.3" width="226" height="34" rx="9"/><text class="tl" x="28" y="111.3">Natural gas distribution</text></g><path class="flow" d="M240 106.3 C 300 106.3, 300 140, 344 140"/><g class="pop" style="--i:2"><rect class="bx" x="14" y="156.7" width="226" height="34" rx="9"/><text class="tl" x="28" y="178.7">Generation by technology</text></g><path class="flow" d="M240 173.7 C 300 173.7, 300 140, 344 140"/><g class="pop" style="--i:3"><rect class="bx" x="14" y="224" width="226" height="34" rx="9"/><text class="tl" x="28" y="246">CPI energy components</text></g><path class="flow" d="M240 241 C 300 241, 300 140, 344 140" marker-end="url(#ah)"/><g class="pop" style="--i:4"><rect class="bx sun hot" x="350" y="90" width="196" height="100" rx="14"/><text class="tb" x="448" y="134" text-anchor="middle">API pipeline</text><text class="ts" x="448" y="151" text-anchor="middle">Statistics Canada</text><text class="ts" x="448" y="165" text-anchor="middle">REST endpoints</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 2: Align">
+          <div class="slide-text"><span class="step-k">02 · Align</span><h3>Put four tables on one calendar.</h3><p>Dates, units and geography are harmonised so an index, gigajoules and a percentage share can sit on the same monthly axis.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Put four tables on one calendar."><g class="pop" style="--i:0"><rect class="bx" x="14" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="69.3" y="128" text-anchor="middle">Calendar</text><text class="ts" x="69.3" y="149" text-anchor="middle">one monthly</text><text class="ts" x="69.3" y="164" text-anchor="middle">date</text></g><path class="flow" d="M126.5 142 L 150.5 142" marker-end="url(#ah)"/><g class="pop" style="--i:1"><rect class="bx" x="154.5" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="209.8" y="135.5" text-anchor="middle">Units</text><text class="ts" x="209.8" y="156.5" text-anchor="middle">index, GJ, %</text></g><path class="flow" d="M267 142 L 291 142" marker-end="url(#ah)"/><g class="pop" style="--i:2"><rect class="bx" x="295" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="350.3" y="128" text-anchor="middle">Geography</text><text class="ts" x="350.3" y="149" text-anchor="middle">Canada,</text><text class="ts" x="350.3" y="164" text-anchor="middle">provinces</text></g><path class="flow" d="M407.5 142 L 431.5 142" marker-end="url(#ah)"/><g class="pop" style="--i:3"><rect class="bx ocean hot" x="435.5" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="490.8" y="128" text-anchor="middle">Model</text><text class="ts" x="490.8" y="149" text-anchor="middle">shared</text><text class="ts" x="490.8" y="164" text-anchor="middle">dimensions</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 3: Model">
+          <div class="slide-text"><span class="step-k">03 · Model</span><h3>Shared dimensions, four measures.</h3><p>Every indicator joins to the same date and geography tables, plus consumer class for prices and technology for generation.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Shared dimensions, four measures."><line class="link" x1="280" y1="140" x2="94" y2="50"/><line class="link" x1="280" y1="140" x2="466" y2="50"/><line class="link" x1="280" y1="140" x2="94" y2="230"/><line class="link" x1="280" y1="140" x2="466" y2="230"/><g class="pop" style="--i:1"><rect class="bx" x="16" y="30" width="156" height="40" rx="9"/><text class="tm" x="94" y="55" text-anchor="middle">dim_date</text></g><g class="pop" style="--i:2"><rect class="bx" x="388" y="30" width="156" height="40" rx="9"/><text class="tm" x="466" y="55" text-anchor="middle">dim_geography</text></g><g class="pop" style="--i:3"><rect class="bx" x="16" y="210" width="156" height="40" rx="9"/><text class="tm" x="94" y="235" text-anchor="middle">dim_consumer_class</text></g><g class="pop" style="--i:4"><rect class="bx" x="388" y="210" width="156" height="40" rx="9"/><text class="tm" x="466" y="235" text-anchor="middle">dim_technology</text></g><g class="pop" style="--i:0"><rect class="bx coral hot" x="188" y="102" width="184" height="76" rx="14"/><text class="tm b" x="280" y="136" text-anchor="middle">energy facts</text><text class="ts" x="280" y="158" text-anchor="middle">4 monthly indicators</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 4: Measure">
+          <div class="slide-text"><span class="step-k">04 · Measure</span><h3>One glance per province.</h3><p>Each KPI shows the latest month, the previous month and the change, with a trend behind it. These are Alberta's values from the demo.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="One glance per province."><rect class="panel" x="10" y="8" width="540" height="264" rx="12"/><text class="tb" x="24" y="36">ALBERTA ENERGY MARKET INTELLIGENCE</text><g class="pop" style="--i:1"><rect class="bx " x="24" y="50" width="120.5" height="66" rx="9"/><text class="tc small" x="34" y="69">PRICE INDEX</text><text class="tkpi" x="34" y="96">162.9</text><text class="ts tiny" x="34" y="110">2014 = 100</text></g><g class="pop" style="--i:2"><rect class="bx " x="154.5" y="50" width="120.5" height="66" rx="9"/><text class="tc small" x="164.5" y="69">GAS DISTRIBUTION</text><text class="tkpi" x="164.5" y="96">48.5K GJ</text></g><g class="pop" style="--i:3"><rect class="bx jungle" x="285" y="50" width="120.5" height="66" rx="9"/><text class="tc small" x="295" y="69">LOW-EMISSION</text><text class="tkpi" x="295" y="96">10.9%</text><text class="ts tiny" x="295" y="110">share of generation</text></g><g class="pop" style="--i:4"><rect class="bx coral" x="415.5" y="50" width="120.5" height="66" rx="9"/><text class="tc small" x="425.5" y="69">ENERGY CPI</text><text class="tkpi" x="425.5" y="96">177.35</text></g><rect class="bx" x="24" y="130" width="512" height="122" rx="9"/><path class="ln draw ocean" pathLength="1" d="M34 199.5 L88.7 185.7 L143.3 191 L198 178.3 L252.7 182.5 L307.3 169.8 L362 174 L416.7 161.3 L471.3 165.6 L526 152.8"/></svg>
+        </article>
+        <article class="slide" aria-label="Step 5: Explain">
+          <div class="slide-text"><span class="step-k">05 · Explain</span><h3>Numbers in, sentences out.</h3><p>Measures read the direction and size of each change and write four short notes: market insight, demand signal, supply outlook and economic impact.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Numbers in, sentences out."><g class="pop" style="--i:0"><rect class="bx" x="14" y="30" width="150" height="42" rx="9"/><text class="tc small" x="26" y="47">GAS DISTRIBUTION</text><text class="tm b" x="26" y="64">+56.1% MoM</text></g><g class="pop" style="--i:1"><rect class="bx" x="14" y="82" width="150" height="42" rx="9"/><text class="tc small" x="26" y="99">ENERGY CPI</text><text class="tm b" x="26" y="116">+0.9% MoM</text></g><g class="pop" style="--i:2"><rect class="bx" x="14" y="134" width="150" height="42" rx="9"/><text class="tc small" x="26" y="151">PRICE INDEX</text><text class="tm b" x="26" y="168">stable MoM</text></g><path class="flow" d="M164 51 C 186 51, 186 103, 204 103"/><path class="flow" d="M164 103 C 186 103, 186 103, 204 103"/><path class="flow" d="M164 155 C 186 155, 186 103, 204 103" marker-end="url(#ah)"/><g class="pop" style="--i:3"><rect class="bx jungle" x="208" y="57" width="132" height="92" rx="12"/><text class="tc acc" x="274" y="81" text-anchor="middle">RULES</text><text class="ts dark" x="274" y="98" text-anchor="middle">direction and size,</text><text class="ts dark" x="274" y="113" text-anchor="middle">choose the verb,</text><text class="ts dark" x="274" y="128" text-anchor="middle">add the likely cause</text></g><path class="flow" d="M340 103 L 360 103" marker-end="url(#ah)"/><g class="pop" style="--i:4"><rect class="bx ocean hot" x="364" y="28" width="182" height="224" rx="12"/><text class="tc acc" x="378" y="52">GENERATED TEXT</text><text class="ts dark" x="378" y="78">Natural gas</text><text class="ts dark" x="378" y="95">distribution rose</text><text class="ts dark" x="378" y="112">sharply 56.1% MoM. The</text><text class="ts dark" x="378" y="129">increase likely</text><text class="ts dark" x="378" y="146">reflects stronger</text><text class="ts dark" x="378" y="163">seasonal winter</text><text class="ts dark" x="378" y="180">heating demand.</text></g><g class="pop" style="--i:6"><rect class="chip" x="378" y="196" width="76" height="20" rx="10"/><text class="ts tiny" x="416" y="210" text-anchor="middle">Market</text></g><g class="pop" style="--i:7"><rect class="chip" x="460" y="196" width="76" height="20" rx="10"/><text class="ts tiny" x="498" y="210" text-anchor="middle">Demand</text></g><g class="pop" style="--i:8"><rect class="chip" x="378" y="222" width="76" height="20" rx="10"/><text class="ts tiny" x="416" y="236" text-anchor="middle">Supply</text></g><g class="pop" style="--i:9"><rect class="chip" x="460" y="222" width="76" height="20" rx="10"/><text class="ts tiny" x="498" y="236" text-anchor="middle">Economy</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 6: Refresh">
+          <div class="slide-text"><span class="step-k">06 · Refresh</span><h3>New release, new report.</h3><p>The pull, clean and load steps run on a schedule, and the report refreshes when the data does.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="New release, new report."><rect class="frame" x="16" y="22" width="528" height="206" rx="14"/><text class="tc acc" x="34" y="50">SCHEDULED REFRESH</text><g class="ts"><circle cx="465.8" cy="46" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M465.8 42v4l3 2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></g><text class="ts" x="526" y="50" text-anchor="end">monthly</text><g class="pop" style="--i:0"><rect class="bx" x="34" y="76" width="109.5" height="58" rx="10"/><text class="tm small" x="88.8" y="102" text-anchor="middle">pull</text><text class="tm small" x="88.8" y="116" text-anchor="middle">API</text></g><path class="flow" d="M144.5 105 L 158.5 105" marker-end="url(#ah)"/><g class="pop" style="--i:1"><rect class="bx" x="161.5" y="76" width="109.5" height="58" rx="10"/><text class="tm small" x="216.3" y="102" text-anchor="middle">clean and</text><text class="tm small" x="216.3" y="116" text-anchor="middle">align</text></g><path class="flow" d="M272 105 L 286 105" marker-end="url(#ah)"/><g class="pop" style="--i:2"><rect class="bx" x="289" y="76" width="109.5" height="58" rx="10"/><text class="tm small" x="343.8" y="102" text-anchor="middle">load</text><text class="tm small" x="343.8" y="116" text-anchor="middle">model</text></g><path class="flow" d="M399.5 105 L 413.5 105" marker-end="url(#ah)"/><g class="pop" style="--i:3"><rect class="bx ocean hot" x="416.5" y="76" width="109.5" height="58" rx="10"/><text class="tm small" x="471.3" y="102" text-anchor="middle">refresh</text><text class="tm small" x="471.3" y="116" text-anchor="middle">report</text></g></svg>
+        </article>
+      </div>
+    </div>
+      </div>
+    </section>
+    <svg class="wave-bottom" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+  </div>
+
+  <section class="section" style="padding-top:88px">
+    <div class="wrap">
+      <div class="section-head"><div><div class="kicker">Outcome</div><h2>What it delivers</h2></div></div>
+      <div class="outcome"><div class="out"><b>4</b><span>Statistics Canada indicators in one model</span></div><div class="out"><b>Canada + provinces</b><span>switch geography and consumer class in one click</span></div><div class="out"><b>4 lenses</b><span>market, demand, supply and economic impact, written each month</span></div><div class="out"><b>No downloads</b><span>API pull and refresh are automated</span></div></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="demo-card">
+        <div><div class="kicker">Demo</div><h2>See it for yourself</h2><p>A short screen recording of the finished work. It only plays when you press the button.</p><div class="ctas"><button type="button" class="btn btn-solid" data-video="/brand_assets/Projects/Energy_Analytics/ENERGY_MARKET_INTELLIGENCE_DASH/demo/energydash.mp4" data-title="Energy Market Intelligence Dashboard"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1v8l7-4z" fill="currentColor"/></svg> Watch the demo</button></div></div>
+        <img src="/brand_assets/Projects/Energy_Analytics/ENERGY_MARKET_INTELLIGENCE_DASH/thumbnail/thumbnail.png" alt="Energy Market Intelligence Dashboard preview" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap next">
+      <a href="/work/migration-participation-rate.html"><span class="nl">← Previous</span><b>Migration and Alberta's Participation Rate</b></a>
+      <a href="/work/hiring-demand-bulletin.html" style="text-align:right"><span class="nl">Next →</span><b>Hiring Demand Bulletin</b></a>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="who"><b>Efe Peter Oroh</b><span>Analytics Engineer · Edmonton, Alberta</span></div>
+    <nav aria-label="Contact">
+      <a href="mailto:efeogheneoroh@gmail.com">efeogheneoroh@gmail.com</a>
+      <a href="https://www.linkedin.com/in/efe-oroh/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/efeoroh" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+<dialog class="player" id="player" aria-label="Project demo">
+  <video controls playsinline preload="none"></video>
+  <div class="bar"><span></span><button type="button">Close</button></div>
+</dialog>
+<script src="/js/site.js" defer></script>
+</body>
+</html>

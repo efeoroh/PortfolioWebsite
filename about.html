@@ -4,7 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>About me | Efe Peter Oroh</title>
-<meta name="description" content="Efe Peter Oroh builds governed data pipelines and Power BI solutions, applied as an economist.">
+<meta name="description" content="Efe Peter Oroh builds governed data pipelines and Power BI solutions, applied as a data analyst in economics.">
+<meta property="og:title" content="About me | Efe Peter Oroh">
+<meta property="og:description" content="Efe Peter Oroh builds governed data pipelines and Power BI solutions, applied as a data analyst in economics.">
+<meta property="og:image" content="/brand_assets/Headshot/headshot_about.webp">
+<meta name="theme-color" content="#fbf7ef">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="/css/styles.css">
@@ -15,51 +19,49 @@
     <a href="/" class="brand"><span class="brand-mark">EO</span>Efe Peter Oroh</a>
     <nav class="nav-links" id="navLinks" aria-label="Main">
       <a href="/#work">Work</a>
+      <a href="/#approach">Approach</a>
       <a href="/about.html" aria-current="page">About</a>
-      <a href="mailto:efeogheneoroh@gmail.com">Contact</a>
       <a href="/brand_assets/resume/EfeOroh_Resume.pdf" class="btn btn-solid" target="_blank" rel="noopener">Resume</a>
     </nav>
     <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
-      <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 6h16M3 11h16M3 16h16" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
     </button>
   </div>
 </header>
-
 <main>
-  <section class="page-head">
-    <div class="wrap about-grid">
+  <section class="section about-hero" style="padding-top:48px">
+    <div class="wrap split">
       <div>
-        <div class="label">About</div>
+        <div class="kicker">About</div>
         <h1>About me</h1>
         <div class="prose" style="margin-top:22px">
           <p>I build data pipelines and data infrastructure that bring data from multiple sources together into scalable, efficient formats, ready for semantic modelling and fast-refreshing visualizations.</p>
-          <p>I apply these skills as an economist: pulling data from public and internal APIs, modelling and governing it in Databricks or BigQuery, and serving it through Power BI dashboards and automated reports.</p>
-        </div>
-        <div class="pillars">
-          <div><h3>Data engineering</h3><p>API ingestion, scheduled pipelines and dimensional models built to scale.</p></div>
-          <div><h3>Data governance</h3><p>Governed, documented tables in Databricks and BigQuery that teams can trust.</p></div>
-          <div><h3>Power BI solutioning</h3><p>Semantic models, DAX and dashboards that refresh fast and read clearly.</p></div>
+          <p>I apply these skills as a Data Analyst: pulling data from public and internal APIs, modelling and governing it in Databricks or BigQuery, and serving it through Power BI dashboards and automated reports.</p>
         </div>
       </div>
-      <figure class="portrait" style="margin:0">
-        <img src="/brand_assets/Headshot/headshot_2026.jpg" alt="Efe Peter Oroh" width="900" height="900">
-      </figure>
+      <figure class="headshot"><img src="/brand_assets/Headshot/headshot_about.webp" alt="Efe Peter Oroh" width="760" height="760"></figure>
+    </div>
+    <div class="wrap">
+      <div class="pillars">
+        <div class="pillar t-ocean"><i></i><h3>Data engineering</h3><p>API ingestion, scheduled pipelines and dimensional models built to scale.</p></div>
+        <div class="pillar t-jungle"><i></i><h3>Data governance</h3><p>Governed, documented tables in Databricks and BigQuery that teams can trust.</p></div>
+        <div class="pillar t-sun"><i></i><h3>Power BI solutioning</h3><p>Semantic models, DAX and dashboards that refresh fast and read clearly.</p></div>
+      </div>
     </div>
   </section>
 
   <section class="section" id="experience">
     <div class="wrap">
-      <div class="label">Career</div>
-      <h2>Experience</h2>
+      <div class="section-head"><div><div class="kicker">Career</div><h2>Experience</h2></div></div>
       <div class="timeline">
         <div class="job">
           <div class="when">May 2024 to Present</div>
           <div>
-            <h3>Economic Statistician</h3>
+            <h3>Data Analyst (Statistician)</h3>
             <div class="org">Government of Alberta · Edmonton, AB <span class="tags"><span>Databricks</span><span>Power BI</span><span>Python/SQL</span></span></div>
             <ul>
-              <li>Owned the full data analytics lifecycle for a Labour Market Insights Power BI dashboard: requirements gathering, data modelling, Power BI visualization, and stakeholder delivery on a 45M-row dataset.</li>
-              <li>Led advanced R and SQL-based analysis on the impact of migration on Alberta's labour market; automated monthly data pipeline, reducing reporting time from 1 month to a single execution (~95% reduction).</li>
+              <li>Migrated the Youth Labour Market Information Power BI dashboard from local Excel files to an automated Databricks pipeline, synthesising data from multiple sources including REST APIs into a medallion architecture with star schema gold tables hosted in Power BI, cutting each monthly refresh from roughly two days of manual updates to a scheduled run of under 10 minutes.</li>
+              <li>Automated the monthly reporting pipeline for several economic reports using advanced R and agentic coding, reducing reporting time from one month to a single execution.</li>
             </ul>
           </div>
         </div>
@@ -102,17 +104,17 @@
 
   <section class="section">
     <div class="wrap">
-      <div class="label">Beyond the work</div>
-      <h2>Outside the office</h2>
+      <div class="section-head"><div><div class="kicker">Beyond the work</div><h2>Outside the office</h2></div></div>
       <div class="personal">
         <div class="prose">
           <video autoplay loop muted playsinline preload="metadata" aria-label="Playing football">
             <source src="/brand_assets/Aboutme/football2.mov" type="video/mp4">
           </video>
-          <p>Outside of work, I enjoy music, staying active, spending time with my dog Ace, and reading philosophy and world history, particularly the works of Martin Buber and Simone Weil. The habits and perspectives I have built across these areas shape how I think, and I try to bring that into how I work.</p>
-          <p>Music has shaped how I think about structure, flow, and adaptability. Playing the piano from an early age taught me to work iteratively: trying different approaches, refining until something clicks, and recognizing when a solution is both functional and intuitive. That instinct for iteration and precision carries directly into how I build data products.</p>
-          <p>Staying active through football, track, and time with Ace has built discipline, consistency, and situational awareness. These qualities translate directly into analytical work: maintaining focus through ambiguity, adjusting quickly when assumptions shift, and executing under pressure without losing care for quality.</p>
-          <p>Reading philosophy and history has shaped how I think about systems, context, and meaning. It pushes me to go beyond surface-level patterns and ask not just what the data shows, but why it looks that way and what that implies for the broader picture. Strong analysis requires that kind of depth.</p>
+          <p>Outside of work, I enjoy creating music, developing iOS applications and games, and playing football.</p>
+          <p>Playing the piano from an early age put creativity at the centre of how I see things. I prioritize that creativity in the problems I solve at work, and outside of work I still find time to make a song here and there.</p>
+          <p>Claude Code has really helped me develop apps as well. It started with me trying to solve problems I face in my daily life, and it turned into a passion once I learned I was providing solutions others found valuable.</p>
+          <p>Staying active through football keeps me in shape and feeds my competitive spirit. It is also great for building confidence in your own ability. Taking on a player on the wing requires you to believe that you can beat him, and I love that about the game.</p>
+          <p>Overall, these three areas take up most of my time outside of work, and they have even shaped some of my perspectives as an analytics engineer.</p>
         </div>
         <div class="photo-col">
           <img src="/brand_assets/Aboutme/Ace.JPG" alt="Ace, my dog" loading="lazy">
@@ -125,7 +127,7 @@
     </div>
   </section>
 
-  <section class="section" id="resume">
+  <section class="section" id="resume" style="padding-top:8px">
     <div class="wrap">
       <div class="resume-card">
         <div><h3>Resume</h3><p>Education, experience and skills in one page.</p></div>
@@ -134,7 +136,6 @@
     </div>
   </section>
 </main>
-
 <footer class="footer">
   <div class="wrap">
     <div class="who"><b>Efe Peter Oroh</b><span>Analytics Engineer · Edmonton, Alberta</span></div>
@@ -145,6 +146,10 @@
     </nav>
   </div>
 </footer>
+<dialog class="player" id="player" aria-label="Project demo">
+  <video controls playsinline preload="none"></video>
+  <div class="bar"><span></span><button type="button">Close</button></div>
+</dialog>
 <script src="/js/site.js" defer></script>
 </body>
 </html>

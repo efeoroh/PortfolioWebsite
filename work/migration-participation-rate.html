@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Migration and Alberta's Participation Rate | Efe Peter Oroh</title>
+<meta name="description" content="How much Alberta's labour force participation depends on newcomers, estimated in R with counterfactuals, a decomposition and a structural break test.">
+<meta property="og:title" content="Migration and Alberta's Participation Rate | Efe Peter Oroh">
+<meta property="og:description" content="How much Alberta's labour force participation depends on newcomers, estimated in R with counterfactuals, a decomposition and a structural break test.">
+<meta property="og:image" content="/brand_assets/Headshot/headshot_about.webp">
+<meta name="theme-color" content="#fbf7ef">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M1 1L9 5L1 9" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker><linearGradient id="ramp" x1="0" x2="1"><stop offset="0" stop-color="#b9763e"/><stop offset=".5" stop-color="#8b9aab"/><stop offset="1" stop-color="#cfa22a"/></linearGradient></defs></svg>
+<header class="nav">
+  <div class="wrap">
+    <a href="/" class="brand"><span class="brand-mark">EO</span>Efe Peter Oroh</a>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="/#work" aria-current="page">Work</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about.html">About</a>
+      <a href="/brand_assets/resume/EfeOroh_Resume.pdf" class="btn btn-solid" target="_blank" rel="noopener">Resume</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+<main class="t-jungle">
+  <header class="p-head">
+    <div class="wrap">
+      <div>
+        <a class="back" href="/#work">← All work</a>
+        <h1>Migration and Alberta's Participation Rate</h1>
+        <p class="lede">How much Alberta's labour force participation depends on newcomers, estimated in R with counterfactuals, a decomposition and a structural break test.</p>
+        <span class="tag">R · Counterfactual modelling</span>
+      </div>
+      <div class="mat"><img src="/brand_assets/Projects/Labour_Economics/impactofMigrationNew.png" alt="Migration and Alberta's Participation Rate"></div>
+    </div>
+  </header>
+
+  <section class="section" style="padding-block:0 24px">
+    <div class="wrap"><dl class="meta"><div><dt>Role</dt><dd>Analysis and report</dd></div><div><dt>Stack</dt><dd>R, tidyverse, strucchange, broom, R Markdown</dd></div><div><dt>Data</dt><dd>LFS, Statistics Canada 14-10-0083-01 and 98-10-0059-01, Alberta Treasury Board and Finance, 2021 Census</dd></div><div><dt>Period</dt><dd>2011 to 2024</dd></div></dl></div>
+  </section>
+
+  <section class="section">
+    <div class="wrap two-col">
+      <div><div class="kicker">Context</div><h2>Why it mattered</h2></div>
+      <div class="prose"><p>Alberta's labour force participation rate, the share of people 15 and over who are working or looking for work, has trended down since 2014 to 2015. Over the same years the province drew large numbers of newcomers, both from other provinces and from abroad.</p><p>Participation drives labour supply, economic output and fiscal planning, so the policy question was direct: how much is migration holding the rate up, and how much of the decline is simply an older population?</p><p>I built the analysis in R from five public datasets and wrote it up as a reproducible R Markdown report, with every chart explained for a reader who has never run a regression.</p></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="ask"><div class="kicker">The question</div><blockquote>To what extent does Alberta's labour force participation depend on migration?</blockquote><ul><li>What would participation look like without each year's newcomers?</li><li>How much of the decline is ageing rather than behaviour?</li><li>Did COVID-19 leave a lasting mark, and does Alberta keep the people it attracts?</li></ul></div>
+    </div>
+  </section>
+
+  <div class="band-sea" id="approach">
+    <svg class="wave-top" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+    <section class="section">
+      <div class="wrap">
+    <div class="slider" id="solution-slider">
+      <div class="slider-head">
+        <div><div class="kicker">Approach</div><h2 id="solution-title">How I solved it</h2></div>
+        <div class="slide-ctrl">
+          <button type="button" class="nav-btn" data-dir="-1" aria-label="Previous step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="nav-btn" data-dir="1" aria-label="Next step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <ol class="steps-nav" aria-label="Steps"><li><button type="button" data-go="0" aria-current="step"><span>01</span>Assemble</button></li><li><button type="button" data-go="1"><span>02</span>Counterfactual</button></li><li><button type="button" data-go="2"><span>03</span>Decompose</button></li><li><button type="button" data-go="3"><span>04</span>Test</button></li><li><button type="button" data-go="4"><span>05</span>Break</button></li><li><button type="button" data-go="5"><span>06</span>Retain</button></li></ol>
+      <div class="progress" aria-hidden="true"><span></span></div>
+      <div class="track" tabindex="0" aria-label="How I solved it, 6 steps">
+        <article class="slide on" aria-label="Step 1: Assemble">
+          <div class="slide-text"><span class="step-k">01 · Assemble</span><h3>Five sources, one tidy panel.</h3><p>The Labour Force Survey, immigrant labour force data (14-10-0083-01), interprovincial migration from Alberta Treasury Board and Finance, immigrant retention (98-10-0059-01) and 2021 Census mobility, joined by year, age group and migrant stream.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Five sources, one tidy panel."><g class="pop" style="--i:0"><rect class="bx" x="14" y="22" width="226" height="34" rx="9"/><text class="tl" x="28" y="44">Labour Force Survey</text></g><path class="flow" d="M240 39 C 300 39, 300 140, 344 140"/><g class="pop" style="--i:1"><rect class="bx" x="14" y="72.5" width="226" height="34" rx="9"/><text class="tl" x="28" y="94.5">Immigrant labour force</text></g><path class="flow" d="M240 89.5 C 300 89.5, 300 140, 344 140"/><g class="pop" style="--i:2"><rect class="bx" x="14" y="123" width="226" height="34" rx="9"/><text class="tl small" x="28" y="145">Interprovincial migration</text></g><path class="flow" d="M240 140 C 300 140, 300 140, 344 140"/><g class="pop" style="--i:3"><rect class="bx" x="14" y="173.5" width="226" height="34" rx="9"/><text class="tl" x="28" y="195.5">Immigrant retention</text></g><path class="flow" d="M240 190.5 C 300 190.5, 300 140, 344 140"/><g class="pop" style="--i:4"><rect class="bx" x="14" y="224" width="226" height="34" rx="9"/><text class="tl" x="28" y="246">2021 Census mobility</text></g><path class="flow" d="M240 241 C 300 241, 300 140, 344 140" marker-end="url(#ah)"/><g class="pop" style="--i:5"><rect class="bx jungle hot" x="350" y="90" width="196" height="100" rx="14"/><text class="tb" x="448" y="134" text-anchor="middle">Tidy panel in R</text><text class="ts" x="448" y="151" text-anchor="middle">year × age group</text><text class="ts" x="448" y="165" text-anchor="middle">× migrant stream</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 2: Counterfactual">
+          <div class="slide-text"><span class="step-k">02 · Counterfactual</span><h3>Take the newcomers out and recompute.</h3><p>Each year's net inflow is removed from both the population and the labour force, and the rate is recalculated. The gap between actual and counterfactual is that group's contribution.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Take the newcomers out and recompute."><line class="grid" x1="46" x2="364" y1="223.5" y2="223.5"/><text class="ts" x="38" y="227.5" text-anchor="end">71%</text><line class="grid" x1="46" x2="364" y1="141.3" y2="141.3"/><text class="ts" x="38" y="145.3" text-anchor="end">73%</text><line class="grid" x1="46" x2="364" y1="59.1" y2="59.1"/><text class="ts" x="38" y="63.1" text-anchor="end">75%</text><text class="ts" x="46" y="264" text-anchor="middle">2014</text><text class="ts" x="152" y="264" text-anchor="middle">2017</text><text class="ts" x="258" y="264" text-anchor="middle">2020</text><text class="ts" x="364" y="264" text-anchor="middle">2023</text><line class="axis" x1="46" x2="364" y1="244" y2="244"/><rect class="band" x="243.9" y="18" width="28.3" height="226"/><text class="ts" x="258" y="32" text-anchor="middle">COVID</text><path class="ln draw ocean" pathLength="1" style="--i:0" d="M46 63.2 L81.3 38.5 L116.7 83.7 L152 92 L187.3 108.4 L222.7 104.3 L258 225.5 L293.3 182.4 L328.7 176.2 L364 179.1"/><circle class="dot ocean pop" style="--i:3" cx="364" cy="179.1" r="4"/><g class="pop" style="--i:4"><text class="ts b ocean" x="374" y="183.1">Actual 72.08%</text></g><path class="ln draw sun dash" pathLength="1" style="--i:1" d="M46 75.5 L81.3 40.6 L116.7 73.5 L152 94 L187.3 116.6 L222.7 98.1 L258 186.5 L293.3 211.1 L328.7 180.3 L364 202.1"/><circle class="dot sun pop" style="--i:4" cx="364" cy="202.1" r="4"/><g class="pop" style="--i:5"><text class="ts b sun" x="374" y="206.1">No immigrant inflow 71.52%</text></g><path class="ln draw coral dash" pathLength="1" style="--i:2" d="M46 75.5 L81.3 44.7 L116.7 83.7 L152 94 L187.3 112.5 L222.7 108.4 L258 229.6 L293.3 184.4 L328.7 186.5 L364 206.6"/><circle class="dot coral pop" style="--i:5" cx="364" cy="206.6" r="4"/><g class="pop" style="--i:6"><text class="ts b coral" x="374" y="221.1">No interprovincial 71.41%</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 3: Decompose">
+          <div class="slide-text"><span class="step-k">03 · Decompose</span><h3>Separate ageing from behaviour.</h3><p>A Kitagawa decomposition splits each year's change into a composition effect, a growing 55 and over population, and a rate effect, people in each age group participating more or less.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Separate ageing from behaviour."><line class="axis" x1="46" x2="546" y1="100.1" y2="100.1"/><text class="ts tiny" x="81.7" y="244" text-anchor="middle">2012</text><rect class="bar sun grow neg" style="--i:0" x="57" y="100.1" width="23.7" height="12.4" rx="2"/><rect class="bar ocean grow" style="--i:0" x="82.7" y="75.3" width="23.7" height="24.8" rx="2"/><text class="ts tiny" x="153.1" y="244" text-anchor="middle">2014</text><rect class="bar sun grow neg" style="--i:1" x="128.4" y="100.1" width="23.7" height="16.5" rx="2"/><rect class="bar ocean grow neg" style="--i:1" x="154.1" y="100.1" width="23.7" height="8.3" rx="2"/><text class="ts tiny" x="224.6" y="244" text-anchor="middle">2016</text><rect class="bar sun grow neg" style="--i:2" x="199.9" y="100.1" width="23.7" height="12.4" rx="2"/><rect class="bar ocean grow neg" style="--i:2" x="225.6" y="100.1" width="23.7" height="41.3" rx="2"/><text class="ts tiny" x="296" y="244" text-anchor="middle">2018</text><rect class="bar sun grow neg" style="--i:3" x="271.3" y="100.1" width="23.7" height="16.5" rx="2"/><rect class="bar ocean grow" style="--i:3" x="297" y="91.8" width="23.7" height="8.3" rx="2"/><text class="ts tiny" x="367.4" y="244" text-anchor="middle">2020</text><rect class="bar sun grow neg" style="--i:4" x="342.7" y="100.1" width="23.7" height="8.3" rx="2"/><rect class="bar ocean grow neg" style="--i:4" x="368.4" y="100.1" width="23.7" height="115.7" rx="2"/><text class="ts tiny" x="438.9" y="244" text-anchor="middle">2022</text><rect class="bar sun grow neg" style="--i:5" x="414.1" y="100.1" width="23.7" height="16.5" rx="2"/><rect class="bar ocean grow" style="--i:5" x="439.9" y="50.5" width="23.7" height="49.6" rx="2"/><text class="ts tiny" x="510.3" y="244" text-anchor="middle">2024</text><rect class="bar sun grow neg" style="--i:6" x="485.6" y="100.1" width="23.7" height="12.4" rx="2"/><rect class="bar ocean grow" style="--i:6" x="511.3" y="83.6" width="23.7" height="16.5" rx="2"/><rect class="bar sun" x="46" y="10" width="11" height="11" rx="2"/><text class="ts" x="62" y="20">composition (ageing)</text><rect class="bar ocean" x="204" y="10" width="11" height="11" rx="2"/><text class="ts" x="220" y="20">rate (behaviour)</text><text class="ts" x="46" y="276">Schematic. Ageing pulls the rate down in most years.</text></svg>
+        </article>
+        <article class="slide" aria-label="Step 4: Test">
+          <div class="slide-text"><span class="step-k">04 · Test</span><h3>Check the association holds.</h3><p>Regressions of participation on both migration flows, with the unemployment rate as a control. Both migration effects stay positive; the intervals are wide because the series is short.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Check the association holds."><line class="mark" x1="355.5" x2="355.5" y1="26" y2="236"/><text class="ts" x="355.5" y="256" text-anchor="middle">no effect</text><text class="tl" x="20" y="65">Immigrant inflow</text><g class="pop" style="--i:0"><line class="whisk jungle" x1="370" x2="486.4" y1="60" y2="60"/><circle class="dot jungle" cx="428.2" cy="60" r="7"/><text class="ts b jungle" x="428.2" y="46" text-anchor="middle">positive</text></g><text class="tl" x="20" y="129">Interprovincial inflow</text><g class="pop" style="--i:1"><line class="whisk jungle" x1="340.9" x2="471.8" y1="124" y2="124"/><circle class="dot jungle" cx="406.4" cy="124" r="7"/><text class="ts b jungle" x="406.4" y="110" text-anchor="middle">positive</text></g><text class="tl" x="20" y="193">Unemployment rate</text><g class="pop" style="--i:2"><line class="whisk coral" x1="239.1" x2="340.9" y1="188" y2="188"/><circle class="dot coral" cx="290" cy="188" r="7"/><text class="ts b coral" x="290" y="174" text-anchor="middle">negative</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 5: Break">
+          <div class="slide-text"><span class="step-k">05 · Break</span><h3>Did COVID-19 shift the level?</h3><p>A Chow test at 2020 confirms that the post-COVID average sits measurably below the pre-COVID average, consistent with the pandemic speeding up the demographic shift.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Did COVID-19 shift the level?"><line class="grid" x1="46" x2="506" y1="223.5" y2="223.5"/><text class="ts" x="38" y="227.5" text-anchor="end">71%</text><line class="grid" x1="46" x2="506" y1="141.3" y2="141.3"/><text class="ts" x="38" y="145.3" text-anchor="end">73%</text><line class="grid" x1="46" x2="506" y1="59.1" y2="59.1"/><text class="ts" x="38" y="63.1" text-anchor="end">75%</text><text class="ts" x="46" y="264" text-anchor="middle">2014</text><text class="ts" x="199.3" y="264" text-anchor="middle">2017</text><text class="ts" x="352.7" y="264" text-anchor="middle">2020</text><text class="ts" x="506" y="264" text-anchor="middle">2023</text><line class="axis" x1="46" x2="506" y1="244" y2="244"/><line class="mark" x1="352.7" x2="352.7" y1="18" y2="244"/><text class="ts" x="358.7" y="32">break at 2020</text><line class="hline jungle" x1="46" x2="327.1" y1="81.7" y2="81.7"/><text class="ts b jungle" x="50" y="100.7">pre-2020 mean</text><line class="hline coral" x1="352.7" x2="506" y1="190.6" y2="190.6"/><text class="ts b coral" x="402.7" y="209.6">post-2020 mean</text><path class="ln draw ocean" pathLength="1" style="--i:0" d="M46 63.2 L97.1 38.5 L148.2 83.7 L199.3 92 L250.4 108.4 L301.6 104.3 L352.7 225.5 L403.8 182.4 L454.9 176.2 L506 179.1"/><circle class="dot ocean pop" style="--i:3" cx="506" cy="179.1" r="4"/></svg>
+        </article>
+        <article class="slide" aria-label="Step 6: Retain">
+          <div class="slide-text"><span class="step-k">06 · Retain</span><h3>Does Alberta keep who it attracts?</h3><p>Admission cohorts are followed one, three and five years after arrival. Retention falls in downturns, which shrinks the long-run workforce benefit of each cohort.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Does Alberta keep who it attracts?"><g class="pop" style="--i:0"><rect class="bx" x="14" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="69.3" y="127" text-anchor="middle">Cohort</text><text class="tl" x="69.3" y="144" text-anchor="middle">arrives</text><text class="ts" x="69.3" y="165" text-anchor="middle">admission year</text></g><path class="flow" d="M126.5 142 L 150.5 142" marker-end="url(#ah)"/><g class="pop" style="--i:1"><rect class="bx" x="154.5" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="209.8" y="128" text-anchor="middle">Year 1</text><text class="ts" x="209.8" y="149" text-anchor="middle">still in</text><text class="ts" x="209.8" y="164" text-anchor="middle">Alberta?</text></g><path class="flow" d="M267 142 L 291 142" marker-end="url(#ah)"/><g class="pop" style="--i:2"><rect class="bx" x="295" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="350.3" y="128" text-anchor="middle">Year 3</text><text class="ts" x="350.3" y="149" text-anchor="middle">still in</text><text class="ts" x="350.3" y="164" text-anchor="middle">Alberta?</text></g><path class="flow" d="M407.5 142 L 431.5 142" marker-end="url(#ah)"/><g class="pop" style="--i:3"><rect class="bx ocean hot" x="435.5" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="490.8" y="128" text-anchor="middle">Year 5</text><text class="ts" x="490.8" y="149" text-anchor="middle">falls in</text><text class="ts" x="490.8" y="164" text-anchor="middle">downturns</text></g></svg>
+        </article>
+      </div>
+    </div>
+      </div>
+    </section>
+    <svg class="wave-bottom" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+  </div>
+
+  <section class="section" style="padding-top:88px">
+    <div class="wrap">
+      <div class="section-head"><div><div class="kicker">Outcome</div><h2>What it delivers</h2></div></div>
+      <div class="outcome"><div class="out"><b>0.2 to 1.0 pts</b><span>yearly lift to participation from landed immigrants, rising after 2019</span></div><div class="out"><b>72.08% vs 71.52%</b><span>2023 participation, with and without that year's net immigrant inflow</span></div><div class="out"><b>0.1 to 0.2 pts</b><span>drag per year from population ageing alone</span></div><div class="out"><b>30,000 to 35,000</b><span>people behind each 1 point of participation</span></div></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="demo-card">
+        <div><div class="kicker">Demo</div><h2>See it for yourself</h2><p>The full report, with every chart and the written analysis.</p><div class="ctas"><a class="btn btn-solid" href="/brand_assets/Projects/Labour_Economics/final_analysis_impactofmigration.html" target="_blank" rel="noopener">Read the report <svg width="13" height="13" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 6h8M6.5 2.5L10 6l-3.5 3.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div></div>
+        <img src="/brand_assets/Projects/Labour_Economics/impactofMigrationNew.png" alt="Migration and Alberta's Participation Rate preview" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap next">
+      <a href="/work/skilled-trades-dashboard.html"><span class="nl">← Previous</span><b>Skilled Trades LMI Dashboard</b></a>
+      <a href="/work/energy-market-intelligence.html" style="text-align:right"><span class="nl">Next →</span><b>Energy Market Intelligence Dashboard</b></a>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="who"><b>Efe Peter Oroh</b><span>Analytics Engineer · Edmonton, Alberta</span></div>
+    <nav aria-label="Contact">
+      <a href="mailto:efeogheneoroh@gmail.com">efeogheneoroh@gmail.com</a>
+      <a href="https://www.linkedin.com/in/efe-oroh/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/efeoroh" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+<dialog class="player" id="player" aria-label="Project demo">
+  <video controls playsinline preload="none"></video>
+  <div class="bar"><span></span><button type="button">Close</button></div>
+</dialog>
+<script src="/js/site.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Industry Profiles Automation | Efe Peter Oroh</title>
+<meta name="description" content="All 18 annual industry profiles rebuilt from Statistics Canada data in a single run.">
+<meta property="og:title" content="Industry Profiles Automation | Efe Peter Oroh">
+<meta property="og:description" content="All 18 annual industry profiles rebuilt from Statistics Canada data in a single run.">
+<meta property="og:image" content="/brand_assets/Headshot/headshot_about.webp">
+<meta name="theme-color" content="#fbf7ef">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path class="ah" d="M1 1L9 5L1 9" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></marker><linearGradient id="ramp" x1="0" x2="1"><stop offset="0" stop-color="#b9763e"/><stop offset=".5" stop-color="#8b9aab"/><stop offset="1" stop-color="#cfa22a"/></linearGradient></defs></svg>
+<header class="nav">
+  <div class="wrap">
+    <a href="/" class="brand"><span class="brand-mark">EO</span>Efe Peter Oroh</a>
+    <nav class="nav-links" id="navLinks" aria-label="Main">
+      <a href="/#work" aria-current="page">Work</a>
+      <a href="/#approach">Approach</a>
+      <a href="/about.html">About</a>
+      <a href="/brand_assets/resume/EfeOroh_Resume.pdf" class="btn btn-solid" target="_blank" rel="noopener">Resume</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="navLinks">
+      <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+<main class="t-jungle">
+  <header class="p-head">
+    <div class="wrap">
+      <div>
+        <a class="back" href="/#work">← All work</a>
+        <h1>Industry Profiles Automation</h1>
+        <p class="lede">All 18 annual industry profiles rebuilt from Statistics Canada data in a single run.</p>
+        <span class="tag">Automation · R</span>
+      </div>
+      <div class="mat"><img src="/brand_assets/Projects/labor_economics/IndustryProfiles_Report/thumbail/Thumbnail.png" alt="Industry Profiles Automation"></div>
+    </div>
+  </header>
+
+  <section class="section" style="padding-block:0 24px">
+    <div class="wrap"><dl class="meta"><div><dt>Role</dt><dd>Built the automation</dd></div><div><dt>Stack</dt><dd>R, Statistics Canada tables, Excel outputs</dd></div><div><dt>Data</dt><dd>Labour Force Survey, establishment size, business counts, wages</dd></div><div><dt>Scale</dt><dd>2M+ rows, 18 industries</dd></div></dl></div>
+  </section>
+
+  <section class="section">
+    <div class="wrap two-col">
+      <div><div class="kicker">Context</div><h2>Why it mattered</h2></div>
+      <div class="prose"><p>Alberta publishes annual profiles of its major industries, from mining and oil and gas extraction to health care. Every profile carries the same tables: labour force characteristics, working conditions, employment by establishment size, business counts, gender, age and wages.</p><p>Building them meant querying Statistics Canada tables by hand for each of 18 industries and formatting dozens of Excel tables. It took about a month each cycle, and small inconsistencies crept in between profiles.</p></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="ask"><div class="kicker">The question</div><blockquote>Can all 18 industry profiles be refreshed for a new reporting year in a single run, with identical structure every time?</blockquote><ul><li>Which tables does each profile need, and from where?</li><li>How do we make every industry follow the same rules?</li><li>How do analysts get publication-ready files without copy and paste?</li></ul></div>
+    </div>
+  </section>
+
+  <div class="band-sea" id="approach">
+    <svg class="wave-top" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+    <section class="section">
+      <div class="wrap">
+    <div class="slider" id="solution-slider">
+      <div class="slider-head">
+        <div><div class="kicker">Approach</div><h2 id="solution-title">How I solved it</h2></div>
+        <div class="slide-ctrl">
+          <button type="button" class="nav-btn" data-dir="-1" aria-label="Previous step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3L5 8l5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button type="button" class="nav-btn" data-dir="1" aria-label="Next step"><svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <ol class="steps-nav" aria-label="Steps"><li><button type="button" data-go="0" aria-current="step"><span>01</span>Run</button></li><li><button type="button" data-go="1"><span>02</span>Pull</button></li><li><button type="button" data-go="2"><span>03</span>Process</button></li><li><button type="button" data-go="3"><span>04</span>Loop</button></li><li><button type="button" data-go="4"><span>05</span>Deliver</button></li></ol>
+      <div class="progress" aria-hidden="true"><span></span></div>
+      <div class="track" tabindex="0" aria-label="How I solved it, 5 steps">
+        <article class="slide on" aria-label="Step 1: Run">
+          <div class="slide-text"><span class="step-k">01 · Run</span><h3>Pick a year, press run.</h3><p>A small app takes the reporting year and runs the whole pipeline, ticking off each table as it is written.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Pick a year, press run."><rect class="panel" x="14" y="14" width="532" height="252" rx="12"/><rect class="bar-top" x="14" y="14" width="532" height="34" rx="12"/><text class="tl b" x="30" y="37">Industry Profile Automation</text><text class="tc" x="34" y="76">REPORTING YEAR</text><g class="pop" style="--i:0"><rect class="bx" x="34" y="86" width="120" height="40" rx="8"/><text class="tb" x="94" y="112" text-anchor="middle">2025</text></g><g class="pop" style="--i:1"><rect class="btnr" x="34" y="138" width="120" height="34" rx="8"/><text class="tl inv" x="94" y="160" text-anchor="middle">Run Automation</text></g><g class="pop" style="--i:2"><circle class="dot jungle" cx="194" cy="78" r="6"/><path class="chk" d="M190.5 78 l2.5 2.5 l4.5 -5"/><text class="ts dark" x="208" y="83">Pull data from Statistics Canada</text></g><g class="pop" style="--i:3"><circle class="dot jungle" cx="194" cy="102" r="6"/><path class="chk" d="M190.5 102 l2.5 2.5 l4.5 -5"/><text class="ts dark" x="208" y="107">Pre-process datasets</text></g><g class="pop" style="--i:4"><circle class="dot jungle" cx="194" cy="126" r="6"/><path class="chk" d="M190.5 126 l2.5 2.5 l4.5 -5"/><text class="ts dark" x="208" y="131">Table 1: Labour force characteristics</text></g><g class="pop" style="--i:5"><circle class="dot jungle" cx="194" cy="150" r="6"/><path class="chk" d="M190.5 150 l2.5 2.5 l4.5 -5"/><text class="ts dark" x="208" y="155">Table 2: Working conditions</text></g><g class="pop" style="--i:6"><circle class="dot jungle" cx="194" cy="174" r="6"/><path class="chk" d="M190.5 174 l2.5 2.5 l4.5 -5"/><text class="ts dark" x="208" y="179">Table 3: Employment by establishment size</text></g><g class="pop" style="--i:7"><circle class="dot jungle" cx="194" cy="198" r="6"/><path class="chk" d="M190.5 198 l2.5 2.5 l4.5 -5"/><text class="ts dark" x="208" y="203">Table 4: Business counts</text></g><g class="pop" style="--i:8"><circle class="dot jungle" cx="194" cy="222" r="6"/><path class="chk" d="M190.5 222 l2.5 2.5 l4.5 -5"/><text class="ts dark" x="208" y="227">Tables 5 and 6: Gender and age</text></g><g class="pop" style="--i:9"><circle class="dot jungle" cx="194" cy="246" r="6"/><path class="chk" d="M190.5 246 l2.5 2.5 l4.5 -5"/><text class="ts dark" x="208" y="251">Chart 1: Wage data</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 2: Pull">
+          <div class="slide-text"><span class="step-k">02 · Pull</span><h3>Every source in one pass.</h3><p>The pipeline requests each Statistics Canada table once for all industries, more than 2 million rows.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Every source in one pass."><g class="pop" style="--i:0"><rect class="bx" x="14" y="22" width="226" height="34" rx="9"/><text class="tl" x="28" y="44">Labour Force Survey</text></g><path class="flow" d="M240 39 C 300 39, 300 140, 344 140"/><g class="pop" style="--i:1"><rect class="bx" x="14" y="89.3" width="226" height="34" rx="9"/><text class="tl" x="28" y="111.3">Establishment size data</text></g><path class="flow" d="M240 106.3 C 300 106.3, 300 140, 344 140"/><g class="pop" style="--i:2"><rect class="bx" x="14" y="156.7" width="226" height="34" rx="9"/><text class="tl" x="28" y="178.7">Business Register counts</text></g><path class="flow" d="M240 173.7 C 300 173.7, 300 140, 344 140"/><g class="pop" style="--i:3"><rect class="bx" x="14" y="224" width="226" height="34" rx="9"/><text class="tl" x="28" y="246">Wage data</text></g><path class="flow" d="M240 241 C 300 241, 300 140, 344 140" marker-end="url(#ah)"/><g class="pop" style="--i:4"><rect class="bx jungle hot" x="350" y="90" width="196" height="100" rx="14"/><text class="tb" x="448" y="134" text-anchor="middle">Raw pulls</text><text class="ts" x="448" y="158" text-anchor="middle">2M+ rows</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 3: Process">
+          <div class="slide-text"><span class="step-k">03 · Process</span><h3>Same rules for every industry.</h3><p>Filters, aggregations and shares are written once, so every profile is calculated the same way.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Same rules for every industry."><g class="pop" style="--i:0"><rect class="bx" x="14" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="69.3" y="128" text-anchor="middle">Filter</text><text class="ts" x="69.3" y="149" text-anchor="middle">industry</text><text class="ts" x="69.3" y="164" text-anchor="middle">(NAICS)</text></g><path class="flow" d="M126.5 142 L 150.5 142" marker-end="url(#ah)"/><g class="pop" style="--i:1"><rect class="bx" x="154.5" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="209.8" y="128" text-anchor="middle">Aggregate</text><text class="ts" x="209.8" y="149" text-anchor="middle">Alberta, by</text><text class="ts" x="209.8" y="164" text-anchor="middle">year</text></g><path class="flow" d="M267 142 L 291 142" marker-end="url(#ah)"/><g class="pop" style="--i:2"><rect class="bx" x="295" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="350.3" y="128" text-anchor="middle">Derive</text><text class="ts" x="350.3" y="149" text-anchor="middle">shares and</text><text class="ts" x="350.3" y="164" text-anchor="middle">changes</text></g><path class="flow" d="M407.5 142 L 431.5 142" marker-end="url(#ah)"/><g class="pop" style="--i:3"><rect class="bx ocean hot" x="435.5" y="96" width="110.5" height="92" rx="12"/><text class="tl" x="490.8" y="128" text-anchor="middle">Format</text><text class="ts" x="490.8" y="149" text-anchor="middle">publication</text><text class="ts" x="490.8" y="164" text-anchor="middle">style</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 4: Loop">
+          <div class="slide-text"><span class="step-k">04 · Loop</span><h3>One template, 126 outputs.</h3><p>The template runs for each of the 18 industries and writes all seven outputs for each one.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="One template, 126 outputs."><g class="pop" style="--i:0"><rect class="bx jungle" x="14" y="70" width="140" height="140" rx="12"/><text class="tb" x="84" y="119" text-anchor="middle">Profile</text><text class="tb" x="84" y="137" text-anchor="middle">template</text><text class="ts" x="84" y="176" text-anchor="middle">one template</text></g><path class="flow" d="M154 140 L 188 140" marker-end="url(#ah)"/><g class="pop" style="--i:0"><rect class="bx mini" x="196" y="34" width="52" height="42" rx="6"/><rect class="tick" x="204" y="43" width="34" height="4" rx="2"/><rect class="tick" x="204" y="52" width="26" height="4" rx="2"/><rect class="tick" x="204" y="61" width="30" height="4" rx="2"/></g><g class="pop" style="--i:0"><rect class="bx mini" x="256" y="34" width="52" height="42" rx="6"/><rect class="tick" x="264" y="43" width="34" height="4" rx="2"/><rect class="tick" x="264" y="52" width="26" height="4" rx="2"/><rect class="tick" x="264" y="61" width="30" height="4" rx="2"/></g><g class="pop" style="--i:1"><rect class="bx mini" x="316" y="34" width="52" height="42" rx="6"/><rect class="tick" x="324" y="43" width="34" height="4" rx="2"/><rect class="tick" x="324" y="52" width="26" height="4" rx="2"/><rect class="tick" x="324" y="61" width="30" height="4" rx="2"/></g><g class="pop" style="--i:1"><rect class="bx mini" x="376" y="34" width="52" height="42" rx="6"/><rect class="tick" x="384" y="43" width="34" height="4" rx="2"/><rect class="tick" x="384" y="52" width="26" height="4" rx="2"/><rect class="tick" x="384" y="61" width="30" height="4" rx="2"/></g><g class="pop" style="--i:2"><rect class="bx mini" x="436" y="34" width="52" height="42" rx="6"/><rect class="tick" x="444" y="43" width="34" height="4" rx="2"/><rect class="tick" x="444" y="52" width="26" height="4" rx="2"/><rect class="tick" x="444" y="61" width="30" height="4" rx="2"/></g><g class="pop" style="--i:2"><rect class="bx mini" x="496" y="34" width="52" height="42" rx="6"/><rect class="tick" x="504" y="43" width="34" height="4" rx="2"/><rect class="tick" x="504" y="52" width="26" height="4" rx="2"/><rect class="tick" x="504" y="61" width="30" height="4" rx="2"/></g><g class="pop" style="--i:3"><rect class="bx mini" x="196" y="86" width="52" height="42" rx="6"/><rect class="tick" x="204" y="95" width="34" height="4" rx="2"/><rect class="tick" x="204" y="104" width="26" height="4" rx="2"/><rect class="tick" x="204" y="113" width="30" height="4" rx="2"/></g><g class="pop" style="--i:3"><rect class="bx mini" x="256" y="86" width="52" height="42" rx="6"/><rect class="tick" x="264" y="95" width="34" height="4" rx="2"/><rect class="tick" x="264" y="104" width="26" height="4" rx="2"/><rect class="tick" x="264" y="113" width="30" height="4" rx="2"/></g><g class="pop" style="--i:4"><rect class="bx mini" x="316" y="86" width="52" height="42" rx="6"/><rect class="tick" x="324" y="95" width="34" height="4" rx="2"/><rect class="tick" x="324" y="104" width="26" height="4" rx="2"/><rect class="tick" x="324" y="113" width="30" height="4" rx="2"/></g><g class="pop" style="--i:4"><rect class="bx mini" x="376" y="86" width="52" height="42" rx="6"/><rect class="tick" x="384" y="95" width="34" height="4" rx="2"/><rect class="tick" x="384" y="104" width="26" height="4" rx="2"/><rect class="tick" x="384" y="113" width="30" height="4" rx="2"/></g><g class="pop" style="--i:5"><rect class="bx mini" x="436" y="86" width="52" height="42" rx="6"/><rect class="tick" x="444" y="95" width="34" height="4" rx="2"/><rect class="tick" x="444" y="104" width="26" height="4" rx="2"/><rect class="tick" x="444" y="113" width="30" height="4" rx="2"/></g><g class="pop" style="--i:5"><rect class="bx mini" x="496" y="86" width="52" height="42" rx="6"/><rect class="tick" x="504" y="95" width="34" height="4" rx="2"/><rect class="tick" x="504" y="104" width="26" height="4" rx="2"/><rect class="tick" x="504" y="113" width="30" height="4" rx="2"/></g><g class="pop" style="--i:6"><rect class="bx mini" x="196" y="138" width="52" height="42" rx="6"/><rect class="tick" x="204" y="147" width="34" height="4" rx="2"/><rect class="tick" x="204" y="156" width="26" height="4" rx="2"/><rect class="tick" x="204" y="165" width="30" height="4" rx="2"/></g><g class="pop" style="--i:6"><rect class="bx mini" x="256" y="138" width="52" height="42" rx="6"/><rect class="tick" x="264" y="147" width="34" height="4" rx="2"/><rect class="tick" x="264" y="156" width="26" height="4" rx="2"/><rect class="tick" x="264" y="165" width="30" height="4" rx="2"/></g><g class="pop" style="--i:7"><rect class="bx mini" x="316" y="138" width="52" height="42" rx="6"/><rect class="tick" x="324" y="147" width="34" height="4" rx="2"/><rect class="tick" x="324" y="156" width="26" height="4" rx="2"/><rect class="tick" x="324" y="165" width="30" height="4" rx="2"/></g><g class="pop" style="--i:7"><rect class="bx mini" x="376" y="138" width="52" height="42" rx="6"/><rect class="tick" x="384" y="147" width="34" height="4" rx="2"/><rect class="tick" x="384" y="156" width="26" height="4" rx="2"/><rect class="tick" x="384" y="165" width="30" height="4" rx="2"/></g><g class="pop" style="--i:8"><rect class="bx mini" x="436" y="138" width="52" height="42" rx="6"/><rect class="tick" x="444" y="147" width="34" height="4" rx="2"/><rect class="tick" x="444" y="156" width="26" height="4" rx="2"/><rect class="tick" x="444" y="165" width="30" height="4" rx="2"/></g><g class="pop" style="--i:8"><rect class="bx mini" x="496" y="138" width="52" height="42" rx="6"/><rect class="tick" x="504" y="147" width="34" height="4" rx="2"/><rect class="tick" x="504" y="156" width="26" height="4" rx="2"/><rect class="tick" x="504" y="165" width="30" height="4" rx="2"/></g><text class="ts" x="196" y="204">18 industries × 7 outputs</text><g class="pop" style="--i:12"><rect class="chip hotchip" x="386" y="188" width="160" height="30" rx="15"/><text class="tm b" x="466" y="208" text-anchor="middle">126 outputs per run</text></g></svg>
+        </article>
+        <article class="slide" aria-label="Step 5: Deliver">
+          <div class="slide-text"><span class="step-k">05 · Deliver</span><h3>Ready for the profile document.</h3><p>Excel files land in a folder, one per table, already in publication format.</p></div>
+          <svg class="dia" viewBox="0 0 560 280" role="img" aria-label="Ready for the profile document."><g class="pop" style="--i:0"><rect class="paper" x="40" y="16" width="190" height="248" rx="8"/><rect class="tick acc" x="56" y="34" width="60" height="6" rx="3"/><text class="tl b" x="56" y="62">Alberta Mining and oil</text><text class="tl b" x="56" y="79">and gas extraction</text><text class="tl b" x="56" y="96">industry profile 2025</text></g><rect class="tick" x="56" y="120" width="150" height="5" rx="2.5"/><rect class="tick" x="56" y="132" width="140" height="5" rx="2.5"/><rect class="tick" x="56" y="144" width="156" height="5" rx="2.5"/><rect class="tick" x="56" y="156" width="110" height="5" rx="2.5"/><rect class="bar ocean grow" style="--i:0" x="62" y="218" width="16" height="18" rx="2"/><rect class="bar ocean grow" style="--i:1" x="88" y="206" width="16" height="30" rx="2"/><rect class="bar ocean grow" style="--i:2" x="114" y="212" width="16" height="24" rx="2"/><rect class="bar ocean grow" style="--i:3" x="140" y="196" width="16" height="40" rx="2"/><rect class="bar ocean grow" style="--i:4" x="166" y="202" width="16" height="34" rx="2"/><g class="pop" style="--i:1"><circle class="dot jungle" cx="270" cy="44" r="5"/><text class="tl" x="286" y="49">Labour force characteristics</text></g><g class="pop" style="--i:2"><circle class="dot jungle" cx="270" cy="80.7" r="5"/><text class="tl" x="286" y="85.7">Working conditions</text></g><g class="pop" style="--i:3"><circle class="dot jungle" cx="270" cy="117.3" r="5"/><text class="tl" x="286" y="122.3">Size of businesses</text></g><g class="pop" style="--i:4"><circle class="dot jungle" cx="270" cy="154" r="5"/><text class="tl" x="286" y="159">Human resources profile</text></g><g class="pop" style="--i:5"><circle class="dot jungle" cx="270" cy="190.7" r="5"/><text class="tl" x="286" y="195.7">Wages</text></g><g class="pop" style="--i:6"><circle class="dot jungle" cx="270" cy="227.3" r="5"/><text class="tl" x="286" y="232.3">Additional information</text></g></svg>
+        </article>
+      </div>
+    </div>
+      </div>
+    </section>
+    <svg class="wave-bottom" viewBox="0 0 1440 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 40 V22 C 120 4, 240 4, 360 20 S 600 38, 720 22 S 960 2, 1080 18 S 1320 38, 1440 20 V40 Z" fill="#e2f3f2"/></svg>
+  </div>
+
+  <section class="section" style="padding-top:88px">
+    <div class="wrap">
+      <div class="section-head"><div><div class="kicker">Outcome</div><h2>What it delivers</h2></div></div>
+      <div class="outcome"><div class="out"><b>126</b><span>outputs per run: 18 industries × 7 tables and charts</span></div><div class="out"><b>2M+</b><span>rows processed</span></div><div class="out"><b>1 run</b><span>instead of about a month of manual work</span></div><div class="out"><b>95%+</b><span>less time on each annual cycle</span></div></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap">
+      <div class="demo-card">
+        <div><div class="kicker">Demo</div><h2>See it for yourself</h2><p>A short screen recording of the finished work. It only plays when you press the button.</p><div class="ctas"><button type="button" class="btn btn-solid" data-video="/brand_assets/Projects/labor_economics/IndustryProfiles_Report/demo%3Alink/IP_Automation.mp4" data-title="Industry Profiles Automation"><svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 1v8l7-4z" fill="currentColor"/></svg> Watch the demo</button></div></div>
+        <img src="/brand_assets/Projects/labor_economics/IndustryProfiles_Report/thumbail/Thumbnail.png" alt="Industry Profiles Automation preview" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:8px">
+    <div class="wrap next">
+      <a href="/work/hiring-demand-bulletin.html"><span class="nl">← Previous</span><b>Hiring Demand Bulletin</b></a>
+      <a href="/work/canadian-crude-price-outlook.html" style="text-align:right"><span class="nl">Next →</span><b>Canadian Crude Prices and Trade Vulnerability</b></a>
+    </div>
+  </section>
+</main>
+<footer class="footer">
+  <div class="wrap">
+    <div class="who"><b>Efe Peter Oroh</b><span>Analytics Engineer · Edmonton, Alberta</span></div>
+    <nav aria-label="Contact">
+      <a href="mailto:efeogheneoroh@gmail.com">efeogheneoroh@gmail.com</a>
+      <a href="https://www.linkedin.com/in/efe-oroh/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/efeoroh" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </div>
+</footer>
+<dialog class="player" id="player" aria-label="Project demo">
+  <video controls playsinline preload="none"></video>
+  <div class="bar"><span></span><button type="button">Close</button></div>
+</dialog>
+<script src="/js/site.js" defer></script>
+</body>
+</html>
