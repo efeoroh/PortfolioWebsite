@@ -64,7 +64,7 @@ const HEAD = (title, desc, extra = '') => `<!DOCTYPE html>
 <meta name="description" content="${esc(desc)}">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(desc)}">
-<meta property="og:image" content="/brand_assets/Headshot/headshot_about.webp">
+<meta property="og:image" content="/brand_assets/Headshot/headshot_about.jpg">
 <meta name="theme-color" content="#fbf7ef">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,7 +168,7 @@ ${NAV('home')}
       <div>
         <span class="hello"><span class="dot"></span>Efe Peter Oroh · Edmonton, AB</span>
         <h1>Analytics<br><span class="under">Engineer<svg viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M4 18 C 50 4, 90 30, 140 16 S 230 4, 296 14" fill="none" stroke="#f3b33d" stroke-width="7" stroke-linecap="round"/></svg></span></h1>
-        <p class="sub">I build Databricks pipelines, modelled in SQL and served in Power BI. Applied every day as a data analyst in economics.</p>
+        <p class="sub">I build Databricks pipelines, model the data in SQL and serve it in Power BI. I do this every day as a data analyst working with economic data.</p>
         <div class="ctas">
           <a href="#work" class="btn btn-solid">See the work</a>
           <a href="#approach" class="btn btn-line">How I build</a>
@@ -313,7 +313,7 @@ ${NAV('about')}
           <p>I apply these skills as a Data Analyst: pulling data from public and internal APIs, modelling and governing it in Databricks or BigQuery, and serving it through Power BI dashboards and automated reports.</p>
         </div>
       </div>
-      <figure class="headshot"><img src="/brand_assets/Headshot/headshot_about.webp" alt="Efe Peter Oroh" width="760" height="760"></figure>
+      <figure class="headshot"><img src="/brand_assets/Headshot/headshot_about.jpg" alt="Efe Peter Oroh" width="560" height="700"></figure>
     </div>
     <div class="wrap">
       <div class="pillars">
@@ -384,11 +384,11 @@ ${NAV('about')}
           <video autoplay loop muted playsinline preload="metadata" aria-label="Playing football">
             <source src="/brand_assets/Aboutme/football2.mov" type="video/mp4">
           </video>
-          <p>Outside of work, I enjoy creating music, developing iOS applications and games, and playing football.</p>
-          <p>Playing the piano from an early age put creativity at the centre of how I see things. I prioritize that creativity in the problems I solve at work, and outside of work I still find time to make a song here and there.</p>
-          <p>Claude Code has really helped me develop apps as well. It started with me trying to solve problems I face in my daily life, and it turned into a passion once I learned I was providing solutions others found valuable.</p>
-          <p>Staying active through football keeps me in shape and feeds my competitive spirit. It is also great for building confidence in your own ability. Taking on a player on the wing requires you to believe that you can beat him, and I love that about the game.</p>
-          <p>Overall, these three areas take up most of my time outside of work, and they have even shaped some of my perspectives as an analytics engineer.</p>
+          <p>Outside of work, I enjoy creating music, developing iOS applications and playing football.</p>
+          <p>Playing the piano from an early age put creativity at the centre of how I see everything. I prioritize that creativity in the problems I solve at work, and outside of work I still find time to make a song here and there.</p>
+          <p>Alongside music, I enjoy developing iOS applications, and Claude Code has been really helpful here, using agentic coding to build apps. It started with me trying to solve problems I face in my daily life, and it turned into a passion once I learned I was providing solutions that others found really valuable. It has also been a great way to learn agentic coding, which I now use in my workflows as a data analyst.</p>
+          <p>Finally, alongside the things that stimulate my mind, I make sure I stay active. Football keeps me in shape and feeds my competitive spirit. It has also been great for building confidence in my ability: taking on a player on the wing requires you to believe you can beat your opponent, and I love that about the game.</p>
+          <p>Overall, these three areas take up most of my time outside of work, and they have even shaped some of my perspectives as a data analyst.</p>
         </div>
         <div class="photo-col">
           <img src="/brand_assets/Aboutme/Ace.JPG" alt="Ace, my dog" loading="lazy">
